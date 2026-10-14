@@ -18,12 +18,26 @@ Check again after adding a dependency:
 | pydantic-settings | 2.15.0 | MIT | Config from `.env` |
 | pwdlib[argon2] | 0.3.1 | MIT | Password hashing (Argon2id) |
 
+New PoC runtime dependencies:
+
+| Package | Version | Licence | Why |
+| --- | --- | --- | --- |
+| redis | 8.1.0 | MIT | Redis sessions, queue connection and Pub/Sub |
+| rq | 2.12.0 | BSD-2-Clause | Background imports and exports |
+| python-multipart | 0.0.32 | Apache-2.0 | Multipart uploads |
+| openpyxl | 3.1.5 | MIT | XLSX reader/writer |
+| xlrd | 2.0.2 | BSD-3-Clause | Legacy XLS reader |
+| python-barcode | 0.16.1 | MIT | Offline Code 128 SVG labels |
+
+PoC transitive dependencies include et-xmlfile (MIT), click (BSD-3-Clause) and croniter (MIT).
+
 Notable transitive: starlette (BSD-3-Clause), anyio (MIT), opentelemetry-api (Apache-2.0, pulled in by fastapi), python-dotenv (BSD-3-Clause), argon2-cffi (MIT), argon2-cffi-bindings (MIT), cffi (MIT-0), pycparser (BSD-3-Clause), **typing_extensions (PSF-2.0)**.
 
 ## Backend, dev (`backend/requirements-dev.txt`)
 
 | Package | Version | Licence | Why |
 | --- | --- | --- | --- |
+| fakeredis[lua] | 2.40.0 | BSD-3-Clause | Isolated Redis session tests; Lua through lupa (MIT), sortedcontainers (Apache-2.0) |
 | pytest | 9.1.1 | MIT | Test runner |
 | httpx2 | 2.13.1 | BSD-3-Clause | HTTP client behind FastAPI's `TestClient` (Starlette 1.x prefers it over `httpx`) |
 
@@ -75,6 +89,8 @@ Build-time transitive licences outside the allow-list (not shipped in the bundle
 
 | Tool | Version | Licence | Why |
 | --- | --- | --- | --- |
+| Redis server | 7.2 | BSD-3-Clause | Persistent development queue/session store; Compose pins the 7.2 release line |
+| Microsoft Access Database Engine / ACE DAO | Matching 64-bit installation | Microsoft licence | Required platform dependency for the explicitly requested ACCDB format |
 | SQL Server 2022 container (`mcr.microsoft.com/mssql/server:2022-latest`, Developer edition) | 2022 | Microsoft EULA (Developer edition: dev/test only) | Dev database. Production uses the client's licensed on-prem SQL Server |
 | Microsoft ODBC Driver 18 for SQL Server | 18.7.1.1 | Microsoft licence (redistributable) | Required by pyodbc |
 | Python | 3.12.10 | PSF-2.0 | Backend runtime |
@@ -84,5 +100,6 @@ Build-time transitive licences outside the allow-list (not shipped in the bundle
 
 | Package | Licence | Status |
 | --- | --- | --- |
+| Microsoft Access Database Engine | Microsoft licence | Platform prerequisite implied by the requested native ACCDB support; installed separately, not bundled as Python code. |
 | @fontsource/cairo | OFL-1.1 (SIL Open Font License) | Named explicitly in the CLAUDE.md stack; treated as approved. OFL allows bundling and redistribution with the app; the font may not be sold on its own. |
 | typing_extensions (transitive, Python) | PSF-2.0 | Unavoidable: required by pydantic, fastapi, sqlalchemy. Permissive. |

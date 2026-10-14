@@ -1,4 +1,5 @@
 from typing import Annotated
+from app.core.roles import Role
 
 from pydantic import BaseModel, Field, StringConstraints
 
@@ -12,6 +13,7 @@ PermissionCode = Annotated[str, StringConstraints(min_length=1, max_length=100)]
 
 
 class UserListItem(BaseModel):
+    role: Role
     id: int
     username: str
     full_name: str
@@ -24,6 +26,7 @@ class UserListItem(BaseModel):
 
 
 class UserDetail(BaseModel):
+    role: Role
     id: int
     username: str
     full_name: str
@@ -38,6 +41,7 @@ class UserDetail(BaseModel):
 
 
 class UserCreate(BaseModel):
+    role: Role = "data_entry_operator"
     username: Username
     full_name: FullName
     password: Password
@@ -47,6 +51,7 @@ class UserCreate(BaseModel):
 
 
 class UserUpdate(BaseModel):
+    role: Role | None = None
     full_name: FullName
     work_entity_id: int | None
     is_active: bool

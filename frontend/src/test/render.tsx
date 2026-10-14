@@ -12,6 +12,7 @@ type Handler = (call: FetchCall) => { status: number; body?: unknown } | undefin
 
 export function makeMe(permissions: string[], overrides: Partial<Me> = {}): Me {
   return {
+    role: 'data_entry_operator',
     id: 7,
     username: 'tester',
     full_name: 'مستخدم تجريبي',

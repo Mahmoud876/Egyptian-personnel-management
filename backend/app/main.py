@@ -12,6 +12,7 @@ from app.admin.lookups.router import router as lookups_router
 from app.admin.templates.router import router as templates_router
 from app.admin.users.router import router as users_router
 from app.auth.router import router as auth_router
+from app.recruits.router import router as recruits_router
 from app.core import health
 from app.core.config import get_settings
 from app.core.errors import install_error_handlers
@@ -46,7 +47,7 @@ def create_app() -> FastAPI:
     install_error_handlers(app)
 
     api = APIRouter(prefix=API_PREFIX)
-    for router in (health.router, auth_router, users_router, templates_router, audit_router, lookups_router):
+    for router in (health.router, auth_router, users_router, audit_router, lookups_router, recruits_router):
         api.include_router(router)
     app.include_router(api)
 

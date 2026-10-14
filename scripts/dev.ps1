@@ -1,7 +1,7 @@
 <#
 .SYNOPSIS
     Starts the dev environment: SQL Server container (with backend/sql applied), then the backend
-    (uvicorn --reload) and the frontend (vite) each in its own window.
+    (uvicorn --reload), RQ worker and frontend (vite) in background processes with logs.
 #>
 . "$PSScriptRoot\_common.ps1"
 
@@ -33,8 +33,16 @@ npm.cmd run dev
 "@
 }
 
+# A dedicated supervised worker is required for import/export jobs.
+Start-InNewWindow -Title "personnel worker" -Command @"
+Remove-Item Env:PYTHONHOME -ErrorAction SilentlyContinue
+Set-Location -LiteralPath '$BackendDir'
+& '$VenvPython' -m app.cli.worker
+"@
+
 Write-Host ''
 Write-Host "App:     http://localhost:$webPort"
 Write-Host "API:     http://localhost:$apiPort/api/v1/health"
 Write-Host "API docs: http://localhost:$apiPort/docs"
-Write-Host 'Close the two windows to stop. The database keeps running: docker compose -f docker-compose.dev.yml stop'
+Write-Host 'Logs and process IDs: storage\logs. Use the taskkill commands printed above to stop application processes.'
+Write-Host 'Stop SQL Server and Redis: docker compose -f docker-compose.dev.yml stop'

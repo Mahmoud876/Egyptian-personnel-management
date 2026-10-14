@@ -7,6 +7,9 @@ import os
 # Before any app import: settings are read once and cached.
 os.environ["DB_NAME"] = os.environ.get("TEST_DB_NAME", "personnel_test")
 os.environ["SESSION_COOKIE_SECURE"] = "false"
+os.environ["REDIS_PREFIX"] = os.environ.get("TEST_REDIS_PREFIX", "personnel-test")
+os.environ["QUEUE_NAME"] = os.environ.get("TEST_QUEUE_NAME", "personnel-test")
+os.environ["STORAGE_ROOT"] = os.environ.get("TEST_STORAGE_ROOT", os.path.abspath(os.path.join(os.path.dirname(__file__), "../../tmp/test-storage")))
 os.environ["FRONTEND_DIST"] = os.path.join(os.path.dirname(__file__), "no-frontend-build")
 
 from collections.abc import Callable, Iterator  # noqa: E402
@@ -61,7 +64,7 @@ def db() -> Iterator[Connection]:
 
 @pytest.fixture
 def make_user() -> Callable[..., UserInfo]:
-    """Creates (and commits) a user holding exactly the given permission codes."""
+    """Creates a role-based user; legacy grants are retained only for compatibility tests."""
 
     def make(
         *permissions: str,
@@ -69,10 +72,12 @@ def make_user() -> Callable[..., UserInfo]:
         is_active: bool = True,
         must_change_password: bool = False,
         work_entity_id: int | None = None,
+        role: str | None = None,
     ) -> UserInfo:
         username = f"t_{uuid4().hex[:12]}"
         with get_sessionmaker()() as session:
             user = AppUser(
+                role=role or ("system_administrator" if any(p.startswith(("users.", "audit.", "templates.", "lookups.")) for p in permissions) else "data_entry_operator"),
                 username=username,
                 full_name="مستخدم اختبار",
                 password_hash=hash_password(password),

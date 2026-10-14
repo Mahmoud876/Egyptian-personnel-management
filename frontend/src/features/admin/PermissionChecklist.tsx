@@ -2,24 +2,30 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import MenuItem from '@mui/material/MenuItem';
-import Paper from '@mui/material/Paper';
-import TextField from '@mui/material/TextField';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { ar } from '../../shared/i18n/ar';
-import type { PermissionInfo, Template } from './api';
+import { Mono } from '../../shared/ui/DataText';
+import { AdminPanelSettingsIcon, BadgeIcon, ShieldIcon, WorkIcon } from '../../shared/ui/icons';
+import { SectionCard } from '../../shared/ui/SectionCard';
+import { StatusBadge } from '../../shared/ui/StatusBadge';
+import type { PermissionInfo } from './api';
 
 type Props = {
   catalog: PermissionInfo[];
   value: readonly string[];
   onChange: (codes: string[]) => void;
   disabled?: boolean;
-  /** When given, shows "apply template", which copies a template's codes into the selection. */
-  templates?: Template[];
 };
 
-/** Permissions grouped by module, with Arabic names. Used by the user editor and the template editor. */
-export function PermissionChecklist({ catalog, value, onChange, disabled = false, templates }: Props) {
+const MODULE_ICONS: Record<string, typeof ShieldIcon> = {
+  conscripts: BadgeIcon,
+  employees: WorkIcon,
+  admin: AdminPanelSettingsIcon,
+};
+
+/** Permissions grouped by module (one card per module), with Arabic names and descriptions. */
+export function PermissionChecklist({ catalog, value, onChange, disabled = false }: Props) {
   const selected = new Set(value);
   const modules = [...new Set(catalog.map((p) => p.module))];
 
@@ -37,79 +43,66 @@ export function PermissionChecklist({ catalog, value, onChange, disabled = false
   };
 
   return (
-    <Box>
-      {templates && !disabled && (
-        <TextField
-          select
-          label={ar.permissionsEditor.applyTemplate}
-          helperText={ar.permissionsEditor.applyTemplateHelp}
-          value=""
-          onChange={(event) => {
-            const template = templates.find((t) => String(t.id) === event.target.value);
-            if (template) onChange(catalog.map((p) => p.code).filter((c) => template.permissions.includes(c)));
-          }}
-          sx={{ mb: 2, minWidth: 280 }}
-        >
-          {templates.map((t) => (
-            <MenuItem key={t.id} value={String(t.id)}>
-              {t.name_ar}
-            </MenuItem>
-          ))}
-        </TextField>
-      )}
-      <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', lg: 'repeat(3, 1fr)' } }}>
-        {modules.map((module) => {
-          const items = catalog.filter((p) => p.module === module);
-          const count = items.filter((p) => selected.has(p.code)).length;
-          return (
-            <Paper key={module} variant="outlined" sx={{ p: 2 }} role="group" aria-label={ar.modules[module] ?? module}>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 1 }}>
-                <Typography sx={{ fontWeight: 700, flex: 1 }}>{ar.modules[module] ?? module}</Typography>
-                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                  {ar.permissionsEditor.selected(count, items.length)}
-                </Typography>
-                {!disabled && (
-                  <Button size="small" onClick={() => setGroup(module, count < items.length)}>
-                    {count < items.length ? ar.permissionsEditor.selectGroup : ar.permissionsEditor.clearGroup}
-                  </Button>
-                )}
+    <Stack spacing={2}>
+      {modules.map((module) => {
+        const items = catalog.filter((p) => p.module === module);
+        const count = items.filter((p) => selected.has(p.code)).length;
+        const Icon = MODULE_ICONS[module] ?? ShieldIcon;
+        return (
+          <Box key={module} role="group" aria-label={ar.modules[module] ?? module}>
+            <SectionCard
+              tintedHeader
+              icon={<Icon />}
+              title={ar.modules[module] ?? module}
+              actions={
+                <>
+                  <StatusBadge tone="neutral" dot={false}>
+                    {ar.permissionsEditor.selected(count, items.length)}
+                  </StatusBadge>
+                  {!disabled && (
+                    <Button size="small" onClick={() => setGroup(module, count < items.length)}>
+                      {count < items.length ? ar.permissionsEditor.selectGroup : ar.permissionsEditor.clearGroup}
+                    </Button>
+                  )}
+                </>
+              }
+            >
+              <Box sx={{ display: 'grid', columnGap: 3, rowGap: 2, gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' } }}>
+                {items.map((p) => (
+                  <FormControlLabel
+                    key={p.code}
+                    sx={{ display: 'flex', alignItems: 'flex-start', m: 0, gap: 0.5 }}
+                    control={
+                      <Checkbox
+                        checked={selected.has(p.code)}
+                        disabled={disabled}
+                        onChange={(event) => toggle(p.code, event.target.checked)}
+                        // Read-only (role-derived) grants stay navy so granted and missing are easy to tell apart.
+                        sx={{ pt: 0.25, '&.Mui-disabled.Mui-checked': { color: 'primary.main', opacity: 0.8 } }}
+                      />
+                    }
+                    label={
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                          {p.name_ar}
+                        </Typography>
+                        {p.description_ar && (
+                          <Typography variant="caption" component="div" sx={{ color: 'text.secondary', fontWeight: 400 }}>
+                            {p.description_ar}
+                          </Typography>
+                        )}
+                        <Typography variant="caption" component="div" sx={{ color: 'text.disabled', fontWeight: 400 }}>
+                          <Mono>{p.code}</Mono>
+                        </Typography>
+                      </Box>
+                    }
+                  />
+                ))}
               </Box>
-              {items.map((p) => (
-                <FormControlLabel
-                  key={p.code}
-                  sx={{ display: 'flex', alignItems: 'flex-start', mx: 0, mb: 0.5 }}
-                  control={
-                    <Checkbox
-                      size="small"
-                      checked={selected.has(p.code)}
-                      disabled={disabled}
-                      onChange={(event) => toggle(p.code, event.target.checked)}
-                      sx={{ pt: 0.25 }}
-                    />
-                  }
-                  label={
-                    <Box>
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                        {p.name_ar}
-                      </Typography>
-                      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
-                        {p.description_ar}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        dir="ltr"
-                        sx={{ color: 'text.disabled', fontFamily: 'monospace', display: 'inline-block' }}
-                      >
-                        {p.code}
-                      </Typography>
-                    </Box>
-                  }
-                />
-              ))}
-            </Paper>
-          );
-        })}
-      </Box>
-    </Box>
+            </SectionCard>
+          </Box>
+        );
+      })}
+    </Stack>
   );
 }

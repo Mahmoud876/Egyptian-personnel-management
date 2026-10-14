@@ -6,6 +6,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
+from redis.exceptions import RedisError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.core import messages
@@ -36,6 +37,11 @@ def error_body(detail: str, code: str, **extra: object) -> dict[str, object]:
 
 
 def install_error_handlers(app: FastAPI) -> None:
+    @app.exception_handler(RedisError)
+    async def redis_error(_: Request, exc: RedisError) -> JSONResponse:
+        logger.error("Redis unavailable: %s", type(exc).__name__)
+        return JSONResponse(error_body("خدمة الجلسات غير متاحة مؤقتاً", "session_store_unavailable"), status_code=503)
+
     @app.exception_handler(StarletteHTTPException)
     async def http_error(_: Request, exc: StarletteHTTPException) -> JSONResponse:
         if isinstance(exc, AppError):

@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "primary-fixed": "#d5e3ff", "tertiary-fixed": "#ffddb0", "surface-variant": "#dbe3f3", "surface-container-lowest": "#ffffff", "surface-tint": "#465f86", "inverse-surface": "#29313d", "on-error": "#ffffff", "on-tertiary-fixed": "#281800", "on-tertiary-container": "#c69d60", "on-surface-variant": "#43474e", "outline": "#74777f", "surface-dim": "#d2daeb", "on-tertiary": "#ffffff", "error": "#ba1a1a", "surface-container": "#e6eeff", "primary-container": "#1f3a5f", "on-secondary-fixed-variant": "#3d4856", "on-primary-fixed": "#001c3b", "secondary-container": "#d8e3f5", "surface": "#f8f9ff", "on-primary": "#ffffff", "tertiary-container": "#503400", "tertiary": "#342000", "secondary-fixed-dim": "#bcc7d9", "on-tertiary-fixed-variant": "#5f410c", "inverse-on-surface": "#ebf1ff", "inverse-primary": "#aec8f4", "secondary": "#545f6e", "on-secondary": "#ffffff", "on-primary-container": "#8ba4cf", "on-background": "#141c28", "background": "#f8f9ff", "primary": "#032448", "on-surface": "#141c28", "surface-container-low": "#eff3ff", "on-error-container": "#93000a", "error-container": "#ffdad6", "outline-variant": "#c4c6cf", "secondary-fixed": "#d8e3f5", "on-secondary-container": "#5a6574", "surface-bright": "#f8f9ff", "on-secondary-fixed": "#111c29", "surface-container-highest": "#dbe3f3", "surface-container-high": "#e1e8f9", "tertiary-fixed-dim": "#ecbf7f", "on-primary-fixed-variant": "#2d476d", "primary-fixed-dim": "#aec8f4" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-xs": "0.25rem", "space-lg": "1.5rem", "margin": "1.5rem", "space-xl": "2rem", "gutter-dense": "0.5rem", "space-md": "1rem", "space-sm": "0.5rem", "margin-compact": "1rem", "gutter": "1rem" }, "fontFamily": { "body-lg": [ "Cairo" ], "code-num": [ "monospace" ], "headline-md": [ "Cairo" ], "headline-sm": [ "Cairo" ], "headline-lg": [ "Cairo" ], "body-table": [ "Cairo" ], "label-sm": [ "Cairo" ], "body-md": [ "Cairo" ], "label-md": [ "Cairo" ] }, "fontSize": { "body-lg": [ "15px", { "lineHeight": "24px", "fontWeight": "400" } ], "code-num": [ "13px", { "lineHeight": "18px", "fontWeight": "400" } ], "headline-md": [ "18px", { "lineHeight": "28px", "fontWeight": "600" } ], "headline-sm": [ "16px", { "lineHeight": "24px", "fontWeight": "600" } ], "headline-lg": [ "20px", { "lineHeight": "32px", "fontWeight": "600" } ], "body-table": [ "13px", { "lineHeight": "20px", "fontWeight": "400" } ], "label-sm": [ "12px", { "lineHeight": "16px", "fontWeight": "500" } ], "body-md": [ "14px", { "lineHeight": "22px", "fontWeight": "400" } ], "label-md": [ "13px", { "lineHeight": "18px", "fontWeight": "500" } ] } } } };</script></head><body class="bg-surface text-on-surface font-body-md text-body-md antialiased selection:bg-primary selection:text-on-primary"><aside class="fixed right-0 top-0 h-screen w-60 bg-surface-container-lowest z-20 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex flex-col"><div class="h-16 px-space-md flex items-center gap-space-sm bg-primary text-on-primary"><span class="material-symbols-outlined text-[24px]">shield</span><div class="flex flex-col"><span class="font-headline-sm text-headline-sm leading-tight font-bold">منظومة شئون الأفراد</span><span class="font-label-sm text-label-sm opacity-80">قطاع الشئون الإدارية</span></div></div><div class="p-space-sm"><div class="px-space-sm py-space-xs font-label-sm text-label-sm text-on-surface-variant font-semibold">إدارة التجنيد والخدمة</div><nav class="flex flex-col gap-space-xs mt-space-xs" data-active-classes="bg-primary text-on-primary font-semibold"><a aria-current="page" class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg transition-colors bg-primary text-on-primary font-semibold" data-path="barcode-printing" href="#"><span class="material-symbols-outlined text-[20px]">qr_code_2</span><span class="font-body-md text-body-md">طباعة ملصق الباركود</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="conscripts-registry" href="#"><span class="material-symbols-outlined text-[20px]">badge</span><span class="font-body-md text-body-md">سجل بيانات المجندين</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="batch-processing" href="#"><span class="material-symbols-outlined text-[20px]">inventory_2</span><span class="font-body-md text-body-md">دفعات التوزيع والقيد</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="printer-configurations" href="#"><span class="material-symbols-outlined text-[20px]">print</span><span class="font-body-md text-body-md">إعدادات الطابعات الحرارية</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="activity-logs" href="#"><span class="material-symbols-outlined text-[20px]">history</span><span class="font-body-md text-body-md">سجل العمليات والطباعة</span></a></nav></div></div><div class="p-space-md bg-surface-container-low flex flex-col gap-space-xs"><div class="flex items-center justify-between font-label-sm text-label-sm text-on-surface-variant"><span>حالة الطابعة المباشرة:</span><span class="inline-flex items-center gap-1 text-on-surface font-semibold"><span class="w-2 h-2 rounded-full bg-primary"></span>متصلة</span></div><div class="font-code-num text-code-num text-secondary text-left">Zebra-ZD420-LAN</div></div></aside><div class="pr-60"><header class="fixed top-0 right-60 left-0 h-16 bg-surface-container-lowest z-20 shadow-[0_1px_8px_rgba(0,0,0,0.04)] px-space-lg flex items-center justify-between"><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs font-label-md text-label-md text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">corporate_fare</span><span>إدارة التعبئة والتجنيد</span><span class="text-outline">/</span><span class="text-on-surface font-semibold">محطة الترميز وطباعة الباركود</span></div></div><div class="flex items-center gap-space-md"><div class="relative flex items-center"><span class="material-symbols-outlined absolute right-space-sm text-outline text-[18px]">search</span><input class="h-9 pr-8 pl-space-md rounded bg-surface font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:ring-1 focus:ring-primary w-64" placeholder="بحث برقم القيد أو الرقم القومي..." type="search"/></div><div class="flex items-center gap-space-sm pl-space-sm"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div><div class="flex flex-col text-right"><span class="font-label-md text-label-md font-semibold text-on-surface leading-none">ملازم أول / أحمد محمود</span><span class="font-label-sm text-label-sm text-on-surface-variant leading-none mt-1">مسئول محطة الإدخال</span></div></div></div></header><main class="w-full pt-16 bg-surface min-h-screen px-space-lg py-space-lg"><div class="flex flex-col w-full">
+<!-- Top Action & Context Strip -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between pb-space-md gap-space-sm">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs font-label-sm text-label-sm text-on-surface-variant">
+<span>المجندين</span>
+<span class="text-outline">/</span>
+<span>حصر وتسجيل المجندين</span>
+<span class="text-outline">/</span>
+<span class="text-primary font-semibold">معاينة وطباعة ملصق الباركود</span>
+</div>
+<div class="flex items-center gap-space-sm mt-1">
+<h1 class="font-headline-md text-headline-md font-bold text-on-surface">معاينة وطباعة ملصق الهوية المشفرة</h1>
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-surface-container-high text-on-surface font-label-sm text-label-sm font-semibold">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          قيد التشغيل المباشر
+        </span>
+</div>
+</div>
+<!-- Quick Profile Badge for Conscript -->
+<div class="flex items-center gap-space-md p-space-sm bg-surface-container-lowest rounded-xl shadow-sm">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary font-bold">
+<span class="material-symbols-outlined text-[24px]">assignment_ind</span>
+</div>
+<div class="flex flex-col text-right">
+<div class="flex items-center gap-2">
+<span class="font-label-md text-label-md font-bold text-on-surface">محمود أحمد عبد الفتاح النجار</span>
+<span class="font-code-num text-code-num text-secondary bg-surface-container-low px-1.5 py-0.5 rounded">#84920</span>
+</div>
+<div class="flex items-center gap-3 text-secondary font-label-sm text-label-sm">
+<span>الدفعة: <strong class="text-on-surface">يناير 2025</strong></span>
+<span class="w-1 h-1 rounded-full bg-outline"></span>
+<span>منطقة: <strong class="text-on-surface">القاهرة الكبرى</strong></span>
+</div>
+</div>
+</div>
+</div>
+<!-- Primary Workspace: Split Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+<!-- LEFT (Desktop RTL Left side): Live Print Preview Area (7 Cols) -->
+<div class="lg:col-span-7 flex flex-col gap-space-md order-2 lg:order-1">
+<!-- Preview Utility Toolbar -->
+<div class="bg-surface-container-lowest p-space-sm rounded-xl shadow-sm flex flex-wrap items-center justify-between gap-space-sm">
+<div class="flex items-center gap-1 bg-surface-container-low p-1 rounded-lg">
+<button class="w-8 h-8 rounded flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" id="zoomOutBtn" title="تصغير">
+<span class="material-symbols-outlined text-[18px]">zoom_out</span>
+</button>
+<span class="font-code-num text-code-num px-2 font-semibold text-on-surface select-none" id="zoomLevelDisplay">100%</span>
+<button class="w-8 h-8 rounded flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" id="zoomInBtn" title="تكبير">
+<span class="material-symbols-outlined text-[18px]">zoom_in</span>
+</button>
+<div class="w-px h-4 bg-outline-variant mx-1"></div>
+<button class="px-2 h-8 rounded font-label-sm text-label-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" id="resetZoomBtn">
+            إعادة تعيين
+          </button>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-1.5 px-3 h-8 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-label-sm text-label-sm transition-colors" id="rotateBtn">
+<span class="material-symbols-outlined text-[16px]">rotate_right</span>
+<span>تدوير 90°</span>
+</button>
+<div class="flex items-center gap-1.5 px-2.5 h-8 rounded-lg bg-surface-container-low text-secondary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">aspect_ratio</span>
+<span>الأبعاد الفعلية: <b class="text-on-surface font-code-num">60 × 40 مم</b></span>
+</div>
+</div>
+</div>
+<!-- Real Preview Viewport with Architectural Rulers -->
+<div class="relative bg-surface-container-high rounded-xl p-6 sm:p-10 flex flex-col items-center justify-center overflow-hidden min-h-[440px] shadow-sm select-none">
+<!-- Top Horizontal Ruler Indicator -->
+<div class="w-[360px] max-w-full flex justify-between items-end mb-2 px-1 text-secondary font-code-num text-[11px] opacity-75">
+<span>0 مم</span>
+<span>10</span>
+<span>20</span>
+<span>30 مم (المنتصف)</span>
+<span>40</span>
+<span>50</span>
+<span>60 مم</span>
+</div>
+<div class="w-[360px] max-w-full h-1.5 bg-outline-variant/40 rounded-full mb-4 flex justify-between px-0.5 items-center">
+<span class="w-0.5 h-2 bg-secondary"></span>
+<span class="w-0.5 h-1 bg-outline"></span>
+<span class="w-0.5 h-1 bg-outline"></span>
+<span class="w-0.5 h-2 bg-primary"></span>
+<span class="w-0.5 h-1 bg-outline"></span>
+<span class="w-0.5 h-1 bg-outline"></span>
+<span class="w-0.5 h-2 bg-secondary"></span>
+</div>
+<!-- The Physical Thermal Label Container -->
+<div class="relative w-[340px] sm:w-[380px] bg-surface-container-lowest text-on-surface rounded-md shadow-xl transition-transform duration-200 p-4 flex flex-col justify-between" id="labelPreviewCard" style="aspect-ratio: 6 / 4;">
+<!-- Subtle Physical Peel & Sensor Notches -->
+<div class="absolute -right-1.5 top-1/2 -translate-y-1/2 w-3 h-4 bg-surface-container-high rounded-l-full"></div>
+<div class="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-4 bg-surface-container-high rounded-r-full"></div>
+<!-- Label Header -->
+<div class="flex items-center justify-between pb-1.5 border-b border-surface-container-highest">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">military_tech</span>
+<div class="flex flex-col text-right leading-none">
+<span class="font-headline-sm text-[11px] font-bold text-primary">جمهورية مصر العربية</span>
+<span class="font-label-sm text-[9px] text-secondary">منظومة شئون الأفراد والتعبئة</span>
+</div>
+</div>
+<div class="text-left font-code-num text-[9px] text-secondary uppercase font-semibold">
+              Tag: SEC-A1
+            </div>
+</div>
+<!-- Barcode Visualization Layer (High Definition Vector Bars) -->
+<div class="my-1.5 flex flex-col items-center justify-center bg-surface-bright p-1 rounded">
+<div class="w-full flex items-center justify-center overflow-hidden h-12 px-1">
+<!-- Code 128 Realistic Simulation SVG -->
+<svg class="w-full h-full text-on-surface" preserveaspectratio="none" viewbox="0 0 260 50">
+<rect fill="currentColor" height="50" width="3" x="0" y="0"></rect>
+<rect fill="currentColor" height="50" width="2" x="5" y="0"></rect>
+<rect fill="currentColor" height="50" width="4" x="10" y="0"></rect>
+<rect fill="currentColor" height="50" width="2" x="16" y="0"></rect>
+<rect fill="currentColor" height="50" width="6" x="20" y="0"></rect>
+<rect fill="currentColor" height="50" width="2" x="28" y="0"></rect>
+<rect fill="currentColor" height="50" width="4" x="33" y="0"></rect>
+<rect fill="currentColor" height="50" width="1" x="39" y="0"></rect>
+<rect fill="currentColor" height="50" width="5" x="43" y="0"></rect>
+<rect fill="currentColor" height="50" width="3" x="51" y="0"></rect>
+<rect fill="currentColor" height="50" width="2" x="57" y="0"></rect>
+<rect fill="currentColor" height="50" width="6" x="62" y="0"></rect>
+<rect fill="currentColor" height="50" width="1" x="70" y="0"></rect>
+<rect fill="currentColor" height="50" width="3" x="74" y="0"></rect>
+<rect fill="currentColor" height="50" width="5" x="80" y="0"></rect>
+<rect fill="currentColor" height="50" width="2" x="88" y="0"></rect>
+<rect fill="currentColor" height="50" width="4" x="93" y="0"></rect>
+<rect fill="currentColor" height="50" width="2" x="100" y="0"></rect>
+<rect fill="currentColor" height="50" width="6" x="105" y="0"></rect>
+<rect fill="currentColor" height="50" width="1" x="114" y="0"></rect>
+<rect fill="currentColor" height="50" width="4" x="118" y="0"></rect>
+<rect fill="currentColor" height="50" width="3" x="125" y="0"></rect>
+<rect fill="currentColor" height="50" width="5" x="131" y="0"></rect>
+<rect fill="currentColor" height="50" width="2" x="139" y="0"></rect>
+<rect fill="currentColor" height="50" width="4" x="144" y="0"></rect>
+<rect fill="currentColor" height="50" width="3" x="151" y="0"></rect>
+<rect fill="currentColor" height="50" width="1" x="156" y="0"></rect>
+<rect fill="currentColor" height="50" width="6" x="160" y="0"></rect>
+<rect fill="currentColor" height="50" width="2" x="169" y="0"></rect>
+<rect fill="currentColor" height="50" width="5" x="174" y="0"></rect>
+<rect fill="currentColor" height="50" width="3" x="182" y="0"></rect>
+<rect fill="currentColor" height="50" width="2" x="188" y="0"></rect>
+<rect fill="currentColor" height="50" width="6" x="193" y="0"></rect>
+<rect fill="currentColor" height="50" width="1" x="202" y="0"></rect>
+<rect fill="currentColor" height="50" width="4" x="206" y="0"></rect>
+<rect fill="currentColor" height="50" width="3" x="213" y="0"></rect>
+<rect fill="currentColor" height="50" width="5" x="219" y="0"></rect>
+<rect fill="currentColor" height="50" width="2" x="227" y="0"></rect>
+<rect fill="currentColor" height="50" width="4" x="232" y="0"></rect>
+<rect fill="currentColor" height="50" width="2" x="239" y="0"></rect>
+<rect fill="currentColor" height="50" width="6" x="244" y="0"></rect>
+<rect fill="currentColor" height="50" width="2" x="253" y="0"></rect>
+<rect fill="currentColor" height="50" width="3" x="257" y="0"></rect>
+</svg>
+</div>
+<div class="font-code-num text-code-num text-[11px] font-bold text-on-surface tracking-wider text-center mt-0.5">
+              * MIL-2025-014851-POL *
+            </div>
+</div>
+<!-- Personnel Info Block -->
+<div class="flex flex-col gap-1 text-right mt-0.5">
+<div class="font-headline-sm text-[13px] font-bold text-primary truncate leading-tight">
+              محمود أحمد عبد الفتاح النجار
+            </div>
+<div class="flex items-center justify-between font-label-sm text-[10px] text-secondary py-0.5 bg-surface-container-low/60 px-1.5 rounded">
+<span>رقم الشرطة: <b class="font-code-num text-on-surface font-semibold">POL-84920</b></span>
+<span>سنة التجنيد: <b class="text-on-surface font-semibold">2025 (دفعة يناير)</b></span>
+</div>
+<div class="flex items-center justify-between font-label-sm text-[10px] text-on-surface-variant pt-0.5">
+<span>الرقم القومي: <b class="font-code-num text-on-surface font-semibold tracking-wider">29804120104851</b></span>
+<span class="inline-flex items-center gap-0.5 text-primary text-[9px] font-bold">
+<span class="material-symbols-outlined text-[11px]">verified</span>
+                مُطابق
+              </span>
+</div>
+</div>
+</div>
+<!-- Thermal Material Specifications Tag -->
+<div class="mt-6 flex items-center gap-4 text-secondary font-label-sm text-label-sm">
+<div class="flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+<span>كثافة النقط: <strong>203 DPI</strong></span>
+</div>
+<div class="flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+<span>الخامة: <strong>ورق حراري Direct Thermal</strong></span>
+</div>
+<div class="flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+<span>مقاومة الرطوبة: <strong>معيار A</strong></span>
+</div>
+</div>
+</div>
+<!-- Quick Guidance Message -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl flex items-start gap-space-sm shadow-sm">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">info</span>
+<div class="flex flex-col text-right">
+<span class="font-label-md text-label-md font-bold text-on-surface">إرشادات التحقق قبل الطباعة الفورية</span>
+<span class="font-body-md text-body-md text-secondary">
+            تأكد من ملاءمة رأس الطباعة الحراري للطابعة المحددة وخلو مسار الورق من أي انحراف لتفادي تلف تسلسل الباركود Code 128 المخصص للأرشفة المركزية.
+          </span>
+</div>
+</div>
+</div>
+<!-- RIGHT (Desktop RTL Right side): Print Settings Configuration Panel (5 Cols) -->
+<div class="lg:col-span-5 flex flex-col gap-space-md order-1 lg:order-2">
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md">
+<!-- Panel Header -->
+<div class="flex items-center justify-between pb-space-sm border-b border-surface-container-highest">
+<div class="flex items-center gap-space-sm">
+<div class="w-9 h-9 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">tune</span>
+</div>
+<div class="flex flex-col">
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">إعدادات طباعة الملصق</h2>
+<span class="font-label-sm text-label-sm text-secondary">التهيئة المباشرة لجهاز التغذية</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-surface-container text-primary font-code-num text-code-num font-semibold">
+            PRN-01
+          </span>
+</div>
+<!-- Form Elements Container -->
+<div class="flex flex-col gap-space-md">
+<!-- 1. Destination Printer Selector -->
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md font-semibold text-on-surface">طابعة الملصقات الحرارية</label>
+<span class="inline-flex items-center gap-1 font-label-sm text-[11px] text-primary font-semibold">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+                متصلة وجاهزة
+              </span>
+</div>
+<div class="relative">
+<select class="w-full h-10 pr-9 pl-8 rounded-lg bg-surface-container-low font-body-md text-body-md text-on-surface focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer appearance-none">
+<option selected="">Zebra ZD421 (203 dpi) - متصلة وجاهزة</option>
+<option>TSC TE200 Thermal Network (203 dpi)</option>
+<option>Bixolon SLP-DX420G (300 dpi)</option>
+<option>طابعة النظام الافتراضية (Microsoft Print to PDF)</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-2.5 text-[20px] text-secondary pointer-events-none">print</span>
+<span class="material-symbols-outlined absolute left-2.5 top-2.5 text-[18px] text-secondary pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- 2. Label Size / Dimension Selector -->
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md font-semibold text-on-surface">مقاس وحجم الملصق (Label Size)</label>
+<div class="relative">
+<select class="w-full h-10 pr-9 pl-8 rounded-lg bg-surface-container-low font-body-md text-body-md text-on-surface focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer appearance-none" id="labelSizeSelect">
+<option selected="" value="60x40">60 مم × 40 مم (قياسي - سجلات التجنيد)</option>
+<option value="50x30">50 مم × 30 مم (كارت التردد الخارجي)</option>
+<option value="70x50">70 مم × 50 مم (ملصق بطاقة الميري الموسعة)</option>
+<option value="100x50">100 مم × 50 مم (حاويات المهمات والتجهيز)</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-2.5 text-[20px] text-secondary pointer-events-none">straighten</span>
+<span class="material-symbols-outlined absolute left-2.5 top-2.5 text-[18px] text-secondary pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- 3. Number of Copies with Stepper -->
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md font-semibold text-on-surface">عدد النسخ المطلوبة</label>
+<span class="font-label-sm text-label-sm text-secondary">نسخة للملف + نسخة لكارت التردد</span>
+</div>
+<div class="flex items-center gap-space-sm">
+<div class="flex items-center flex-1 bg-surface-container-low rounded-lg p-1">
+<button class="w-9 h-8 rounded bg-surface-container-lowest text-on-surface hover:bg-surface-container flex items-center justify-center font-bold text-lg select-none transition-colors" id="decrementCopiesBtn" type="button">
+                  -
+                </button>
+<input class="w-full text-center bg-transparent font-code-num text-code-num font-bold text-on-surface focus:outline-none" id="copiesInput" max="20" min="1" type="number" value="2"/>
+<button class="w-9 h-8 rounded bg-surface-container-lowest text-on-surface hover:bg-surface-container flex items-center justify-center font-bold text-lg select-none transition-colors" id="incrementCopiesBtn" type="button">
+                  +
+                </button>
+</div>
+<span class="font-label-md text-label-md font-semibold text-secondary px-2">ملصقات</span>
+</div>
+</div>
+<!-- 4. Orientation & Darkness (Grid layout) -->
+<div class="grid grid-cols-2 gap-space-sm pt-1">
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md font-semibold text-on-surface">اتجاه الطباعة</label>
+<div class="grid grid-cols-2 p-1 bg-surface-container-low rounded-lg">
+<button class="py-1 text-center font-label-sm text-label-sm rounded bg-surface-container-lowest text-on-surface font-semibold shadow-xs" id="orientLandscapeBtn" type="button">أفقي</button>
+<button class="py-1 text-center font-label-sm text-label-sm rounded text-secondary hover:text-on-surface" id="orientPortraitBtn" type="button">رأسي</button>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md font-semibold text-on-surface">كثافة الحبر والحرارة</label>
+<select class="h-9 px-2 rounded-lg bg-surface-container-low font-label-sm text-label-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary">
+<option>داكن جداً (High 12)</option>
+<option selected="">قياسي متوازن (Normal 8)</option>
+<option>اقتصادي خفيف (Draft 4)</option>
+</select>
+</div>
+</div>
+<!-- 5. Advanced Toggle Controls -->
+<div class="flex flex-col gap-space-sm pt-2 border-t border-surface-container-highest">
+<label class="flex items-center justify-between p-2 rounded-lg hover:bg-surface-container-low cursor-pointer transition-colors">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-[20px] text-primary">content_cut</span>
+<div class="flex flex-col text-right">
+<span class="font-label-md text-label-md font-medium text-on-surface">القص التلقائي بعد الطباعة (Auto Cut)</span>
+<span class="font-label-sm text-[11px] text-secondary">فصل الشريط تلقائياً عند انتهاء المجموعة</span>
+</div>
+</div>
+<input checked="" class="w-4 h-4 rounded text-primary focus:ring-primary" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between p-2 rounded-lg hover:bg-surface-container-low cursor-pointer transition-colors">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-[20px] text-primary">barcode_reader</span>
+<div class="flex flex-col text-right">
+<span class="font-label-md text-label-md font-medium text-on-surface">التحقق بالمسح الضوئي الفوري</span>
+<span class="font-label-sm text-[11px] text-secondary">مطالبة القارئ بالتأكيد عقب الخروج</span>
+</div>
+</div>
+<input class="w-4 h-4 rounded text-primary focus:ring-primary" type="checkbox"/>
+</label>
+</div>
+<!-- 6. Operational Task Summary Box -->
+<div class="bg-surface-container-low p-space-sm rounded-lg flex flex-col gap-1 text-right">
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<span class="text-secondary">ملخص المهمة الحالية:</span>
+<span class="font-bold text-on-surface" id="summaryCopies">إجمالي: 2 ملصق</span>
+</div>
+<div class="font-label-sm text-[11px] text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-primary">check_circle</span>
+<span>نوع الوسيط: ورق حراري لاصق (Thermal Adhesive 60×40)</span>
+</div>
+</div>
+<!-- 7. Action Button Matrix -->
+<div class="flex flex-col gap-space-xs pt-space-xs">
+<!-- Primary Print Button -->
+<button class="w-full h-11 bg-primary text-on-primary rounded-lg font-headline-sm text-headline-sm font-bold flex items-center justify-center gap-space-sm hover:bg-primary-container transition-all active:scale-[0.99] shadow-md" id="primaryPrintBtn" type="button">
+<span class="material-symbols-outlined text-[22px]">print</span>
+<span>طباعة الملصق الآن</span>
+<span class="bg-primary-container px-2 py-0.5 rounded font-code-num text-[11px] text-on-primary opacity-90">Ctrl + P</span>
+</button>
+<!-- Secondary Actions Row -->
+<div class="grid grid-cols-2 gap-space-sm mt-1">
+<button class="h-9 bg-surface-container text-on-surface rounded-lg font-label-md text-label-md font-semibold flex items-center justify-center gap-1.5 hover:bg-surface-container-high transition-colors" id="testPrintBtn" type="button">
+<span class="material-symbols-outlined text-[18px]">bug_report</span>
+<span>طباعة اختبارية</span>
+</button>
+<button class="h-9 bg-surface-container-low text-secondary rounded-lg font-label-md text-label-md font-semibold flex items-center justify-center gap-1.5 hover:bg-surface-container hover:text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+<span>إلغاء والعودة</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Registry History Snippet -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]">history</span>
+<span class="font-label-md text-label-md text-secondary">آخر طباعة تمت لهذا السجل:</span>
+</div>
+<span class="font-code-num text-code-num text-on-surface font-semibold">اليوم، 10:14 ص (نسخة أصلية)</span>
+</div>
+</div>
+</div>
+<!-- Notification Toast for Print Triggering (Hidden by default, triggered via JS) -->
+<div class="fixed bottom-6 left-6 bg-primary text-on-primary px-space-md py-space-sm rounded-xl shadow-2xl flex items-center gap-space-sm transition-all duration-300 opacity-0 pointer-events-none translate-y-4 z-50" id="printNotification">
+<span class="material-symbols-outlined text-[24px]">task_alt</span>
+<div class="flex flex-col text-right">
+<span class="font-label-md text-label-md font-bold">تم إرسال أمر الطباعة بنجاح</span>
+<span class="font-label-sm text-label-sm opacity-80">جاري إخراج الملصقات عبر Zebra ZD421</span>
+</div>
+</div>
+<script>
+    (function () {
+      const zoomLevels = [0.8, 0.9, 1.0, 1.15, 1.3];
+      let currentZoomIdx = 2; // 100%
+      let currentRotation = 0;
+
+      const labelCard = document.getElementById('labelPreviewCard');
+      const zoomDisplay = document.getElementById('zoomLevelDisplay');
+      const zoomInBtn = document.getElementById('zoomInBtn');
+      const zoomOutBtn = document.getElementById('zoomOutBtn');
+      const resetZoomBtn = document.getElementById('resetZoomBtn');
+      const rotateBtn = document.getElementById('rotateBtn');
+      
+      const copiesInput = document.getElementById('copiesInput');
+      const incrementCopies = document.getElementById('incrementCopiesBtn');
+      const decrementCopies = document.getElementById('decrementCopiesBtn');
+      const summaryCopies = document.getElementById('summaryCopies');
+      
+      const primaryPrintBtn = document.getElementById('primaryPrintBtn');
+      const testPrintBtn = document.getElementById('testPrintBtn');
+      const printNotification = document.getElementById('printNotification');
+
+      function updateTransform() {
+        const scale = zoomLevels[currentZoomIdx];
+        labelCard.style.transform = `scale(${scale}) rotate(${currentRotation}deg)`;
+        zoomDisplay.textContent = Math.round(scale * 100) + '%';
+      }
+
+      zoomInBtn.addEventListener('click', () => {
+        if (currentZoomIdx < zoomLevels.length - 1) {
+          currentZoomIdx++;
+          updateTransform();
+        }
+      });
+
+      zoomOutBtn.addEventListener('click', () => {
+        if (currentZoomIdx > 0) {
+          currentZoomIdx--;
+          updateTransform();
+        }
+      });
+
+      resetZoomBtn.addEventListener('click', () => {
+        currentZoomIdx = 2;
+        currentRotation = 0;
+        updateTransform();
+      });
+
+      rotateBtn.addEventListener('click', () => {
+        currentRotation = (currentRotation + 90) % 360;
+        updateTransform();
+      });
+
+      function updateCopies(val) {
+        let v = parseInt(val, 10);
+        if (isNaN(v) || v < 1) v = 1;
+        if (v > 20) v = 20;
+        copiesInput.value = v;
+        summaryCopies.textContent = `إجمالي: ${v} ملصق`;
+      }
+
+      incrementCopies.addEventListener('click', () => updateCopies(parseInt(copiesInput.value, 10) + 1));
+      decrementCopies.addEventListener('click', () => updateCopies(parseInt(copiesInput.value, 10) - 1));
+      copiesInput.addEventListener('change', (e) => updateCopies(e.target.value));
+
+      function showToast(msgTitle, msgDesc) {
+        if (msgTitle) {
+          printNotification.querySelector('span.font-label-md').textContent = msgTitle;
+        }
+        if (msgDesc) {
+          printNotification.querySelector('span.font-label-sm').textContent = msgDesc;
+        }
+        printNotification.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+        setTimeout(() => {
+          printNotification.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+        }, 3200);
+      }
+
+      primaryPrintBtn.addEventListener('click', () => {
+        showToast('تم إرسال أمر الطباعة بنجاح', `جاري إخراج ${copiesInput.value} ملصقات عبر Zebra ZD421`);
+      });
+
+      testPrintBtn.addEventListener('click', () => {
+        showToast('بدء الطباعة الاختبارية', 'جاري إخراج ملصق تشخيصي بمعايير المعايرة...');
+      });
+
+      // Keyboard Shortcut Ctrl+P
+      window.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P' || e.key === 'ح')) {
+          e.preventDefault();
+          primaryPrintBtn.click();
+        }
+      });
+    })();
+  </script>
+</div></main></div></body></html>

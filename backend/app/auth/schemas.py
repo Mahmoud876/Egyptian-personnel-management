@@ -9,6 +9,7 @@ class LoginRequest(BaseModel):
 
 
 class MeResponse(BaseModel):
+    role: str
     id: int
     username: str
     full_name: str

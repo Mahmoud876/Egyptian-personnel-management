@@ -14,6 +14,8 @@ from app.core.queries import PageParams, like_contains, paginate, violated_const
 from app.core.schemas import Page
 from app.core.security import delete_user_sessions, hash_password, utcnow
 
+from app.core.roles import permissions_for_role
+
 from .schemas import UserCreate, UserDetail, UserListItem, UserUpdate
 
 _MODULE_ORDER = {"admin": 0, "conscripts": 1, "employees": 2}
@@ -32,7 +34,7 @@ def _get(db: Session, user_id: int) -> AppUser:
 
 
 def _codes(db: Session, user_id: int) -> list[str]:
-    return sorted(db.scalars(select(UserPermission.permission_code).where(UserPermission.user_id == user_id)))
+    return sorted(permissions_for_role(_get(db, user_id).role))
 
 
 def validate_permission_codes(db: Session, codes: Iterable[str]) -> list[str]:
@@ -53,6 +55,7 @@ def _validate_work_entity(db: Session, work_entity_id: int | None) -> None:
 
 def _snapshot(user: AppUser) -> dict[str, object]:
     return {
+        "role": user.role,
         "username": user.username,
         "full_name": user.full_name,
         "is_active": user.is_active,
@@ -65,6 +68,7 @@ def get_detail(db: Session, user_id: int) -> UserDetail:
     entity = db.get(WorkEntity, user.work_entity_id) if user.work_entity_id else None
     return UserDetail(
         id=user.id,
+        role=user.role,
         username=user.username,
         full_name=user.full_name,
         is_active=user.is_active,
@@ -106,6 +110,7 @@ def list_users(db: Session, q: str | None, is_active: bool | None, params: PageP
         user, entity_name, count = row
         return UserListItem(
             id=user.id,
+        role=user.role,
             username=user.username,
             full_name=user.full_name,
             is_active=user.is_active,
@@ -113,16 +118,19 @@ def list_users(db: Session, q: str | None, is_active: bool | None, params: PageP
             work_entity_name=entity_name,
             last_login_at=user.last_login_at,
             created_at=user.created_at,
-            permission_count=count,
+            permission_count=len(permissions_for_role(user.role)),
         )
 
     return paginate(db, statement, params, to_item)
 
 
 def create_user(db: Session, actor: CurrentUser, body: UserCreate, ip: str | None) -> UserDetail:
-    codes = validate_permission_codes(db, body.permissions)
+    if body.permissions:
+        raise AppError(422, "الصلاحيات تحدد حسب الدور فقط", "role_permissions_only")
+    codes = []
     _validate_work_entity(db, body.work_entity_id)
     user = AppUser(
+        role=body.role,
         username=body.username,
         full_name=body.full_name,
         password_hash=hash_password(body.password),
@@ -155,6 +163,11 @@ def update_user(db: Session, actor: CurrentUser, user_id: int, body: UserUpdate,
     _validate_work_entity(db, body.work_entity_id)
 
     old = _snapshot(user)
+    if user.id == actor.id and body.role is not None and body.role != user.role:
+        raise AppError(400, "لا يمكنك تغيير دورك", "cannot_change_own_role")
+    if body.role is not None and body.role != user.role:
+        user.role = body.role
+        delete_user_sessions(db, user.id)
     user.full_name = body.full_name
     user.work_entity_id = body.work_entity_id
     user.is_active = body.is_active
@@ -171,29 +184,7 @@ def update_user(db: Session, actor: CurrentUser, user_id: int, body: UserUpdate,
 
 
 def set_permissions(db: Session, actor: CurrentUser, user_id: int, codes: list[str], ip: str | None) -> UserDetail:
-    user = _get(db, user_id)
-    wanted = validate_permission_codes(db, codes)
-    if user.id == actor.id and "users.manage" not in wanted:
-        raise AppError(
-            status.HTTP_400_BAD_REQUEST, messages.CANNOT_REMOVE_OWN_USER_MANAGEMENT, "cannot_remove_own_user_management"
-        )
-
-    current = _codes(db, user.id)
-    removed = sorted(set(current) - set(wanted))
-    added = sorted(set(wanted) - set(current))
-    if removed:
-        db.execute(
-            delete(UserPermission).where(UserPermission.user_id == user.id, UserPermission.permission_code.in_(removed))
-        )
-    db.add_all(UserPermission(user_id=user.id, permission_code=c, granted_by=actor.id) for c in added)
-    user.updated_at = utcnow()
-    user.updated_by = actor.id
-    audit.write(
-        db, action="update_permissions", user_id=actor.id, ip=ip, entity="app_user", entity_id=user.id,
-        old_values={"permissions": current}, new_values={"permissions": wanted},
-    )
-    db.commit()
-    return get_detail(db, user.id)
+    raise AppError(409, "الصلاحيات تحدد حسب الدور؛ عدل دور المستخدم", "role_permissions_only")
 
 
 def reset_password(db: Session, actor: CurrentUser, user_id: int, new_password: str, ip: str | None) -> None:

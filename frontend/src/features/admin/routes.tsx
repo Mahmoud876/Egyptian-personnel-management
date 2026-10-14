@@ -3,7 +3,6 @@ import { RequirePermission } from '../../shared/permissions/permissions';
 import { AuditLogPage } from './audit/AuditLogPage';
 import { LookupsPage } from './lookups/LookupsPage';
 import { adminPaths } from './paths';
-import { TemplatesPage } from './templates/TemplatesPage';
 import { UserEditPage } from './users/UserEditPage';
 import { UsersListPage } from './users/UsersListPage';
 
@@ -29,14 +28,6 @@ export const adminRoutes: RouteObject[] = [
     element: (
       <RequirePermission perm="users.view">
         <UserEditPage />
-      </RequirePermission>
-    ),
-  },
-  {
-    path: adminPaths.templates,
-    element: (
-      <RequirePermission perm="templates.manage">
-        <TemplatesPage />
       </RequirePermission>
     ),
   },

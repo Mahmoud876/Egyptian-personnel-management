@@ -24,11 +24,15 @@ describe('menu', () => {
 
   it('drops groups with no visible items', () => {
     const groups = visibleMenu(['audit.view']).map((group) => group.label);
-    expect(groups).toEqual([undefined, ar.menu.groups.admin]);
+    expect(groups).toEqual([ar.menu.groups.main, ar.menu.groups.admin]);
   });
 
   it('renders the filtered sidebar in the layout', async () => {
-    stubFetch(({ path }) => (path === '/api/v1/health' ? { status: 200, body: { status: 'ok', database: { reachable: true } } } : undefined));
+    stubFetch(({ path }) =>
+      path === '/api/v1/health'
+        ? { status: 200, body: { status: 'ok', database: { reachable: true }, redis: { reachable: true } } }
+        : undefined,
+    );
     renderApp('/', makeMe(DATA_ENTRY));
 
     const nav = await screen.findByRole('navigation', { name: ar.app.title });
@@ -105,11 +109,15 @@ describe('login', () => {
 describe('home', () => {
   it('shows the database as disconnected when health returns 503', async () => {
     stubFetch(({ path }) =>
-      path === '/api/v1/health' ? { status: 503, body: { status: 'degraded', database: { reachable: false } } } : undefined,
+      path === '/api/v1/health'
+        ? { status: 503, body: { status: 'degraded', database: { reachable: false }, redis: { reachable: true } } }
+        : undefined,
     );
     renderApp('/', makeMe([]));
 
-    expect(await screen.findByText(ar.health.connected)).toBeTruthy();
-    expect(await screen.findByText(ar.health.disconnected)).toBeTruthy();
+    // Server and queue are up, the database is down; the sidebar summarises it as a fault.
+    expect(await screen.findAllByText(ar.health.connected)).toHaveLength(2);
+    expect(screen.getByText(ar.health.disconnected)).toBeTruthy();
+    expect(screen.getByText(ar.health.degraded)).toBeTruthy();
   });
 });

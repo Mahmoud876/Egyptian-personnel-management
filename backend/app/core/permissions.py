@@ -1,4 +1,4 @@
-"""Permission checks. Access is decided by permission codes only, never by role or template (docs/permissions.md).
+"""Permission checks using grants derived from fixed roles (docs/permissions.md).
 
 Every API route declares one of:
     Depends(require_permission("code", ...))     user must have all listed codes
@@ -19,8 +19,10 @@ from app.core import audit, messages
 from app.core.config import get_settings
 from app.core.db import get_db
 from app.core.errors import AppError
-from app.core.models import AppUser, UserPermission
+from app.core.models import AppUser
 from app.core.security import resolve_session
+from app.core.redis_client import get_redis, key
+from app.core.roles import permissions_for_role
 
 # Attribute set on every dependency built here; the route coverage test looks for it.
 PERMISSION_MARKER = "required_permissions"
@@ -35,6 +37,7 @@ class CurrentUser:
     must_change_password: bool
     permissions: frozenset[str]
     session_id: str
+    role: str = "data_entry_operator"
 
 
 def has_permission(user: CurrentUser, code: str) -> bool:
@@ -56,12 +59,11 @@ def get_current_user(request: Request, db: Session = Depends(get_db)) -> Current
     if session is None:
         raise _not_authenticated()
     user = db.get(AppUser, session.user_id)
-    if user is None or not user.is_active:
-        db.delete(session)
-        db.commit()
+    if user is None or not user.is_active or user.session_version != session.version:
+        get_redis().delete(key(f"session:{session.id}"))
         raise _not_authenticated()
 
-    codes = db.scalars(select(UserPermission.permission_code).where(UserPermission.user_id == user.id))
+    codes = permissions_for_role(user.role)
     current = CurrentUser(
         id=user.id,
         username=user.username,
@@ -70,6 +72,7 @@ def get_current_user(request: Request, db: Session = Depends(get_db)) -> Current
         must_change_password=user.must_change_password,
         permissions=frozenset(codes),
         session_id=session.id,
+        role=user.role,
     )
     request.state.current_user = current
     return current

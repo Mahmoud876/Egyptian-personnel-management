@@ -1,3 +1,5 @@
+> **Current entry point:** Read [docs/backend-poc.md](docs/backend-poc.md) and CLAUDE.md. The skeleton-only prompt below is historical and has been superseded by the owner's request to implement the PoC backend.
+
 # How to start Claude Code on this project
 
 1. Install the prerequisites if you don't have them: Git, Python 3.12, Node.js 20+, Docker Desktop, and Microsoft ODBC Driver 18 for SQL Server.

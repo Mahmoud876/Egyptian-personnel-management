@@ -1,3 +1,5 @@
+> **Historical document:** The owner's newer PoC Markdown now governs the conscripts backend. See [backend-poc.md](backend-poc.md) for implemented workflows, Redis sessions, RBAC, migration and operating instructions. Conflicting skeleton-era rules below are superseded.
+
 # Skeleton build plan
 
 Build one phase at a time. At the end of each phase: run the checks listed, commit, then **stop and report** (what was built, how to run it, anything decided along the way) and wait for approval.

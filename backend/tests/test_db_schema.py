@@ -28,7 +28,7 @@ def _doc_section(path: Path, heading: str) -> str:
 def _doc_permissions() -> dict[str, str]:
     """code -> Arabic name, from the tables under '## Permission codes'."""
     section = _doc_section(PERMISSIONS_DOC, "## Permission codes")
-    return dict(re.findall(r"^\| `([a-z0-9._]+)` \| ([^|]+?) \|", section, re.MULTILINE))
+    return dict(re.findall(r"^\| `([a-z0-9._:]+)` \| ([^|]+?) \|", section, re.MULTILINE))
 
 
 def _doc_templates(all_codes: set[str]) -> dict[str, set[str]]:
@@ -134,7 +134,7 @@ def test_table_is_system_versioned(db: Connection, table: str) -> None:
 def test_permission_codes_match_docs(db: Connection) -> None:
     seeded = {row.code: row.name_ar for row in db.execute(text("SELECT code, name_ar FROM dbo.permission"))}
     documented = _doc_permissions()
-    assert len(documented) == 27
+    assert len(documented) == 37
     assert seeded == documented
 
 

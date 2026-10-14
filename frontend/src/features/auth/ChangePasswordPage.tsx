@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import { useForm } from 'react-hook-form';
@@ -11,8 +10,10 @@ import { z } from 'zod';
 import { errorMessage } from '../../shared/api/client';
 import { useChangePassword, useMe } from '../../shared/auth/auth';
 import { ar } from '../../shared/i18n/ar';
+import { KeyIcon } from '../../shared/ui/icons';
 import { useNotify } from '../../shared/ui/notifications';
 import { PageHeader } from '../../shared/ui/PageHeader';
+import { SectionCard } from '../../shared/ui/SectionCard';
 
 const MIN_LENGTH = 8;
 
@@ -48,9 +49,15 @@ export function ChangePasswordPage() {
   );
 
   return (
-    <Box sx={{ maxWidth: 480 }}>
-      <PageHeader title={ar.auth.changePassword} />
-      <Paper variant="outlined" sx={{ p: 3 }}>
+    <Box>
+      <PageHeader title={ar.auth.changePassword} subtitle={ar.auth.changePasswordIntro} />
+      <SectionCard
+        icon={<KeyIcon />}
+        iconTone="solid"
+        title={ar.auth.newPasswordSection}
+        subtitle={ar.auth.passwordHint(MIN_LENGTH)}
+        sx={{ maxWidth: 560 }}
+      >
         <Box component="form" onSubmit={onSubmit} noValidate>
           <Stack spacing={2}>
             {me?.must_change_password && <Alert severity="warning">{ar.auth.mustChangePassword}</Alert>}
@@ -89,7 +96,7 @@ export function ChangePasswordPage() {
             </Box>
           </Stack>
         </Box>
-      </Paper>
+      </SectionCard>
     </Box>
   );
 }

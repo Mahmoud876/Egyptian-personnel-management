@@ -25,6 +25,9 @@ storage/
 /*.accdb
 /*.docx
 /*.pdf
+/PoC *.md
+# Duplicate archive of the stitch_egyptian_personnel_management_system/ folder
+/stitch_egyptian_personnel_management_system*.zip
 # Access lock files (created while a .mdb/.accdb is open)
 *.ldb
 *.laccdb
@@ -33,3 +36,8 @@ storage/
 .idea/
 .qodo/
 .claude/settings.local.json
+
+# Private PoC uploads, exports, local verification dependencies
+storage/
+backend/.poc-deps/
+tmp/

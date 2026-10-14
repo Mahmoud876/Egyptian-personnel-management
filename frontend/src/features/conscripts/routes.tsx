@@ -1,16 +1,27 @@
 import type { RouteObject } from 'react-router';
-import { ar } from '../../shared/i18n/ar';
 import { RequirePermission } from '../../shared/permissions/permissions';
-import { UnderDevelopment } from '../../shared/ui/ErrorPages';
+import { EntryLookupPage, RecruitEntryPage } from './entry/EntryPage';
+import { ImportReportPage } from './imports/ImportReportPage';
+import { ImportsPage } from './imports/ImportsPage';
+import { LabelLookupPage, LabelPage } from './labels/LabelsPage';
 import { conscriptsPaths } from './paths';
+import { SearchPage } from './search/SearchPage';
 
-// Screens come in Phase 4 (docs/skeleton-plan.md). The guards are already in place.
+// Each guard uses the same permission as the menu item; the backend enforces its own check on every call.
 export const conscriptsRoutes: RouteObject[] = [
   {
-    path: conscriptsPaths.upload,
+    path: conscriptsPaths.imports,
     element: (
       <RequirePermission perm="conscripts.import.upload">
-        <UnderDevelopment title={ar.menu.conscriptsUpload} />
+        <ImportsPage />
+      </RequirePermission>
+    ),
+  },
+  {
+    path: conscriptsPaths.importReport(':importId'),
+    element: (
+      <RequirePermission perm="conscripts.import.upload">
+        <ImportReportPage />
       </RequirePermission>
     ),
   },
@@ -18,7 +29,7 @@ export const conscriptsRoutes: RouteObject[] = [
     path: conscriptsPaths.search,
     element: (
       <RequirePermission perm="conscripts.view">
-        <UnderDevelopment title={ar.menu.conscriptsSearch} />
+        <SearchPage />
       </RequirePermission>
     ),
   },
@@ -26,7 +37,15 @@ export const conscriptsRoutes: RouteObject[] = [
     path: conscriptsPaths.entry,
     element: (
       <RequirePermission perm="conscripts.enter">
-        <UnderDevelopment title={ar.menu.conscriptsEntry} />
+        <EntryLookupPage />
+      </RequirePermission>
+    ),
+  },
+  {
+    path: conscriptsPaths.entryFor(':recruitId'),
+    element: (
+      <RequirePermission perm="conscripts.enter">
+        <RecruitEntryPage />
       </RequirePermission>
     ),
   },
@@ -34,7 +53,15 @@ export const conscriptsRoutes: RouteObject[] = [
     path: conscriptsPaths.labels,
     element: (
       <RequirePermission perm="conscripts.label.print">
-        <UnderDevelopment title={ar.menu.conscriptsLabels} />
+        <LabelLookupPage />
+      </RequirePermission>
+    ),
+  },
+  {
+    path: conscriptsPaths.labelFor(':recruitId'),
+    element: (
+      <RequirePermission perm="conscripts.label.print">
+        <LabelPage />
       </RequirePermission>
     ),
   },

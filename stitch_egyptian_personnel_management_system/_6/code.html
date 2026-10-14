@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"primary":"#032448","error":"#ba1a1a","on-primary-container":"#8ba4cf","tertiary-fixed":"#ffddb0","surface-container-high":"#e1e8f9","tertiary-fixed-dim":"#ecbf7f","secondary-container":"#d8e3f5","outline":"#74777f","inverse-on-surface":"#ebf1ff","surface":"#f8f9ff","on-secondary":"#ffffff","surface-container-highest":"#dbe3f3","on-primary-fixed":"#001c3b","primary-fixed-dim":"#aec8f4","surface-tint":"#465f86","on-primary":"#ffffff","inverse-surface":"#29313d","secondary-fixed-dim":"#bcc7d9","surface-container":"#e6eeff","surface-bright":"#f8f9ff","surface-dim":"#d2daeb","inverse-primary":"#aec8f4","surface-container-lowest":"#ffffff","on-primary-fixed-variant":"#2d476d","on-secondary-fixed":"#111c29","on-secondary-container":"#5a6574","on-surface":"#141c28","on-background":"#141c28","on-tertiary-fixed":"#281800","tertiary-container":"#503400","background":"#f8f9ff","outline-variant":"#c4c6cf","on-secondary-fixed-variant":"#3d4856","on-tertiary":"#ffffff","on-surface-variant":"#43474e","secondary":"#545f6e","on-tertiary-container":"#c69d60","on-error":"#ffffff","on-error-container":"#93000a","surface-variant":"#dbe3f3","secondary-fixed":"#d8e3f5","primary-container":"#1f3a5f","on-tertiary-fixed-variant":"#5f410c","error-container":"#ffdad6","surface-container-low":"#eff3ff","primary-fixed":"#d5e3ff","tertiary":"#342000"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-xs":"0.25rem","space-lg":"1.5rem","gutter":"1rem","gutter-dense":"0.5rem","margin":"1.5rem","space-md":"1rem","margin-compact":"1rem","space-sm":"0.5rem","space-xl":"2rem"},"fontFamily":{"body-md":["Cairo"],"headline-md":["Cairo"],"code-num":["monospace"],"headline-sm":["Cairo"],"body-lg":["Cairo"],"label-sm":["Cairo"],"label-md":["Cairo"],"headline-lg":["Cairo"],"body-table":["Cairo"]},"fontSize":{"body-md":["14px",{"lineHeight":"22px","fontWeight":"400"}],"headline-md":["18px",{"lineHeight":"28px","fontWeight":"600"}],"code-num":["13px",{"lineHeight":"18px","fontWeight":"400"}],"headline-sm":["16px",{"lineHeight":"24px","fontWeight":"600"}],"body-lg":["15px",{"lineHeight":"24px","fontWeight":"400"}],"label-sm":["12px",{"lineHeight":"16px","fontWeight":"500"}],"label-md":["13px",{"lineHeight":"18px","fontWeight":"500"}],"headline-lg":["20px",{"lineHeight":"32px","fontWeight":"600"}],"body-table":["13px",{"lineHeight":"20px","fontWeight":"400"}]}}}}</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><aside class="fixed top-0 right-0 h-screen w-60 bg-surface-container-lowest z-20 flex flex-col border-l border-outline-variant"><div class="h-16 px-space-md flex items-center gap-space-sm border-b border-outline-variant"><img alt="Logo" class="w-8 h-8 rounded-full object-cover shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1VdUWHvMojBRy49Lxrwv-lNOk8dqX6wig9RRxFHW3wrVPyy-28ktzflmKUvvzDaFy8CRgeHj5HU0cXD4CZ65aZDBBSGuwhxl3VsSCk8aOVW5hgeRjnLA5kpCZTAf5FqlBNEPEq8vksjEUpxcnAgAZ3-ixagGexM8AAcxI2phF8B2GTVVL6AwJ01iLbmA9XmywXQphKmsGAuy1fWYxbWFmAdpFRKPdkmitH2fH4dyVsLhBnnuAgMb62CTuc"/><div class="flex flex-col min-w-0"><span class="font-headline-sm text-headline-sm text-primary-container truncate font-semibold">منظومة شئون الأفراد</span><span class="font-label-sm text-label-sm text-secondary truncate">جمهورية مصر العربية - قطاع الموارد البشرية</span></div></div><div class="flex-1 overflow-y-auto py-space-sm px-space-xs"><nav class="flex flex-col gap-space-sm" data-active-classes="bg-surface-container-low text-primary-container font-semibold rounded-lg"><div class="flex flex-col"><span class="px-space-sm py-1 font-label-sm text-label-sm text-secondary uppercase">الرئيسية</span><div class="flex flex-col gap-0.5 mt-0.5"><a class="flex items-center gap-space-xs px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="overview-dashboard" href="#"><span class="truncate">لوحة المعلومات والملخص</span></a></div></div><div class="flex flex-col"><span class="px-space-sm py-1 font-label-sm text-label-sm text-secondary uppercase">المجندين</span><div class="flex flex-col gap-0.5 mt-0.5"><a class="flex items-center gap-space-xs px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="conscripts-registration" href="#"><span class="truncate">حصر وتسجيل المجندين</span></a><a class="flex items-center gap-space-xs px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="military-service-records" href="#"><span class="truncate">سجلات الخدمة العسكرية</span></a><a class="flex items-center gap-space-xs px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="deployment-transfer-actions" href="#"><span class="truncate">إجراءات التوزيع والنقل</span></a></div></div><div class="flex flex-col"><span class="px-space-sm py-1 font-label-sm text-label-sm text-secondary uppercase">العاملين المدنيين</span><div class="flex flex-col gap-0.5 mt-0.5"><a class="flex items-center gap-space-xs px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="employee-records" href="#"><span class="truncate">ملفات الموظفين</span></a><a class="flex items-center gap-space-xs px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="leaves-delegations" href="#"><span class="truncate">الإجازات والانتدابات</span></a><a class="flex items-center gap-space-xs px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="annual-evaluations" href="#"><span class="truncate">تقارير الكفاءة السنوية</span></a></div></div><div class="flex flex-col"><span class="px-space-sm py-1 font-label-sm text-label-sm text-secondary uppercase">الإدارة</span><div class="flex flex-col gap-0.5 mt-0.5"><a class="flex items-center gap-space-xs px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="review-approvals" href="#"><span class="truncate">مراجعة واعتماد الطلبات</span></a><a class="flex items-center gap-space-xs px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="system-reports-logs" href="#"><span class="truncate">تقارير وسجلات النظام</span></a><a class="flex items-center gap-space-xs px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="user-permissions" href="#"><span class="truncate">صلاحيات المستخدم</span></a><a class="flex items-center gap-space-xs px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="system-configuration" href="#"><span class="truncate">إعدادات المنظومة</span></a></div></div></nav></div></aside><div class="mr-60"><header class="fixed top-0 right-60 left-0 h-16 bg-surface-container-lowest z-20 flex items-center justify-between px-space-lg border-b border-outline-variant"><div class="flex items-center gap-space-md"><div class="relative flex items-center"><span class="material-symbols-outlined absolute right-3 text-secondary text-[20px] pointer-events-none">search</span><input class="w-80 h-9 pr-9 pl-space-sm rounded-lg bg-surface border border-outline-variant font-body-md text-body-md text-on-surface placeholder:text-secondary focus:outline-none focus:border-primary-container focus:bg-surface-container-lowest" placeholder="بحث برقم قومي، كود ملف، أو اسم الموظف..." type="text"/></div></div><div class="flex items-center gap-space-md"><div class="hidden md:flex items-center gap-1.5 px-space-sm py-1 rounded-lg bg-surface-container-low text-secondary font-label-sm text-label-sm"><span class="material-symbols-outlined text-[16px] text-primary-container">sync</span><span class="font-code-num text-code-num">آخر تحديث: 09:30 ص</span></div><div class="h-6 w-px bg-outline-variant"></div><div class="flex items-center gap-space-sm"><div class="flex flex-col text-left"><span class="font-label-md text-label-md text-on-surface font-medium">أ. طارق عبد الرحمن</span><span class="font-label-sm text-label-sm text-secondary">مسؤول النظام</span></div><a class="flex items-center gap-1 text-secondary hover:text-error transition-colors font-label-md text-label-md px-2 py-1 rounded hover:bg-surface-container-high" data-path="login" href="#"><span class="material-symbols-outlined text-[18px]">logout</span><span>تسجيل الخروج</span></a></div><img alt="Profile" class="w-8 h-8 rounded-full object-cover shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1VdUWHvMojBRy49Lxrwv-lNOk8dqX6wig9RRxFHW3wrVPyy-28ktzflmKUvvzDaFy8CRgeHj5HU0cXD4CZ65aZDBBSGuwhxl3VsSCk8aOVW5hgeRjnLA5kpCZTAf5FqlBNEPEq8vksjEUpxcnAgAZ3-ixagGexM8AAcxI2phF8B2GTVVL6AwJ01iLbmA9XmywXQphKmsGAuy1fWYxbWFmAdpFRKPdkmitH2fH4dyVsLhBnnuAgMb62CTuc"/></div></header><main class="w-full pt-16 min-h-screen bg-surface p-space-lg"><div class="flex flex-col w-full">
+<!-- BREADCRUMB & CONTEXT HEADER -->
+<div class="flex flex-col md:flex-row md:items-center justify-between pb-space-md gap-space-sm">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-1.5 font-label-sm text-label-sm text-secondary">
+<span>الرئيسية</span>
+<span class="material-symbols-outlined text-[14px]">chevron_left</span>
+<span>الإدارة ونظم المعلومات</span>
+<span class="material-symbols-outlined text-[14px]">chevron_left</span>
+<span>ترحيل قواعد البيانات</span>
+<span class="material-symbols-outlined text-[14px]">chevron_left</span>
+<span class="text-primary-container font-semibold">تقرير ترحيل البيانات (تشغيل #MIG-2025-084)</span>
+</div>
+<div class="flex items-center gap-space-sm mt-1">
+<h1 class="font-headline-lg text-headline-lg text-primary-container font-bold tracking-tight">تقرير ترحيل ومطابقة البيانات</h1>
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-surface-container-high text-on-surface font-code-num text-code-num font-semibold">
+          #MIG-2025-084
+        </span>
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#FEF0C7] text-[#B54708] font-label-sm text-label-sm font-semibold">
+<span class="material-symbols-outlined text-[16px]">warning</span>
+          مكتمل مع وجود استثناءات
+        </span>
+</div>
+</div>
+<!-- Quick Environment Indicator Pills -->
+<div class="flex items-center gap-2 bg-surface-container-lowest p-1.5 rounded-xl shadow-sm">
+<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-low">
+<span class="material-symbols-outlined text-primary-container text-[18px]">database</span>
+<div class="flex flex-col leading-tight">
+<span class="font-label-sm text-label-sm text-secondary">المصدر (Source)</span>
+<span class="font-code-num text-code-num text-on-surface font-semibold">Oracle 11g RAC (PROD)</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary text-[20px]">arrow_back</span>
+<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-container text-on-primary">
+<span class="material-symbols-outlined text-[18px]">dns</span>
+<div class="flex flex-col leading-tight">
+<span class="font-label-sm text-label-sm text-on-primary-container">الهدف (Target)</span>
+<span class="font-code-num text-code-num text-on-primary font-semibold">SQL Server 2022 AG</span>
+</div>
+</div>
+</div>
+</div>
+<!-- RUN SUMMARY & KPIS BENTO -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md mb-space-md">
+<!-- Meta Execution Details (Left in RTL, Column 4) -->
+<div class="lg:col-span-4 bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-space-sm">
+<span class="font-headline-sm text-headline-sm text-primary-container font-semibold">بيانات أمر التشغيل والتدقيق</span>
+<span class="inline-flex items-center gap-1 text-[#1E7F4F] font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+            فحص المطابقة منتهي
+          </span>
+</div>
+<div class="space-y-2 mt-2">
+<div class="flex items-center justify-between py-1 bg-surface-container-low px-2 rounded">
+<span class="font-label-sm text-label-sm text-secondary">توقيت البدء:</span>
+<span class="font-code-num text-code-num text-on-surface">2025/02/17 02:15:20 ص</span>
+</div>
+<div class="flex items-center justify-between py-1 bg-surface-container-low px-2 rounded">
+<span class="font-label-sm text-label-sm text-secondary">توقيت الانتهاء:</span>
+<span class="font-code-num text-code-num text-on-surface">2025/02/17 03:42:10 ص</span>
+</div>
+<div class="flex items-center justify-between py-1 bg-surface-container-low px-2 rounded">
+<span class="font-label-sm text-label-sm text-secondary">المدة المستغرقة:</span>
+<span class="font-code-num text-code-num text-primary-container font-semibold">01:26:50 (ساعة و 26 دقيقة)</span>
+</div>
+<div class="flex items-center justify-between py-1 bg-surface-container-low px-2 rounded">
+<span class="font-label-sm text-label-sm text-secondary">المهندس المشرف:</span>
+<span class="font-body-md text-body-md text-on-surface font-medium">م. حسام الدين عثمان</span>
+</div>
+<div class="flex items-center justify-between py-1 bg-surface-container-low px-2 rounded">
+<span class="font-label-sm text-label-sm text-secondary">خادم المعالجة:</span>
+<span class="font-code-num text-code-num text-on-surface">SRV-MIG-EGY-01.gov.local</span>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-2 flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-secondary">حالة الأمان والنسخ الاحتياطي:</span>
+<span class="font-label-sm text-label-sm text-primary-container font-medium inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">lock</span>
+          نقطة حفظ معتمدة (Snap #492)
+        </span>
+</div>
+</div>
+<!-- 4 High Impact Metrics (Column 8) -->
+<div class="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-space-sm">
+<!-- Total Records -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-secondary">إجمالي السجلات المستهدفة</span>
+<span class="material-symbols-outlined text-secondary text-[22px]">all_inbox</span>
+</div>
+<div class="my-2">
+<div class="font-headline-lg text-headline-lg font-bold text-on-surface font-code-num">248,510</div>
+<span class="font-label-sm text-label-sm text-secondary">100% من نطاق الدفعة</span>
+</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary h-full" style="width: 100%"></div>
+</div>
+</div>
+<!-- Loaded Successfully -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-secondary">تم ترحيلها بنجاح</span>
+<span class="material-symbols-outlined text-[#1E7F4F] text-[22px]">check_circle</span>
+</div>
+<div class="my-2">
+<div class="font-headline-lg text-headline-lg font-bold text-[#1E7F4F] font-code-num">247,892</div>
+<span class="font-label-sm text-label-sm text-[#1E7F4F] font-semibold font-code-num">99.75% نسبة الإنجاز</span>
+</div>
+<div class="w-full bg-[#E8F5EE] h-1.5 rounded-full overflow-hidden">
+<div class="bg-[#1E7F4F] h-full" style="width: 99.75%"></div>
+</div>
+</div>
+<!-- Rejected Records -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-secondary">السجلات المستبعدة والمرفوضة</span>
+<span class="material-symbols-outlined text-[#B42318] text-[22px]">error</span>
+</div>
+<div class="my-2">
+<div class="font-headline-lg text-headline-lg font-bold text-[#B42318] font-code-num">618</div>
+<span class="font-label-sm text-label-sm text-[#B42318] font-semibold font-code-num">0.25% فاقد يحتاج معالجة</span>
+</div>
+<div class="w-full bg-[#FEE4E2] h-1.5 rounded-full overflow-hidden">
+<div class="bg-[#B42318] h-full" style="width: 5%"></div>
+</div>
+</div>
+<!-- General Reconciliation Status -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-secondary">حالة مطابقة البيانات العامة</span>
+<span class="material-symbols-outlined text-[#B54708] text-[22px]">sync_problem</span>
+</div>
+<div class="my-2">
+<div class="font-headline-sm text-headline-sm font-bold text-[#B54708]">تطابق نسبي جزئي</div>
+<span class="font-label-sm text-label-sm text-secondary">يوجد 2 جدول بانتظار الاعتماد</span>
+</div>
+<div class="flex items-center gap-1 font-label-sm text-label-sm text-[#B54708] bg-[#FEF0C7] px-2 py-0.5 rounded">
+<span class="material-symbols-outlined text-[14px]">info</span>
+          قيود التكامل المرجعي
+        </div>
+</div>
+</div>
+</div>
+<!-- TABLE 1: RECONCILIATION SUMMARY PER ENTITY -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm mb-space-md overflow-hidden">
+<div class="p-space-md bg-surface-container-lowest flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+<div>
+<h2 class="font-headline-md text-headline-md text-primary-container font-semibold">جدول المطابقة وحصر السجلات حسب الجداول المصدرية</h2>
+<p class="font-body-md text-body-md text-secondary">تدقيق العد التراكمي ومطابقة القيود بين جدول المصدر (Oracle 11g) وجدول الهدف (SQL Server 2022)</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-label-sm text-label-sm text-secondary font-code-num">عدد الجداول: 3</span>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-right border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-secondary font-headline-sm text-headline-sm h-10">
+<th class="px-space-md py-2 font-semibold">اسم الجدول المصدر (Oracle 11g)</th>
+<th class="px-space-md py-2 font-semibold">الجدول الهدف (SQL Server)</th>
+<th class="px-space-md py-2 font-semibold font-code-num">سجلات المصدر</th>
+<th class="px-space-md py-2 font-semibold font-code-num">المحملة بنجاح</th>
+<th class="px-space-md py-2 font-semibold font-code-num">المرفوضة</th>
+<th class="px-space-md py-2 font-semibold">نسبة الإنجاز</th>
+<th class="px-space-md py-2 font-semibold">حالة المطابقة</th>
+<th class="px-space-md py-2 font-semibold">وقت المعالجة</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-low font-body-table text-body-table text-on-surface">
+<!-- Row 1: Employees -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-space-md py-3 font-medium">
+<div class="flex flex-col">
+<span class="text-on-surface font-semibold">بيانات العاملين المدنيين</span>
+<span class="font-code-num text-code-num text-secondary">HR_OWNER.TBL_EMPLOYEES</span>
+</div>
+</td>
+<td class="px-space-md py-3 font-code-num text-code-num text-secondary">
+              HumanResources.Employees
+            </td>
+<td class="px-space-md py-3 font-code-num text-code-num font-semibold text-on-surface">124,150</td>
+<td class="px-space-md py-3 font-code-num text-code-num text-[#1E7F4F] font-semibold">124,150</td>
+<td class="px-space-md py-3 font-code-num text-code-num text-secondary">0</td>
+<td class="px-space-md py-3">
+<div class="flex items-center gap-2">
+<span class="font-code-num text-code-num font-semibold text-[#1E7F4F]">100%</span>
+<div class="w-16 bg-surface-container-high h-1.5 rounded-full overflow-hidden hidden md:block">
+<div class="bg-[#1E7F4F] h-full" style="width: 100%"></div>
+</div>
+</div>
+</td>
+<td class="px-space-md py-3">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#E8F5EE] text-[#1E7F4F] font-label-sm text-label-sm font-semibold">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+                مطابقة تامة
+              </span>
+</td>
+<td class="px-space-md py-3 font-code-num text-code-num text-secondary">28 دقيقة و 12 ثانية</td>
+</tr>
+<!-- Row 2: Job Actions -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-space-md py-3 font-medium">
+<div class="flex flex-col">
+<span class="text-on-surface font-semibold">الإجراءات والقرارات الوظيفية</span>
+<span class="font-code-num text-code-num text-secondary">HR_OWNER.TBL_JOB_ACTIONS</span>
+</div>
+</td>
+<td class="px-space-md py-3 font-code-num text-code-num text-secondary">
+              Career.JobDecisions
+            </td>
+<td class="px-space-md py-3 font-code-num text-code-num font-semibold text-on-surface">82,340</td>
+<td class="px-space-md py-3 font-code-num text-code-num text-[#1E7F4F] font-semibold">81,920</td>
+<td class="px-space-md py-3 font-code-num text-code-num text-[#B42318] font-bold">420</td>
+<td class="px-space-md py-3">
+<div class="flex items-center gap-2">
+<span class="font-code-num text-code-num font-semibold text-[#B54708]">99.49%</span>
+<div class="w-16 bg-surface-container-high h-1.5 rounded-full overflow-hidden hidden md:block">
+<div class="bg-[#B54708] h-full" style="width: 99.49%"></div>
+</div>
+</div>
+</td>
+<td class="px-space-md py-3">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#FEE4E2] text-[#B42318] font-label-sm text-label-sm font-semibold">
+<span class="material-symbols-outlined text-[16px]">cancel</span>
+                عدم تطابق (قيود)
+              </span>
+</td>
+<td class="px-space-md py-3 font-code-num text-code-num text-secondary">34 دقيقة و 22 ثانية</td>
+</tr>
+<!-- Row 3: Documents -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-space-md py-3 font-medium">
+<div class="flex flex-col">
+<span class="text-on-surface font-semibold">المستندات والأرشيف الإلكتروني</span>
+<span class="font-code-num text-code-num text-secondary">ARCH_OWNER.TBL_DOCUMENTS</span>
+</div>
+</td>
+<td class="px-space-md py-3 font-code-num text-code-num text-secondary">
+              Archive.ElectronicDocs
+            </td>
+<td class="px-space-md py-3 font-code-num text-code-num font-semibold text-on-surface">42,020</td>
+<td class="px-space-md py-3 font-code-num text-code-num text-[#1E7F4F] font-semibold">41,822</td>
+<td class="px-space-md py-3 font-code-num text-code-num text-[#B42318] font-bold">198</td>
+<td class="px-space-md py-3">
+<div class="flex items-center gap-2">
+<span class="font-code-num text-code-num font-semibold text-[#B54708]">99.53%</span>
+<div class="w-16 bg-surface-container-high h-1.5 rounded-full overflow-hidden hidden md:block">
+<div class="bg-[#B54708] h-full" style="width: 99.53%"></div>
+</div>
+</div>
+</td>
+<td class="px-space-md py-3">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#FEE4E2] text-[#B42318] font-label-sm text-label-sm font-semibold">
+<span class="material-symbols-outlined text-[16px]">cancel</span>
+                عدم تطابق (ملفات)
+              </span>
+</td>
+<td class="px-space-md py-3 font-code-num text-code-num text-secondary">24 دقيقة و 16 ثانية</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- TABLE 2: REJECTED RECORDS AUDIT LOG -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm mb-space-md overflow-hidden">
+<!-- Audit Log Header & Action Bar -->
+<div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm bg-surface-container-lowest">
+<div>
+<div class="flex items-center gap-2">
+<h2 class="font-headline-md text-headline-md text-primary-container font-semibold">سجل القيود والسجلات المرفوضة (Rejected Records Audit Log)</h2>
+<span class="px-2 py-0.5 rounded-full bg-[#FEE4E2] text-[#B42318] font-code-num text-code-num font-bold">618 سجل مستبعد</span>
+</div>
+<p class="font-body-md text-body-md text-secondary mt-0.5">تفاصيل الاستثناءات الناتجة عن تعارض قيود التكامل المرجعي أو عدم سلامة الأنماط الزمنية وحقول الـ BLOB</p>
+</div>
+<!-- Filter Controls -->
+<div class="flex items-center gap-2 flex-wrap">
+<div class="relative">
+<span class="material-symbols-outlined absolute right-2.5 top-2 text-secondary text-[18px]">search</span>
+<input class="h-9 pr-8 pl-3 bg-surface border border-outline-variant rounded-lg font-body-md text-body-md text-on-surface placeholder:text-secondary focus:outline-none focus:border-primary-container" placeholder="بحث بالمفتاح أو كود الخطأ..." type="text"/>
+</div>
+<select class="h-9 px-3 bg-surface border border-outline-variant rounded-lg font-label-md text-label-md text-on-surface focus:outline-none focus:border-primary-container">
+<option>كافة الجداول المصدرية</option>
+<option>TBL_JOB_ACTIONS (420)</option>
+<option>TBL_DOCUMENTS (198)</option>
+</select>
+<select class="h-9 px-3 bg-surface border border-outline-variant rounded-lg font-label-md text-label-md text-on-surface focus:outline-none focus:border-primary-container">
+<option>كافة أنواع الأخطاء</option>
+<option>تكامل مرجعي (Foreign Key)</option>
+<option>تنسيق التاريخ (Date Format)</option>
+<option>فحص البصمة الثنائية (Checksum)</option>
+<option>قاموس البيانات (Lookup Mismatch)</option>
+</select>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-right border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-secondary font-headline-sm text-headline-sm h-10">
+<th class="px-space-md py-2 font-semibold">كود الخطأ</th>
+<th class="px-space-md py-2 font-semibold">الجدول المصدر</th>
+<th class="px-space-md py-2 font-semibold">المفتاح بالمصدر (Source Key)</th>
+<th class="px-space-md py-2 font-semibold">الحقل المتسبب</th>
+<th class="px-space-md py-2 font-semibold w-2/5">سبب الرفض والتعارض التقني</th>
+<th class="px-space-md py-2 font-semibold">الإجراء التصحيحي المقترح</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-low font-body-table text-body-table text-on-surface">
+<!-- Item 1 -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="px-space-md py-2.5">
+<span class="font-code-num text-code-num font-semibold text-[#B42318] bg-[#FEE4E2] px-2 py-0.5 rounded">MIG-ERR-042</span>
+</td>
+<td class="px-space-md py-2.5 font-code-num text-code-num text-secondary">TBL_JOB_ACTIONS</td>
+<td class="px-space-md py-2.5 font-code-num text-code-num font-bold text-primary-container">DEC_ID: 884210</td>
+<td class="px-space-md py-2.5 font-code-num text-code-num text-secondary">PROM_DATE</td>
+<td class="px-space-md py-2.5">
+<span class="text-on-surface font-medium">تعارض في تنسيق التاريخ:</span>
+<span class="text-secondary">قيمة التاريخ غير صالحة <span class="font-code-num text-code-num text-[#B42318] bg-surface-container px-1 rounded">'00/00/1998'</span> لا يقبلها حقل DATETIME2 في SQL Server.</span>
+</td>
+<td class="px-space-md py-2.5">
+<span class="text-[#B54708] font-medium inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">edit_calendar</span>
+                تصحيح التاريخ يدوياً من واقع القرار
+              </span>
+</td>
+</tr>
+<!-- Item 2 -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="px-space-md py-2.5">
+<span class="font-code-num text-code-num font-semibold text-[#B42318] bg-[#FEE4E2] px-2 py-0.5 rounded">MIG-ERR-018</span>
+</td>
+<td class="px-space-md py-2.5 font-code-num text-code-num text-secondary">TBL_JOB_ACTIONS</td>
+<td class="px-space-md py-2.5 font-code-num text-code-num font-bold text-primary-container">DEC_ID: 912044</td>
+<td class="px-space-md py-2.5 font-code-num text-code-num text-secondary">EMP_ID</td>
+<td class="px-space-md py-2.5">
+<span class="text-on-surface font-medium">فشل التكامل المرجعي (FK Violation):</span>
+<span class="text-secondary">كود الموظف <span class="font-code-num text-code-num text-[#1F3A5F]">41092</span> غير مدرج في جدول الموظفين المعينين بقاعدة البيانات الهدف.</span>
+</td>
+<td class="px-space-md py-2.5">
+<span class="text-primary-container font-medium inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">person_search</span>
+                فحص قيد الموظف بسجل الاستبعاد
+              </span>
+</td>
+</tr>
+<!-- Item 3 -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="px-space-md py-2.5">
+<span class="font-code-num text-code-num font-semibold text-[#B42318] bg-[#FEE4E2] px-2 py-0.5 rounded">MIG-ERR-099</span>
+</td>
+<td class="px-space-md py-2.5 font-code-num text-code-num text-secondary">TBL_DOCUMENTS</td>
+<td class="px-space-md py-2.5 font-code-num text-code-num font-bold text-primary-container">DOC_UUID: A94-9912-F</td>
+<td class="px-space-md py-2.5 font-code-num text-code-num text-secondary">DOC_BLOB</td>
+<td class="px-space-md py-2.5">
+<span class="text-on-surface font-medium">تلف البصمة الثنائية (BLOB Checksum):</span>
+<span class="text-secondary">تفاوت في بصمة MD5 وتجاوز الحجم المخصص لكتلة التخزين المؤقت، الملف تالف بالمصدر.</span>
+</td>
+<td class="px-space-md py-2.5">
+<span class="text-secondary font-medium inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">restart_alt</span>
+                إعادة مسح الوثيقة ضوئياً
+              </span>
+</td>
+</tr>
+<!-- Item 4 -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="px-space-md py-2.5">
+<span class="font-code-num text-code-num font-semibold text-[#B42318] bg-[#FEE4E2] px-2 py-0.5 rounded">MIG-ERR-018</span>
+</td>
+<td class="px-space-md py-2.5 font-code-num text-code-num text-secondary">TBL_JOB_ACTIONS</td>
+<td class="px-space-md py-2.5 font-code-num text-code-num font-bold text-primary-container">DEC_ID: 945112</td>
+<td class="px-space-md py-2.5 font-code-num text-code-num text-secondary">GRADE_CODE</td>
+<td class="px-space-md py-2.5">
+<span class="text-on-surface font-medium">عدم مطابقة القاموس:</span>
+<span class="text-secondary">القيمة <span class="font-code-num text-code-num text-[#B42318] bg-surface-container px-1 rounded">'GRADE_SPEC_X'</span> غير معرفة في جدول الدرجات المالية المعتمد للجهاز الإداري.</span>
+</td>
+<td class="px-space-md py-2.5">
+<span class="text-primary-container font-medium inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">sync_alt</span>
+                إدراجها بجدول خريطة التحويل
+              </span>
+</td>
+</tr>
+<!-- Item 5 -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="px-space-md py-2.5">
+<span class="font-code-num text-code-num font-semibold text-[#B42318] bg-[#FEE4E2] px-2 py-0.5 rounded">MIG-ERR-073</span>
+</td>
+<td class="px-space-md py-2.5 font-code-num text-code-num text-secondary">TBL_DOCUMENTS</td>
+<td class="px-space-md py-2.5 font-code-num text-code-num font-bold text-primary-container">DOC_UUID: B12-4011-E</td>
+<td class="px-space-md py-2.5 font-code-num text-code-num text-secondary">ISSUE_DATE</td>
+<td class="px-space-md py-2.5">
+<span class="text-on-surface font-medium">خطأ منطقي في تاريخ الوثيقة:</span>
+<span class="text-secondary">تاريخ إصدار وثيقة المؤهل يسبق تاريخ ميلاد صاحب القيد المسجل بجدول الموظفين.</span>
+</td>
+<td class="px-space-md py-2.5">
+<span class="text-[#B54708] font-medium inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">fact_check</span>
+                مراجعة أصل الملف الورقي
+              </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Pagination & Counter -->
+<div class="px-space-md py-3 bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-2">
+<div class="font-label-sm text-label-sm text-secondary">
+        عرض <span class="font-code-num text-code-num font-semibold text-on-surface">1 - 5</span> من إجمالي <span class="font-code-num text-code-num font-semibold text-[#B42318]">618</span> سجل مستبعد
+      </div>
+<div class="flex items-center gap-1">
+<button class="h-8 px-2.5 bg-surface-container-lowest text-secondary rounded border border-outline-variant hover:bg-surface-container-high transition-colors font-label-sm text-label-sm">
+          السابق
+        </button>
+<button class="h-8 w-8 bg-primary-container text-on-primary rounded font-code-num text-code-num font-semibold">1</button>
+<button class="h-8 w-8 bg-surface-container-lowest text-on-surface rounded border border-outline-variant hover:bg-surface-container-high transition-colors font-code-num text-code-num">2</button>
+<button class="h-8 w-8 bg-surface-container-lowest text-on-surface rounded border border-outline-variant hover:bg-surface-container-high transition-colors font-code-num text-code-num">3</button>
+<span class="px-1 text-secondary">...</span>
+<button class="h-8 w-8 bg-surface-container-lowest text-on-surface rounded border border-outline-variant hover:bg-surface-container-high transition-colors font-code-num text-code-num">124</button>
+<button class="h-8 px-2.5 bg-surface-container-lowest text-secondary rounded border border-outline-variant hover:bg-surface-container-high transition-colors font-label-sm text-label-sm">
+          التالي
+        </button>
+</div>
+</div>
+</div>
+<!-- PERSISTENT / EXECUTIVE ACTION TOOLBAR -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-md flex flex-col md:flex-row items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-lg bg-surface-container-low flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-[24px]">shield</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">إجراءات اعتماد ومعالجة دورة الترحيل</span>
+<span class="font-label-sm text-label-sm text-secondary">لا يمكن التراجع عن المعالجة بعد تثبيت الحزمة النهائية ونقل خدمة المستخدمين</span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm flex-wrap w-full md:w-auto justify-end">
+<!-- Export Menu Buttons -->
+<div class="flex items-center gap-1.5">
+<button class="h-9 px-3.5 bg-surface-container-lowest border border-outline-variant hover:bg-surface-container-low text-on-surface rounded-lg font-label-md text-label-md flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[18px] text-secondary">description</span>
+<span>تصدير تقرير مفصل (PDF)</span>
+</button>
+<button class="h-9 px-3.5 bg-surface-container-lowest border border-outline-variant hover:bg-surface-container-low text-on-surface rounded-lg font-label-md text-label-md flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[18px] text-[#1E7F4F]">table_chart</span>
+<span>سجل الاستثناءات (Excel)</span>
+</button>
+</div>
+<div class="h-6 w-px bg-outline-variant hidden sm:block"></div>
+<!-- Rerun Failed Records -->
+<button class="h-9 px-4 bg-primary-container text-on-primary hover:bg-[#2B4C7E] rounded-lg font-label-md text-label-md font-semibold flex items-center gap-1.5 shadow-sm transition-colors">
+<span class="material-symbols-outlined text-[18px]">replay</span>
+<span>إعادة ترحيل السجلات المرفوضة فقط</span>
+</button>
+<!-- Rollback Trigger Button -->
+<button class="h-9 px-4 bg-[#FEE4E2] text-[#B42318] hover:bg-[#B42318] hover:text-white rounded-lg font-label-md text-label-md font-semibold flex items-center gap-1.5 transition-colors" onclick="document.getElementById('rollback-dialog-backdrop').classList.remove('hidden');">
+<span class="material-symbols-outlined text-[18px]">history</span>
+<span>التراجع عن هذا الترحيل (Rollback)</span>
+</button>
+</div>
+</div>
+<!-- INTERACTIVE ROLLBACK CONFIRMATION MODAL (Hidden by default, triggered by JS) -->
+<div class="fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] flex items-center justify-center p-4 hidden" id="rollback-dialog-backdrop">
+<div class="bg-surface-container-lowest rounded-xl max-w-xl w-full p-space-lg shadow-xl relative animate-in fade-in duration-200">
+<!-- Modal Header -->
+<div class="flex items-start gap-space-sm mb-space-md">
+<div class="w-12 h-12 rounded-full bg-[#FEE4E2] text-[#B42318] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[28px]">warning</span>
+</div>
+<div class="flex flex-col">
+<h3 class="font-headline-lg text-headline-lg font-bold text-[#B42318]">تحذير وإجراء عالي الحساسية: التراجع عن الترحيل</h3>
+<span class="font-label-sm text-label-sm text-secondary font-code-num">EXECUTION ID: MIG-2025-084</span>
+</div>
+</div>
+<!-- Impact Notice Box -->
+<div class="bg-[#FFF5F5] p-space-md rounded-lg mb-space-md">
+<p class="font-body-md text-body-md text-on-surface leading-relaxed">
+          أنت على وشك تنفيذ أمر <span class="font-bold text-[#B42318]">التراجع الشامل (Database Rollback)</span> للعملية الحالية.
+          سيترتب على هذا الإجراء:
+        </p>
+<ul class="list-disc list-inside mt-2 space-y-1.5 font-body-md text-body-md text-secondary">
+<li>حذف كافة السجلات المرحلة حديثاً بقاعدة بيانات SQL Server ومقدارها <span class="font-code-num text-code-num font-bold text-on-surface">247,892 سجل</span>.</li>
+<li>إلغاء أقفال الجداول وتهيئة مؤشرات التسلسل وإعادة تعيين الهويات (Re-seed Identity Keys).</li>
+<li>استعادة لقطة النظام المرجعية <span class="font-code-num text-code-num font-semibold text-primary-container">SNAPSHOT_PRE_MIG_084</span>.</li>
+<li>إشعار كافة مسؤولي قطاع تكنولوجيا المعلومات بوقف جاهزية البيئة الجديدة.</li>
+</ul>
+</div>
+<!-- Authorization Confirm Input -->
+<div class="mb-space-md">
+<label class="block font-label-md text-label-md text-on-surface mb-1">
+          لتأكيد هوية التنفيذ، يرجى كتابة رمز التراجع المعتمد (<span class="font-code-num text-code-num font-bold text-[#B42318]">ROLLBACK-CONFIRM</span>):
+        </label>
+<input class="w-full h-10 px-3 bg-surface border border-outline-variant rounded-lg font-code-num text-code-num text-left ltr focus:outline-none focus:border-[#B42318]" id="rollback-confirm-input" placeholder="اكتب ROLLBACK-CONFIRM هنا" type="text"/>
+</div>
+<!-- Action Footer -->
+<div class="flex items-center justify-end gap-space-sm">
+<button class="h-9 px-4 bg-surface border border-outline-variant rounded-lg text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-label-md" onclick="document.getElementById('rollback-dialog-backdrop').classList.add('hidden');" type="button">
+          إلغاء الأمر
+        </button>
+<button class="h-9 px-5 bg-[#B42318] text-white hover:bg-[#912015] rounded-lg font-label-md text-label-md font-semibold flex items-center gap-1.5 transition-colors" id="confirm-rollback-btn" onclick="handleExecuteRollback()" type="button">
+<span class="material-symbols-outlined text-[18px]">delete_forever</span>
+<span>تأكيد التراجع الآن</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<script>
+  function handleExecuteRollback() {
+    const input = document.getElementById('rollback-confirm-input');
+    if (input && input.value.trim().toUpperCase() === 'ROLLBACK-CONFIRM') {
+      alert('جاري إرسال إشارة التراجع الفوري لخادم SQL Server وإعادة نقطة الحفظ...');
+      document.getElementById('rollback-dialog-backdrop').classList.add('hidden');
+    } else {
+      alert('يرجى كتابة رمز التأكيد بشكل صحيح للبدء في إجراء التراجع.');
+      input.focus();
+    }
+  }
+</script></main></div></body></html>

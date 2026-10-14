@@ -1,3 +1,5 @@
+> **Historical document:** The owner's newer PoC Markdown now governs the conscripts backend. See [backend-poc.md](backend-poc.md) for implemented workflows, Redis sessions, RBAC, migration and operating instructions. Conflicting skeleton-era rules below are superseded.
+
 # Business rules
 
 Source: `مجندين.docx`, `العاملين المدنيين POC.pdf`, and an analysis of `Person_data_S.mdb`. Every rule is enforced in the API (Pydantic / service) **and** in SQL Server where a constraint can express it.

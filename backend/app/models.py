@@ -17,3 +17,5 @@ __all__ = [
     "employees_models",
     "migration_models",
 ]
+
+from app.recruits import models as recruit_models

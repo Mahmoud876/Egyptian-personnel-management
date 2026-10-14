@@ -6,6 +6,8 @@ from sqlalchemy import select, update
 
 from app.core.db import get_sessionmaker
 from app.core.models import UserSession
+from app.core.redis_client import get_redis, key
+from app.core.roles import permissions_for_role
 from app.core.security import session_id_for, utcnow
 from app.main import create_app
 from tests.helpers import UserInfo, audit_rows, login
@@ -19,7 +21,7 @@ def test_login_sets_session_cookie_and_returns_me(client: TestClient, make_user:
     assert response.status_code == 200
     body = response.json()
     assert body["username"] == user.username
-    assert body["permissions"] == ["conscripts.enter", "conscripts.view"]
+    assert body["permissions"] == sorted(permissions_for_role("data_entry_operator"))
     assert body["must_change_password"] is False
     cookie = response.headers["set-cookie"].lower()
     assert "httponly" in cookie
@@ -32,10 +34,9 @@ def test_session_token_is_stored_hashed(client: TestClient, make_user: Callable[
     login(client, user)
     token = client.cookies["session"]
 
-    with get_sessionmaker()() as session:
-        ids = list(session.scalars(select(UserSession.id).where(UserSession.user_id == user.id)))
-    assert ids == [session_id_for(token)]
-    assert token not in ids
+    redis_key = key(f"session:{session_id_for(token)}")
+    assert get_redis().exists(redis_key)
+    assert token not in redis_key
 
 
 def test_me_returns_current_user(client: TestClient, make_user: Callable[..., UserInfo]) -> None:
@@ -45,7 +46,7 @@ def test_me_returns_current_user(client: TestClient, make_user: Callable[..., Us
     response = client.get("/api/v1/auth/me")
 
     assert response.status_code == 200
-    assert response.json()["permissions"] == ["audit.view"]
+    assert response.json()["permissions"] == sorted(permissions_for_role("system_administrator"))
 
 
 def test_me_without_session_is_401(client: TestClient) -> None:
@@ -99,13 +100,8 @@ def test_logout_ends_the_session(client: TestClient, make_user: Callable[..., Us
 def test_idle_session_expires(client: TestClient, make_user: Callable[..., UserInfo]) -> None:
     user = make_user()
     login(client, user)
-    with get_sessionmaker()() as session:
-        session.execute(
-            update(UserSession)
-            .where(UserSession.user_id == user.id)
-            .values(last_seen_at=utcnow() - timedelta(minutes=31))
-        )
-        session.commit()
+    token = client.cookies["session"]
+    get_redis().expire(key(f"session:{session_id_for(token)}"), 0)
 
     assert client.get("/api/v1/auth/me").status_code == 401
 

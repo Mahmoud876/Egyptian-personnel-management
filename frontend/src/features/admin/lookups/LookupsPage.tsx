@@ -1,7 +1,6 @@
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Chip from '@mui/material/Chip';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -9,7 +8,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton from '@mui/material/IconButton';
 import MenuItem from '@mui/material/MenuItem';
-import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Switch from '@mui/material/Switch';
 import Tab from '@mui/material/Tab';
@@ -21,14 +19,18 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Tabs from '@mui/material/Tabs';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { type FormEvent, useState } from 'react';
 import { errorMessage } from '../../../shared/api/client';
 import { ar } from '../../../shared/i18n/ar';
 import { AddIcon, EditIcon } from '../../../shared/ui/icons';
 import { useNotify } from '../../../shared/ui/notifications';
+import { Mono } from '../../../shared/ui/DataText';
 import { PageHeader } from '../../../shared/ui/PageHeader';
+import { SectionCard } from '../../../shared/ui/SectionCard';
 import { EmptyState, ErrorAlert, LoadingState } from '../../../shared/ui/states';
+import { StatusBadge } from '../../../shared/ui/StatusBadge';
 import { adminKeys } from '../api';
 import { type LookupDef, type LookupField, type LookupRow, lookupDefs, validateField } from './lookupDefs';
 
@@ -180,7 +182,9 @@ function LookupDialog({
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose}>{ar.common.cancel}</Button>
+          <Button variant="outlined" onClick={onClose}>
+            {ar.common.cancel}
+          </Button>
           <Button type="submit" variant="contained" disabled={save.isPending}>
             {save.isPending ? ar.common.saving : ar.common.save}
           </Button>
@@ -208,8 +212,16 @@ function LookupTable({ def }: { def: LookupDef }) {
   const governorateRows = governorates.data ?? [];
   return (
     <>
-      <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Box sx={{ flex: 1 }}>{def.hint && <Alert severity="info">{def.hint}</Alert>}</Box>
+      <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2, borderBottom: 1, borderColor: 'divider' }}>
+        <Box sx={{ flex: 1 }}>
+          {def.hint ? (
+            <Alert severity="info">{def.hint}</Alert>
+          ) : (
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              {ar.lookups.rowsCount(query.data.length)}
+            </Typography>
+          )}
+        </Box>
         {def.creatable && (
           <Button variant="contained" startIcon={<AddIcon />} onClick={() => setEditing('new')}>
             {ar.common.add}
@@ -232,18 +244,25 @@ function LookupTable({ def }: { def: LookupDef }) {
                 {def.columns.map((column) => (
                   <TableCell key={column}>
                     {column === 'is_active' ? (
-                      <Chip
-                        size="small"
-                        label={row.is_active ? ar.common.active : ar.common.inactive}
-                        color={row.is_active ? 'success' : 'default'}
-                      />
+                      row.is_active ? (
+                        <StatusBadge tone="success">{ar.common.active}</StatusBadge>
+                      ) : (
+                        <StatusBadge tone="neutral">{ar.common.inactive}</StatusBadge>
+                      )
+                    ) : column === 'code' ? (
+                      <Mono>{cellText(column, row, governorateRows)}</Mono>
                     ) : (
                       cellText(column, row, governorateRows)
                     )}
                   </TableCell>
                 ))}
                 <TableCell align="center">
-                  <IconButton size="small" aria-label={ar.common.edit} onClick={() => setEditing(row)}>
+                  <IconButton
+                    size="small"
+                    aria-label={ar.common.edit}
+                    onClick={() => setEditing(row)}
+                    sx={{ bgcolor: 'surface.low', color: 'primary.main' }}
+                  >
                     <EditIcon fontSize="small" />
                   </IconButton>
                 </TableCell>
@@ -271,8 +290,8 @@ export function LookupsPage() {
 
   return (
     <>
-      <PageHeader title={ar.lookups.title} />
-      <Paper variant="outlined">
+      <PageHeader title={ar.lookups.title} subtitle={ar.lookups.subtitle} />
+      <SectionCard flush>
         <Tabs
           value={tab}
           onChange={(_, next: number) => setTab(next)}
@@ -285,7 +304,7 @@ export function LookupsPage() {
           ))}
         </Tabs>
         <LookupTable key={def.key} def={def} />
-      </Paper>
+      </SectionCard>
     </>
   );
 }

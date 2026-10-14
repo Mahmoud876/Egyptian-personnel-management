@@ -1,46 +1,18 @@
 # Permission model
 
-Access is decided by **permission codes assigned directly to each user**. There are no roles in the authorisation logic.
+Current authorization is RBAC, required by FR-27 of the owner's PoC specification. Each account has one role, and `app/core/roles.py` derives its permissions. Direct user grants and editable permission templates do not influence access. [backend-poc.md](backend-poc.md) documents the complete migration and workflow.
 
-**Permission templates** exist only to save typing: when an admin creates or edits a user, they can apply a template (e.g. "Data entry") to pre-fill that user's permissions, then add or remove individual codes. Applying a template **copies** its codes into `user_permission`. Later changes to a template do not change existing users. The check at request time only ever looks at the user's own codes.
+- `system_administrator`: all ten PoC colon-separated codes below, plus lookup maintenance.
+- `data_entry_operator`: `profile:get`, `profile:insert`, `barcode:get`.
+- Dot-separated conscript/admin names are compatibility aliases for the existing frontend. Civilian employee codes below are retained in the historical catalog but are not granted by these two conscript roles.
 
-## Tables
+Routes declare `require_permission(...)`; the backend enforces access and audits denials. The UI hides unavailable actions. `GET /auth/me` returns the user's role and derived permissions. `GET /roles` is the administrator's fixed role catalog. Nonempty direct grants on user creation are rejected; the old assignment endpoint returns 409, and template routes are retired.
 
-```
-permission            code PK (nvarchar 100), module, name_ar, name_en, description_ar, sort_order
-app_user              id PK, username UQ, full_name, password_hash, is_active, work_entity_id FK NULL,
-                      must_change_password, last_login_at, created_at/by, updated_at/by
-user_permission       user_id FK, permission_code FK, granted_at, granted_by    PK (user_id, permission_code)
-permission_template   id PK, name_ar UQ, description_ar
-template_permission   template_id FK, permission_code FK                        PK (template_id, permission_code)
-user_session          id PK (SHA-256 hex of the cookie token), user_id FK, created_at, expires_at, last_seen_at, ip
-audit_log             id PK, at, user_id FK NULL, ip, action, entity, entity_id, permission_code,
-                      old_values NVARCHAR(MAX) JSON, new_values NVARCHAR(MAX) JSON, batch_id NULL
-```
+Sessions use opaque HTTP-only, SameSite=Strict cookies with hashed token keys in Redis, idle TTL and an absolute lifetime. Every authenticated request checks the account's active flag and SQL session version. Role changes, deactivation and password resets revoke existing sessions. SQL `user_session` rows are no longer used.
 
-`permission` rows are seeded by script (`sql/003_permissions_seed.sql`); the app never creates codes at runtime. The DB login used by the app (`sql/007_app_login.sql`) has `SELECT`/`INSERT` only on `audit_log` (no `UPDATE`/`DELETE`) and cannot write to `permission`.
+Migration 009 assigns existing accounts with the old `users.manage` grant to administrator and other accounts to operator once. New accounts default to operator. `scripts/create-admin.ps1` creates or resets the administrator role and forces a password change. Historical permission/template tables remain for compatibility, not authorization.
 
-## How checks work
-
-Backend:
-```python
-@router.post("/imports/conscripts")
-def upload(..., user = Depends(require_permission("conscripts.import.upload"))): ...
-```
-- `require_permission(*codes)` loads the session user and their codes (cache per request), allows if the user has **all** listed codes, otherwise writes `audit_log(action='denied', permission_code=...)` and raises 403.
-  - `require_permission()` with no codes means any signed-in user (used by `/auth/me`, `/auth/logout`, `/auth/change-password`, and reading lookups).
-  - `require_any_permission(*codes)` allows if the user has **at least one** code (e.g. listing templates: `users.manage` or `templates.manage`).
-  - `tests/test_route_permissions.py` fails if any route other than login and health lacks one of these.
-- `has_permission(user, code)` for checks inside services (e.g. data scoping).
-- Sessions: the cookie holds a random 32-byte token; `user_session.id` stores its SHA-256, so reading the table does not reveal usable sessions. Idle timeout `SESSION_IDLE_MINUTES`, absolute limit `SESSION_MAX_HOURS`.
-- A user with `must_change_password` can only call `/auth/me`, `/auth/logout` and `/auth/change-password` until they change it.
-- `POST /auth/permission-check {permission, path}`: the frontend route guard calls it when it blocks a screen, so the attempt is audited server-side (`action='denied'`, `entity_id='screen <path>'`).
-- Data scope: a user **without** `employees.scope.all` only sees employees whose `work_entity_id` equals their own. Apply in the query layer, not in the router.
-
-Frontend:
-- `GET /api/v1/auth/me` returns `{ id, username, full_name, permissions: string[] }`.
-- `usePermission("code")` → boolean. `<Can perm="code">…</Can>` hides children. `<RequirePermission perm="code">` guards a route and shows the 403 page.
-- Sidebar menu items each declare a permission; items the user lacks are not rendered.
+The catalog below includes active PoC codes and historical codes so database seeds and older UI identifiers remain documented. Historical codes do not imply implemented civilian workflows.
 
 ## Permission codes
 
@@ -83,6 +55,20 @@ Frontend:
 | `migration.rollback` | التراجع عن الترحيل | Roll back a migration run |
 | `backup.manage` | النسخ الاحتياطي | Run backups and restores |
 
+### PoC role permission codes (current backend)
+| Code | Arabic name | Allows |
+| --- | --- | --- |
+| `file:insert` | استيراد واعتماد وتصدير الملفات | Admin import, approval, cancellation and exports |
+| `audit:get` | عرض سجل الرقابة | Admin audit access |
+| `profile:get` | عرض المجندين | Read/search recruits |
+| `profile:insert` | إكمال بيانات التجنيد | Complete an unlocked profile |
+| `profile:update` | تعديل بيانات المجندين | Admin correction of profiles |
+| `barcode:get` | طباعة الباركود | Print a completed recruit label |
+| `user:get` | عرض المستخدمين | Admin user/role catalog |
+| `user:insert` | إضافة مستخدم | Admin account creation |
+| `user:update` | تعديل المستخدم والدور | Admin role, details and password management |
+| `user:delete` | إيقاف المستخدم | Admin account deactivation |
+
 ## Seed templates
 
 | Template | Codes |
@@ -94,4 +80,4 @@ Frontend:
 | مستعلم | `employees.view`, `documents.view`, `reports.view` |
 | مراجع | `employees.view`, `employees.scope.all`, `employees.history.view`, `documents.view`, `audit.view` |
 
-The first admin user is created by `scripts/create-admin.ps1` with **every** permission code.
+These are historical seed templates retained for migration compatibility only. They do not grant access in the current RBAC backend.

@@ -16,11 +16,13 @@ from app.core.security import (
 )
 
 from .schemas import MeResponse
+from app.core.roles import permissions_for_role
 
 
 def me_response(user: CurrentUser) -> MeResponse:
     return MeResponse(
         id=user.id,
+        role=user.role,
         username=user.username,
         full_name=user.full_name,
         work_entity_id=user.work_entity_id,
@@ -63,9 +65,10 @@ def login(db: Session, username: str, password: str, ip: str | None) -> tuple[st
     audit.write(db, action="login", user_id=user.id, ip=ip, entity="app_user", entity_id=user.id)
     db.commit()
 
-    codes = db.scalars(select(UserPermission.permission_code).where(UserPermission.user_id == user.id))
+    codes = permissions_for_role(user.role)
     return token, MeResponse(
         id=user.id,
+        role=user.role,
         username=user.username,
         full_name=user.full_name,
         work_entity_id=user.work_entity_id,

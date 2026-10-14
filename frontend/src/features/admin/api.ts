@@ -4,7 +4,7 @@ import { api, type Schemas, unwrap } from '../../shared/api/client';
 export type UserListItem = Schemas['UserListItem'];
 export type UserDetail = Schemas['UserDetail'];
 export type PermissionInfo = Schemas['PermissionOut'];
-export type Template = Schemas['TemplateOut'];
+export type Template = { id: number; name_ar: string; description_ar: string | null; permissions: string[] };
 export type AuditEntry = Schemas['AuditEntry'];
 export type WorkEntity = Schemas['WorkEntityOut'];
 
@@ -89,28 +89,10 @@ export function usePermissionsCatalog() {
   });
 }
 
-export function useTemplatesQuery(enabled = true) {
-  return useQuery({
-    queryKey: adminKeys.templates,
-    queryFn: () => unwrap(api.GET('/api/v1/templates')),
-    enabled,
-  });
-}
-
-export function useSaveTemplate() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ id, body }: { id: number | null; body: Schemas['TemplateIn'] }) =>
-      id === null
-        ? unwrap(api.POST('/api/v1/templates', { body }))
-        : unwrap(api.PUT('/api/v1/templates/{template_id}', { params: { path: { template_id: id } }, body })),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: adminKeys.templates }),
-  });
-}
-
 // --- audit -----------------------------------------------------------------------
 
 export type AuditQuery = {
+  q?: string;
   user_id?: number;
   action?: string;
   entity?: string;

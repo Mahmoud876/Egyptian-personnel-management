@@ -34,7 +34,7 @@ def list_users(
     q: str | None = Query(None, max_length=100),
     is_active: bool | None = None,
     paging: PageParams = Depends(page_params),
-    _: CurrentUser = Depends(require_permission("users.view")),
+    _: CurrentUser = Depends(require_permission("user:get")),
     db: Session = Depends(get_db),
 ) -> Page[UserListItem]:
     return service.list_users(db, q, is_active, paging)
@@ -42,7 +42,7 @@ def list_users(
 
 @router.get("/users/{user_id}", response_model=UserDetail)
 def get_user(
-    user_id: int, _: CurrentUser = Depends(require_permission("users.view")), db: Session = Depends(get_db)
+    user_id: int, _: CurrentUser = Depends(require_permission("user:get")), db: Session = Depends(get_db)
 ) -> UserDetail:
     return service.get_detail(db, user_id)
 
@@ -51,7 +51,7 @@ def get_user(
 def create_user(
     body: UserCreate,
     request: Request,
-    actor: CurrentUser = Depends(require_permission("users.manage")),
+    actor: CurrentUser = Depends(require_permission("user:insert")),
     db: Session = Depends(get_db),
 ) -> UserDetail:
     return service.create_user(db, actor, body, client_ip(request))
@@ -62,7 +62,7 @@ def update_user(
     user_id: int,
     body: UserUpdate,
     request: Request,
-    actor: CurrentUser = Depends(require_permission("users.manage")),
+    actor: CurrentUser = Depends(require_permission("user:update")),
     db: Session = Depends(get_db),
 ) -> UserDetail:
     return service.update_user(db, actor, user_id, body, client_ip(request))
@@ -73,7 +73,7 @@ def set_user_permissions(
     user_id: int,
     body: UserPermissionsUpdate,
     request: Request,
-    actor: CurrentUser = Depends(require_permission("users.manage")),
+    actor: CurrentUser = Depends(require_permission("user:update")),
     db: Session = Depends(get_db),
 ) -> UserDetail:
     return service.set_permissions(db, actor, user_id, body.permissions, client_ip(request))
@@ -84,7 +84,21 @@ def reset_password(
     user_id: int,
     body: PasswordReset,
     request: Request,
-    actor: CurrentUser = Depends(require_permission("users.manage")),
+    actor: CurrentUser = Depends(require_permission("user:update")),
     db: Session = Depends(get_db),
 ) -> None:
     service.reset_password(db, actor, user_id, body.new_password, client_ip(request))
+
+
+@router.get("/roles")
+def list_roles(_: CurrentUser = Depends(require_permission("user:get"))):
+    from app.core.roles import ROLE_PERMISSIONS
+    return [{"role": role, "permissions": sorted(codes)} for role, codes in ROLE_PERMISSIONS.items()]
+
+
+@router.delete("/users/{user_id}", status_code=204)
+def deactivate_user(user_id: int, request: Request,
+                    actor: CurrentUser = Depends(require_permission("user:delete")), db: Session = Depends(get_db)):
+    current = service.get_detail(db, user_id)
+    service.update_user(db, actor, user_id, UserUpdate(full_name=current.full_name,
+                        work_entity_id=current.work_entity_id, is_active=False), client_ip(request))

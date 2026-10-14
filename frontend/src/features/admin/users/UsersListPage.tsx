@@ -1,25 +1,28 @@
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Chip from '@mui/material/Chip';
 import InputAdornment from '@mui/material/InputAdornment';
 import MenuItem from '@mui/material/MenuItem';
-import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { formatDateTime } from '../../../shared/format';
+import { formatDateTimeNumeric } from '../../../shared/format';
 import { ar } from '../../../shared/i18n/ar';
 import { Can } from '../../../shared/permissions/permissions';
-import { AddIcon, SearchIcon } from '../../../shared/ui/icons';
+import { Mono } from '../../../shared/ui/DataText';
+import { AddIcon, PeopleIcon, SearchIcon } from '../../../shared/ui/icons';
+import { InitialsAvatar } from '../../../shared/ui/InitialsAvatar';
 import { PageHeader } from '../../../shared/ui/PageHeader';
+import { SectionCard } from '../../../shared/ui/SectionCard';
 import { EmptyState, ErrorAlert, LoadingState } from '../../../shared/ui/states';
+import { StatusBadge } from '../../../shared/ui/StatusBadge';
+import { TablePager } from '../../../shared/ui/TablePager';
 import { type UsersQuery, useUsersQuery } from '../api';
 import { adminPaths } from '../paths';
 
@@ -32,6 +35,22 @@ function useDebounced<T>(value: T, delayMs: number): T {
     return () => clearTimeout(timer);
   }, [value, delayMs]);
   return debounced;
+}
+
+export function RoleBadge({ role }: { role: string }) {
+  return role === 'system_administrator' ? (
+    <StatusBadge tone="primary">{ar.users.adminRole}</StatusBadge>
+  ) : (
+    <StatusBadge tone="neutral">{ar.users.operatorRole}</StatusBadge>
+  );
+}
+
+export function ActiveBadge({ active }: { active: boolean }) {
+  return active ? (
+    <StatusBadge tone="success">{ar.common.active}</StatusBadge>
+  ) : (
+    <StatusBadge tone="error">{ar.common.inactive}</StatusBadge>
+  );
 }
 
 export function UsersListPage() {
@@ -53,6 +72,7 @@ export function UsersListPage() {
     <>
       <PageHeader
         title={ar.users.title}
+        subtitle={ar.users.subtitle}
         actions={
           <Can perm="users.manage">
             <Button component={Link} to={adminPaths.newUser} variant="contained" startIcon={<AddIcon />}>
@@ -61,13 +81,34 @@ export function UsersListPage() {
           </Can>
         }
       />
-      <Paper variant="outlined">
-        <Box sx={{ p: 2, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+      <SectionCard
+        icon={<PeopleIcon />}
+        title={ar.users.listTitle}
+        actions={
+          users.data && (
+            <StatusBadge tone="primary" dot={false}>
+              {ar.users.count(users.data.total)}
+            </StatusBadge>
+          )
+        }
+        flush
+      >
+        <Box
+          sx={{
+            p: 2,
+            display: 'flex',
+            gap: 2,
+            flexWrap: 'wrap',
+            alignItems: 'flex-end',
+            borderBottom: 1,
+            borderColor: 'divider',
+          }}
+        >
           <TextField
             value={search}
             onChange={(event) => setSearch(event.target.value)}
+            label={ar.common.search}
             placeholder={ar.users.searchPlaceholder}
-            aria-label={ar.common.search}
             sx={{ flex: 1, minWidth: 240 }}
             slotProps={{
               input: {
@@ -84,7 +125,7 @@ export function UsersListPage() {
             label={ar.common.status}
             value={status}
             onChange={(event) => setStatus(event.target.value as StatusFilter)}
-            sx={{ width: 160 }}
+            sx={{ width: 180 }}
           >
             <MenuItem value="all">{ar.common.all}</MenuItem>
             <MenuItem value="active">{ar.common.active}</MenuItem>
@@ -92,7 +133,7 @@ export function UsersListPage() {
           </TextField>
         </Box>
         {users.isError && (
-          <Box sx={{ px: 2, pb: 2 }}>
+          <Box sx={{ p: 2 }}>
             <ErrorAlert error={users.error} onRetry={() => void users.refetch()} />
           </Box>
         )}
@@ -105,11 +146,10 @@ export function UsersListPage() {
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell>{ar.users.username}</TableCell>
-                      <TableCell>{ar.users.fullName}</TableCell>
+                      <TableCell>{ar.users.user}</TableCell>
+                      <TableCell>{ar.users.role}</TableCell>
                       <TableCell>{ar.users.workEntity}</TableCell>
                       <TableCell>{ar.common.status}</TableCell>
-                      <TableCell>{ar.users.permissionCount}</TableCell>
                       <TableCell>{ar.users.lastLogin}</TableCell>
                     </TableRow>
                   </TableHead>
@@ -121,42 +161,50 @@ export function UsersListPage() {
                         sx={{ cursor: 'pointer' }}
                         onClick={() => void navigate(adminPaths.user(user.id))}
                       >
-                        <TableCell dir="ltr" sx={{ textAlign: 'right' }}>
-                          {user.username}
-                        </TableCell>
-                        <TableCell>{user.full_name}</TableCell>
-                        <TableCell>{user.work_entity_name ?? ar.common.none}</TableCell>
                         <TableCell>
-                          <Chip
-                            size="small"
-                            label={user.is_active ? ar.common.active : ar.common.inactive}
-                            color={user.is_active ? 'success' : 'default'}
-                          />
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+                            <InitialsAvatar name={user.full_name} size={32} soft />
+                            <Box sx={{ minWidth: 0 }}>
+                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                {user.full_name}
+                              </Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 400 }}>
+                                <Mono>{user.username}</Mono>
+                              </Typography>
+                            </Box>
+                          </Box>
                         </TableCell>
-                        <TableCell>{user.permission_count}</TableCell>
-                        <TableCell>{user.last_login_at ? formatDateTime(user.last_login_at) : ar.users.never}</TableCell>
+                        <TableCell>
+                          <RoleBadge role={user.role} />
+                        </TableCell>
+                        <TableCell sx={{ color: 'text.secondary' }}>{user.work_entity_name ?? ar.common.none}</TableCell>
+                        <TableCell>
+                          <ActiveBadge active={user.is_active} />
+                        </TableCell>
+                        <TableCell sx={{ color: 'text.secondary' }}>
+                          {user.last_login_at ? <Mono>{formatDateTimeNumeric(user.last_login_at)}</Mono> : ar.users.never}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
               </TableContainer>
               {users.data.items.length === 0 && <EmptyState />}
-              <TablePagination
-                component="div"
-                count={users.data.total}
+              <TablePager
                 page={page}
-                rowsPerPage={pageSize}
-                rowsPerPageOptions={[10, 20, 50, 100]}
-                onPageChange={(_, next) => setPage(next)}
-                onRowsPerPageChange={(event) => {
-                  setPageSize(Number(event.target.value));
+                pageSize={pageSize}
+                total={users.data.total}
+                onPageChange={setPage}
+                onPageSizeChange={(size) => {
+                  setPageSize(size);
                   setPage(0);
                 }}
+                pageSizeOptions={[10, 20, 50, 100]}
               />
             </>
           )
         )}
-      </Paper>
+      </SectionCard>
     </>
   );
 }

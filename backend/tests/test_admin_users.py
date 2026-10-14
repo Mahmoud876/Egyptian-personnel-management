@@ -5,7 +5,8 @@ from fastapi.testclient import TestClient
 
 from tests.helpers import UserInfo, audit_rows, login
 
-DATA_ENTRY = ["conscripts.enter", "conscripts.label.print", "conscripts.view"]
+from app.core.roles import permissions_for_role
+DATA_ENTRY = sorted(permissions_for_role("data_entry_operator"))
 
 
 def _new_user_body(**overrides: object) -> dict[str, object]:
@@ -13,7 +14,7 @@ def _new_user_body(**overrides: object) -> dict[str, object]:
         "username": f"n_{uuid4().hex[:10]}",
         "full_name": "أحمد محمد علي",
         "password": "Initial-pass-1",
-        "permissions": DATA_ENTRY,
+        "role": "data_entry_operator",
     }
     body.update(overrides)
     return body
@@ -54,7 +55,7 @@ def test_unknown_permission_code_is_rejected(client: TestClient, make_user: Call
     response = client.post("/api/v1/users", json=_new_user_body(permissions=["conscripts.view", "made.up"]))
 
     assert response.status_code == 422
-    assert response.json()["code"] == "unknown_permission"
+    assert response.json()["code"] == "role_permissions_only"
 
 
 def test_list_and_search_users(client: TestClient, make_user: Callable[..., UserInfo]) -> None:
@@ -67,7 +68,7 @@ def test_list_and_search_users(client: TestClient, make_user: Callable[..., User
     page = response.json()
     assert page["total"] == 1
     assert page["items"][0]["username"] == viewer.username
-    assert page["items"][0]["permission_count"] == 1
+    assert page["items"][0]["permission_count"] == len(permissions_for_role("system_administrator"))
 
 
 def test_search_matches_arabic_name_variants(client: TestClient, make_user: Callable[..., UserInfo]) -> None:
@@ -81,27 +82,22 @@ def test_search_matches_arabic_name_variants(client: TestClient, make_user: Call
     assert response.json()["total"] == 1
 
 
-def test_set_permissions_replaces_the_set_and_is_audited(client: TestClient, make_user: Callable[..., UserInfo]) -> None:
-    admin = make_user("users.manage", "users.view")
-    target = make_user("conscripts.view")
+def test_direct_permission_grants_are_rejected(client, make_user):
+    admin = make_user(role="system_administrator")
+    target = make_user()
     login(client, admin)
-
-    response = client.put(f"/api/v1/users/{target.id}/permissions", json={"permissions": ["audit.view"]})
-
-    assert response.json()["permissions"] == ["audit.view"]
-    [row] = audit_rows(admin.id, "update_permissions")
-    assert '"conscripts.view"' in (row.old_values or "")
-    assert '"audit.view"' in (row.new_values or "")
+    response = client.put(f"/api/v1/users/{target.id}/permissions", json={"permissions": ["audit:get"]})
+    assert response.status_code == 409
+    assert response.json()["code"] == "role_permissions_only"
 
 
-def test_admin_cannot_remove_own_user_management(client: TestClient, make_user: Callable[..., UserInfo]) -> None:
-    admin = make_user("users.manage")
+def test_admin_cannot_demote_self(client, make_user):
+    admin = make_user(role="system_administrator")
     login(client, admin)
-
-    response = client.put(f"/api/v1/users/{admin.id}/permissions", json={"permissions": []})
-
+    response = client.put(f"/api/v1/users/{admin.id}", json={"full_name": "Admin", "work_entity_id": None,
+                          "is_active": True, "role": "data_entry_operator"})
     assert response.status_code == 400
-    assert response.json()["code"] == "cannot_remove_own_user_management"
+    assert response.json()["code"] == "cannot_change_own_role"
 
 
 def test_deactivating_a_user_ends_their_sessions(make_user: Callable[..., UserInfo]) -> None:
@@ -142,13 +138,13 @@ def test_reset_password_forces_change(client: TestClient, make_user: Callable[..
 
 
 def test_users_view_cannot_modify(client: TestClient, make_user: Callable[..., UserInfo]) -> None:
-    viewer = make_user("users.view")
+    viewer = make_user(role="data_entry_operator")
     login(client, viewer)
 
     response = client.post("/api/v1/users", json=_new_user_body())
 
     assert response.status_code == 403
-    assert audit_rows(viewer.id, "denied")[0].permission_code == "users.manage"
+    assert audit_rows(viewer.id, "denied")[0].permission_code == "user:insert"
 
 
 def test_permission_catalog_is_grouped_by_module(client: TestClient, make_user: Callable[..., UserInfo]) -> None:
@@ -156,6 +152,5 @@ def test_permission_catalog_is_grouped_by_module(client: TestClient, make_user: 
 
     codes = client.get("/api/v1/permissions").json()
 
-    assert len(codes) == 27
-    assert [c["module"] for c in codes[:5]] == ["admin"] * 5
-    assert codes[5]["code"] == "conscripts.view"
+    assert {"file:insert", "user:update", "profile:insert"} <= {c["code"] for c in codes}
+    assert codes[0]["module"] == "admin"

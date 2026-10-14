@@ -2,11 +2,11 @@ import json
 from datetime import UTC, datetime
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import select, or_, cast, String
 from sqlalchemy.orm import Session
 
 from app.core.models import AppUser, AuditLog
-from app.core.queries import PageParams, paginate
+from app.core.queries import PageParams, paginate, like_contains
 from app.core.schemas import Page
 
 from .schemas import AuditEntry, AuditFacets, AuditUser
@@ -31,12 +31,19 @@ def search(
     entity: str | None = None,
     date_from: datetime | None = None,
     date_to: datetime | None = None,
+    q: str | None = None,
 ) -> Page[AuditEntry]:
     statement = (
         select(AuditLog, AppUser.username, AppUser.full_name)
         .outerjoin(AppUser, AppUser.id == AuditLog.user_id)
         .order_by(AuditLog.id.desc())
     )
+    if q:
+        pattern = like_contains(q.strip())
+        statement = statement.where(or_(AppUser.username.like(pattern), AppUser.full_name.like(pattern),
+            cast(AuditLog.user_id, String).like(pattern), AuditLog.action.like(pattern),
+            AuditLog.entity.like(pattern), AuditLog.entity_id.like(pattern),
+            AuditLog.old_values.like(pattern), AuditLog.new_values.like(pattern)))
     if user_id is not None:
         statement = statement.where(AuditLog.user_id == user_id)
     if action:

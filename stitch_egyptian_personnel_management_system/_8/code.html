@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"primary":"#032448","error":"#ba1a1a","on-primary-container":"#8ba4cf","tertiary-fixed":"#ffddb0","surface-container-high":"#e1e8f9","tertiary-fixed-dim":"#ecbf7f","secondary-container":"#d8e3f5","outline":"#74777f","inverse-on-surface":"#ebf1ff","surface":"#f8f9ff","on-secondary":"#ffffff","surface-container-highest":"#dbe3f3","on-primary-fixed":"#001c3b","primary-fixed-dim":"#aec8f4","surface-tint":"#465f86","on-primary":"#ffffff","inverse-surface":"#29313d","secondary-fixed-dim":"#bcc7d9","surface-container":"#e6eeff","surface-bright":"#f8f9ff","surface-dim":"#d2daeb","inverse-primary":"#aec8f4","surface-container-lowest":"#ffffff","on-primary-fixed-variant":"#2d476d","on-secondary-fixed":"#111c29","on-secondary-container":"#5a6574","on-surface":"#141c28","on-background":"#141c28","on-tertiary-fixed":"#281800","tertiary-container":"#503400","background":"#f8f9ff","outline-variant":"#c4c6cf","on-secondary-fixed-variant":"#3d4856","on-tertiary":"#ffffff","on-surface-variant":"#43474e","secondary":"#545f6e","on-tertiary-container":"#c69d60","on-error":"#ffffff","on-error-container":"#93000a","surface-variant":"#dbe3f3","secondary-fixed":"#d8e3f5","primary-container":"#1f3a5f","on-tertiary-fixed-variant":"#5f410c","error-container":"#ffdad6","surface-container-low":"#eff3ff","primary-fixed":"#d5e3ff","tertiary":"#342000"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-xs":"0.25rem","space-lg":"1.5rem","gutter":"1rem","gutter-dense":"0.5rem","margin":"1.5rem","space-md":"1rem","margin-compact":"1rem","space-sm":"0.5rem","space-xl":"2rem"},"fontFamily":{"body-md":["Cairo"],"headline-md":["Cairo"],"code-num":["monospace"],"headline-sm":["Cairo"],"body-lg":["Cairo"],"label-sm":["Cairo"],"label-md":["Cairo"],"headline-lg":["Cairo"],"body-table":["Cairo"]},"fontSize":{"body-md":["14px",{"lineHeight":"22px","fontWeight":"400"}],"headline-md":["18px",{"lineHeight":"28px","fontWeight":"600"}],"code-num":["13px",{"lineHeight":"18px","fontWeight":"400"}],"headline-sm":["16px",{"lineHeight":"24px","fontWeight":"600"}],"body-lg":["15px",{"lineHeight":"24px","fontWeight":"400"}],"label-sm":["12px",{"lineHeight":"16px","fontWeight":"500"}],"label-md":["13px",{"lineHeight":"18px","fontWeight":"500"}],"headline-lg":["20px",{"lineHeight":"32px","fontWeight":"600"}],"body-table":["13px",{"lineHeight":"20px","fontWeight":"400"}]}}}}</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><aside class="fixed top-0 right-0 h-screen w-60 bg-surface-container-lowest z-20 flex flex-col border-l border-outline-variant"><div class="h-16 px-space-md flex items-center gap-space-sm border-b border-outline-variant"><img alt="Logo" class="w-8 h-8 rounded-full object-cover shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1VdUWHvMojBRy49Lxrwv-lNOk8dqX6wig9RRxFHW3wrVPyy-28ktzflmKUvvzDaFy8CRgeHj5HU0cXD4CZ65aZDBBSGuwhxl3VsSCk8aOVW5hgeRjnLA5kpCZTAf5FqlBNEPEq8vksjEUpxcnAgAZ3-ixagGexM8AAcxI2phF8B2GTVVL6AwJ01iLbmA9XmywXQphKmsGAuy1fWYxbWFmAdpFRKPdkmitH2fH4dyVsLhBnnuAgMb62CTuc"/><div class="flex flex-col min-w-0"><span class="font-headline-sm text-headline-sm text-primary-container truncate font-semibold">منظومة شئون الأفراد</span><span class="font-label-sm text-label-sm text-secondary truncate">جمهورية مصر العربية - قطاع الموارد البشرية</span></div></div><div class="flex-1 overflow-y-auto py-space-sm px-space-xs"><nav class="flex flex-col gap-space-sm" data-active-classes="bg-surface-container-low text-primary-container font-semibold rounded-lg"><div class="flex flex-col"><span class="px-space-sm py-1 font-label-sm text-label-sm text-secondary uppercase">الرئيسية</span><div class="flex flex-col gap-0.5 mt-0.5"><a class="flex items-center gap-space-xs px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="overview-dashboard" href="#"><span class="truncate">لوحة المعلومات والملخص</span></a></div></div><div class="flex flex-col"><span class="px-space-sm py-1 font-label-sm text-label-sm text-secondary uppercase">المجندين</span><div class="flex flex-col gap-0.5 mt-0.5"><a class="flex items-center gap-space-xs px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="conscripts-registration" href="#"><span class="truncate">حصر وتسجيل المجندين</span></a><a class="flex items-center gap-space-xs px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="military-service-records" href="#"><span class="truncate">سجلات الخدمة العسكرية</span></a><a class="flex items-center gap-space-xs px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="deployment-transfer-actions" href="#"><span class="truncate">إجراءات التوزيع والنقل</span></a></div></div><div class="flex flex-col"><span class="px-space-sm py-1 font-label-sm text-label-sm text-secondary uppercase">العاملين المدنيين</span><div class="flex flex-col gap-0.5 mt-0.5"><a class="flex items-center gap-space-xs px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="employee-records" href="#"><span class="truncate">ملفات الموظفين</span></a><a class="flex items-center gap-space-xs px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="leaves-delegations" href="#"><span class="truncate">الإجازات والانتدابات</span></a><a class="flex items-center gap-space-xs px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="annual-evaluations" href="#"><span class="truncate">تقارير الكفاءة السنوية</span></a></div></div><div class="flex flex-col"><span class="px-space-sm py-1 font-label-sm text-label-sm text-secondary uppercase">الإدارة</span><div class="flex flex-col gap-0.5 mt-0.5"><a class="flex items-center gap-space-xs px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="review-approvals" href="#"><span class="truncate">مراجعة واعتماد الطلبات</span></a><a class="flex items-center gap-space-xs px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="system-reports-logs" href="#"><span class="truncate">تقارير وسجلات النظام</span></a><a class="flex items-center gap-space-xs px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="user-permissions" href="#"><span class="truncate">صلاحيات المستخدم</span></a><a class="flex items-center gap-space-xs px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="system-configuration" href="#"><span class="truncate">إعدادات المنظومة</span></a></div></div></nav></div></aside><div class="mr-60"><header class="fixed top-0 right-60 left-0 h-16 bg-surface-container-lowest z-20 flex items-center justify-between px-space-lg border-b border-outline-variant"><div class="flex items-center gap-space-md"><div class="relative flex items-center"><span class="material-symbols-outlined absolute right-3 text-secondary text-[20px] pointer-events-none">search</span><input class="w-80 h-9 pr-9 pl-space-sm rounded-lg bg-surface border border-outline-variant font-body-md text-body-md text-on-surface placeholder:text-secondary focus:outline-none focus:border-primary-container focus:bg-surface-container-lowest" placeholder="بحث برقم قومي، كود ملف، أو اسم الموظف..." type="text"/></div></div><div class="flex items-center gap-space-md"><div class="hidden md:flex items-center gap-1.5 px-space-sm py-1 rounded-lg bg-surface-container-low text-secondary font-label-sm text-label-sm"><span class="material-symbols-outlined text-[16px] text-primary-container">sync</span><span class="font-code-num text-code-num">آخر تحديث: 09:30 ص</span></div><div class="h-6 w-px bg-outline-variant"></div><div class="flex items-center gap-space-sm"><div class="flex flex-col text-left"><span class="font-label-md text-label-md text-on-surface font-medium">أ. طارق عبد الرحمن</span><span class="font-label-sm text-label-sm text-secondary">مسؤول النظام</span></div><a class="flex items-center gap-1 text-secondary hover:text-error transition-colors font-label-md text-label-md px-2 py-1 rounded hover:bg-surface-container-high" data-path="login" href="#"><span class="material-symbols-outlined text-[18px]">logout</span><span>تسجيل الخروج</span></a></div><img alt="Profile" class="w-8 h-8 rounded-full object-cover shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1VdUWHvMojBRy49Lxrwv-lNOk8dqX6wig9RRxFHW3wrVPyy-28ktzflmKUvvzDaFy8CRgeHj5HU0cXD4CZ65aZDBBSGuwhxl3VsSCk8aOVW5hgeRjnLA5kpCZTAf5FqlBNEPEq8vksjEUpxcnAgAZ3-ixagGexM8AAcxI2phF8B2GTVVL6AwJ01iLbmA9XmywXQphKmsGAuy1fWYxbWFmAdpFRKPdkmitH2fH4dyVsLhBnnuAgMb62CTuc"/></div></header><main class="w-full pt-16 min-h-screen bg-surface p-space-lg"><div class="flex flex-col w-full gap-space-md">
+<!-- رأس الصفحة والمسار الإداري -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm bg-surface-container-lowest p-space-md rounded-lg shadow-sm">
+<div class="flex flex-col gap-1">
+<nav class="flex items-center gap-1.5 text-secondary font-label-sm text-label-sm">
+<a class="hover:text-primary transition-colors" href="#">الإدارة</a>
+<span class="material-symbols-outlined text-[14px]">chevron_left</span>
+<a class="hover:text-primary transition-colors" href="#">تقارير وسجلات النظام</a>
+<span class="material-symbols-outlined text-[14px]">chevron_left</span>
+<span class="text-on-surface font-semibold">سجل الرقابة والتدقيق الأمني</span>
+</nav>
+<div class="flex items-center gap-space-sm mt-0.5">
+<h1 class="font-headline-lg text-headline-lg text-primary tracking-tight font-bold">سجل الرقابة والتدقيق الأمني (Audit Log)</h1>
+<div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#E8F5EE] text-[#1E7F4F] font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[15px]" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+<span>نظام التتبع الأمني مشفر ومؤمّن SHA-256</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-sm">
+<button class="inline-flex items-center gap-1.5 px-space-sm py-1.5 rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors font-label-md text-label-md" type="button">
+<span class="material-symbols-outlined text-[18px] text-primary">autorenew</span>
+<span>تحديث حي</span>
+</button>
+<div class="relative group">
+<button class="inline-flex items-center gap-1.5 px-space-sm py-1.5 rounded-lg bg-surface-container-lowest text-on-surface hover:bg-surface-container-low shadow-sm transition-colors font-label-md text-label-md" type="button">
+<span class="material-symbols-outlined text-[18px] text-secondary">file_download</span>
+<span>تصدير السجل</span>
+<span class="material-symbols-outlined text-[16px]">expand_more</span>
+</button>
+<div class="hidden group-hover:flex flex-col absolute left-0 top-full mt-1 w-36 bg-surface-container-lowest rounded-lg shadow-md py-1 z-40">
+<button class="flex items-center gap-2 px-3 py-1.5 font-label-sm text-label-sm text-on-surface hover:bg-surface-container-low text-right w-full" type="button">
+<span class="material-symbols-outlined text-[16px] text-[#1E7F4F]">description</span>
+<span>ملف Excel (.xlsx)</span>
+</button>
+<button class="flex items-center gap-2 px-3 py-1.5 font-label-sm text-label-sm text-on-surface hover:bg-surface-container-low text-right w-full" type="button">
+<span class="material-symbols-outlined text-[16px] text-error">picture_as_pdf</span>
+<span>وثيقة PDF معتمدة</span>
+</button>
+</div>
+</div>
+<button class="inline-flex items-center gap-1.5 px-space-md py-1.5 rounded-lg bg-primary-container text-on-primary hover:bg-[#2B4C7E] transition-colors font-label-md text-label-md shadow-sm" type="button">
+<span class="material-symbols-outlined text-[18px]">security_update_good</span>
+<span>شهادة النزاهة الرقمية</span>
+</button>
+</div>
+</div>
+<!-- لوحة الفلاتر والبحث الرقابي المتقدم -->
+<div class="bg-surface-container-lowest p-space-md rounded-lg shadow-sm flex flex-col gap-space-sm">
+<div class="flex items-center justify-between pb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-primary">filter_alt</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">معايير تصفية وتدقيق العمليات</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="font-label-sm text-label-sm text-secondary">نطاق السجلات المباشر:</span>
+<span class="font-code-num text-code-num bg-surface-container-low text-primary px-2 py-0.5 rounded font-medium">84,920 حدث مسجل</span>
+</div>
+</div>
+<!-- شبكة مدخلات التصفية -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-space-sm">
+<!-- فلتر المستخدم المسؤول -->
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md text-on-surface font-medium flex items-center justify-between">
+<span>المستخدم المنفّذ</span>
+<span class="font-label-sm text-label-sm text-secondary font-normal">كود / اسم</span>
+</label>
+<div class="relative flex items-center">
+<select class="w-full h-9 pr-2.5 pl-7 rounded-lg bg-surface-container-low font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest transition-colors appearance-none cursor-pointer">
+<option value="all">كافة المستخدمين والمشرفين</option>
+<option selected="" value="tarek">أ. طارق عبد الرحمن (EMP-1082) - مسؤول</option>
+<option value="hossam">م. حسام الدين البدري (EMP-4390) - نظم</option>
+<option value="ahmed">ملازم أول / أحمد محمود (MIL-9011) - فرع التجنيد</option>
+<option value="samir">أ. سمير خليل حسن (EMP-2219) - مراجع</option>
+</select>
+<span class="material-symbols-outlined absolute left-2 text-secondary text-[18px] pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- فلتر نوع الإجراء -->
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md text-on-surface font-medium">نوع الإجراء الرقابي</label>
+<div class="relative flex items-center">
+<select class="w-full h-9 pr-2.5 pl-7 rounded-lg bg-surface-container-low font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest transition-colors appearance-none cursor-pointer">
+<option value="all">الكل (كافة الإجراءات)</option>
+<option value="insert">إضافة سجل جديد (Insert)</option>
+<option selected="" value="update">تعديل بيانات (Update)</option>
+<option value="upload">رفع وثيقة أمنية (Upload)</option>
+<option value="approval">اعتماد وتوقيع إلكتروني (Approval)</option>
+<option value="denied">محاولة مرفوضة أمنياً (Unauthorized)</option>
+</select>
+<span class="material-symbols-outlined absolute left-2 text-secondary text-[18px] pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- فلتر جهة / وحدة التأثير -->
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md text-on-surface font-medium">جهة التأثير (Entity)</label>
+<div class="relative flex items-center">
+<select class="w-full h-9 pr-2.5 pl-7 rounded-lg bg-surface-container-low font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest transition-colors appearance-none cursor-pointer">
+<option value="all">كافة الكيانات وقواعد البيانات</option>
+<option selected="" value="conscripts">سجلات وبيانات المجندين</option>
+<option value="civilian">ملفات العاملين المدنيين</option>
+<option value="permissions">إدارة الصلاحيات والأدوار</option>
+<option value="security">إعدادات المنظومة والشهادات</option>
+<option value="armed-forces">بيانات قطاع التعبئة العسكرية</option>
+</select>
+<span class="material-symbols-outlined absolute left-2 text-secondary text-[18px] pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- نطاق التواريخ -->
+<div class="flex flex-col gap-1 lg:col-span-2">
+<label class="font-label-md text-label-md text-on-surface font-medium flex items-center justify-between">
+<span>النطاق الزمني للحدث</span>
+<div class="flex gap-1 text-label-sm font-label-sm text-secondary">
+<button class="hover:text-primary hover:underline px-1" type="button">اليوم</button>
+<span>•</span>
+<button class="text-primary font-semibold hover:underline px-1" type="button">آخر 7 أيام</button>
+<span>•</span>
+<button class="hover:text-primary hover:underline px-1" type="button">هذا الشهر</button>
+</div>
+</label>
+<div class="grid grid-cols-2 gap-2">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute right-2 text-secondary text-[16px]">calendar_today</span>
+<input class="w-full h-9 pr-8 pl-2 rounded-lg bg-surface-container-low font-code-num text-code-num text-on-surface focus:outline-none focus:bg-surface-container-lowest text-left" dir="ltr" type="text" value="08/10/2024"/>
+</div>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute right-2 text-secondary text-[16px]">calendar_today</span>
+<input class="w-full h-9 pr-8 pl-2 rounded-lg bg-surface-container-low font-code-num text-code-num text-on-surface focus:outline-none focus:bg-surface-container-lowest text-left" dir="ltr" type="text" value="14/10/2024"/>
+</div>
+</div>
+</div>
+</div>
+<!-- أزرار الإجراء للفلاتر ومعرف السجل -->
+<div class="flex items-center justify-between pt-2">
+<div class="flex items-center gap-space-sm flex-1 max-w-md">
+<div class="relative w-full flex items-center">
+<span class="material-symbols-outlined absolute right-2.5 text-secondary text-[18px]">manage_search</span>
+<input class="w-full h-9 pr-9 pl-3 rounded-lg bg-surface-container-low font-body-md text-body-md text-on-surface placeholder:text-secondary focus:outline-none focus:bg-surface-container-lowest" placeholder="بحث دقيق برقم السجل (Record ID) أو عنوان الـ IP..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="h-9 px-space-md rounded-lg bg-surface-container text-secondary hover:text-on-surface font-label-md text-label-md transition-colors flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[16px]">restart_alt</span>
+<span>إعادة ضبط</span>
+</button>
+<button class="h-9 px-space-lg rounded-lg bg-primary-container text-on-primary hover:bg-[#2B4C7E] font-label-md text-label-md transition-colors flex items-center gap-1 shadow-sm" type="button">
+<span class="material-symbols-outlined text-[18px]">search_check</span>
+<span>تطبيق الفلترة والتدقيق</span>
+</button>
+</div>
+</div>
+</div>
+<!-- الحاوية المزدوجة: جدول السجل واللوحة الجانبية للمقارنة جنباً إلى جنب -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md items-start">
+<!-- جدول سجل العمليات والتدقيق (يمتد على 7 أعمدة لترك مساحة للمقارنة التفاعلية) -->
+<div class="lg:col-span-7 bg-surface-container-lowest rounded-lg shadow-sm flex flex-col overflow-hidden">
+<!-- ترويسة الجدول وتحديث الحالة -->
+<div class="p-space-sm px-space-md bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-primary">view_timeline</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">سجل العمليات المؤرشفة</span>
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">15 عملية مطابقة</span>
+</div>
+<div class="flex items-center gap-2 text-secondary font-label-sm text-label-sm">
+<span class="inline-block w-2 h-2 rounded-full bg-[#1E7F4F] animate-pulse"></span>
+<span>الاستماع المباشر للأحداث الأمنية</span>
+</div>
+</div>
+<!-- محتوى الجدول فائق الدقة والكثافة -->
+<div class="overflow-x-auto w-full">
+<table class="w-full text-right border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-secondary font-label-md text-label-md">
+<th class="py-2.5 px-space-sm font-semibold">الوقت والتاريخ</th>
+<th class="py-2.5 px-space-sm font-semibold">المستخدم المنفذ</th>
+<th class="py-2.5 px-space-sm font-semibold text-center">نوع الإجراء</th>
+<th class="py-2.5 px-space-sm font-semibold">جهة التأثير (Entity)</th>
+<th class="py-2.5 px-space-sm font-semibold">معرّف السجل</th>
+<th class="py-2.5 px-space-sm font-semibold">عنوان الشبكة (IP)</th>
+<th class="py-2.5 px-space-sm font-semibold text-center">تتبع الأثر</th>
+</tr>
+</thead>
+<tbody class="font-body-table text-body-table divide-y divide-surface-container">
+<!-- الصف الأول (محدد كنشط / Selected Active Row المتطابق مع شاشة المقارنة) -->
+<tr class="bg-surface-container-low transition-colors cursor-pointer group">
+<td class="py-2.5 px-space-sm font-code-num text-code-num text-on-surface whitespace-nowrap" dir="ltr">
+<div class="flex flex-col text-right">
+<span class="font-bold text-primary">14/10/2024</span>
+<span class="text-secondary text-[11px]">10:45:12 ص</span>
+</div>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-bold text-[11px] shrink-0">
+                    طع
+                  </div>
+<div class="flex flex-col">
+<span class="font-semibold text-on-surface">أ. طارق عبد الرحمن</span>
+<span class="font-code-num text-[11px] text-secondary">EMP-1082 (مسؤول)</span>
+</div>
+</div>
+</td>
+<td class="py-2.5 px-space-sm text-center whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#EFF4FF] text-[#175CD3] font-label-sm text-label-sm font-semibold">
+<span class="material-symbols-outlined text-[13px]">edit_note</span>
+<span>تعديل بيانات</span>
+</span>
+</td>
+<td class="py-2.5 px-space-sm text-on-surface font-medium whitespace-nowrap">سجلات المجندين</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<span class="font-code-num text-code-num bg-surface-container-highest px-1.5 py-0.5 rounded text-on-surface font-semibold" dir="ltr">MIL-84920</span>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap font-code-num text-code-num text-secondary" dir="ltr">
+<span>192.168.10.45</span>
+</td>
+<td class="py-2.5 px-space-sm text-center whitespace-nowrap">
+<button class="w-7 h-7 rounded-full bg-primary-container text-on-primary inline-flex items-center justify-center shadow-sm" type="button">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+</button>
+</td>
+</tr>
+<!-- الصف الثاني: إضافة -->
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer">
+<td class="py-2.5 px-space-sm font-code-num text-code-num text-on-surface whitespace-nowrap" dir="ltr">
+<div class="flex flex-col text-right">
+<span>14/10/2024</span>
+<span class="text-secondary text-[11px]">10:32:05 ص</span>
+</div>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center font-bold text-[11px] shrink-0">
+                    أم
+                  </div>
+<div class="flex flex-col">
+<span class="font-semibold text-on-surface">ملازم أول / أحمد محمود</span>
+<span class="font-code-num text-[11px] text-secondary">MIL-9011 (تجنيد)</span>
+</div>
+</div>
+</td>
+<td class="py-2.5 px-space-sm text-center whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#E8F5EE] text-[#1E7F4F] font-label-sm text-label-sm font-semibold">
+<span class="material-symbols-outlined text-[13px]">add_circle</span>
+<span>إضافة سجل</span>
+</span>
+</td>
+<td class="py-2.5 px-space-sm text-on-surface font-medium whitespace-nowrap">بيانات التجنيد</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<span class="font-code-num text-code-num bg-surface-container-high px-1.5 py-0.5 rounded text-on-surface" dir="ltr">MIL-84921</span>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap font-code-num text-code-num text-secondary" dir="ltr">
+<span>192.168.10.82</span>
+</td>
+<td class="py-2.5 px-space-sm text-center whitespace-nowrap">
+<button class="w-7 h-7 rounded-full bg-surface-container hover:bg-surface-container-high text-secondary inline-flex items-center justify-center transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+</button>
+</td>
+</tr>
+<!-- الصف الثالث: محاولة مرفوضة (High Contrast Alert) -->
+<tr class="hover:bg-error-container/30 bg-error-container/10 transition-colors cursor-pointer">
+<td class="py-2.5 px-space-sm font-code-num text-code-num text-on-surface whitespace-nowrap" dir="ltr">
+<div class="flex flex-col text-right">
+<span class="text-error font-semibold">14/10/2024</span>
+<span class="text-error text-[11px]">10:14:59 ص</span>
+</div>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-full bg-error text-on-error flex items-center justify-center font-bold text-[11px] shrink-0">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+</div>
+<div class="flex flex-col">
+<span class="font-semibold text-error">حساب خارجي مجهول</span>
+<span class="font-code-num text-[11px] text-error">ERR-AUTH-403</span>
+</div>
+</div>
+</td>
+<td class="py-2.5 px-space-sm text-center whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#FEE4E2] text-[#B42318] font-label-sm text-label-sm font-bold">
+<span class="material-symbols-outlined text-[13px]">gpp_bad</span>
+<span>محاولة مرفوضة</span>
+</span>
+</td>
+<td class="py-2.5 px-space-sm text-error font-medium whitespace-nowrap">صلاحيات المستخدمين</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<span class="font-code-num text-code-num bg-[#FEE4E2] text-[#B42318] px-1.5 py-0.5 rounded font-bold" dir="ltr">USER-ADMIN-SEC</span>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap font-code-num text-code-num text-error font-semibold" dir="ltr">
+<span>10.200.4.119</span>
+</td>
+<td class="py-2.5 px-space-sm text-center whitespace-nowrap">
+<button class="w-7 h-7 rounded-full bg-error text-on-error inline-flex items-center justify-center" type="button">
+<span class="material-symbols-outlined text-[16px]">policy</span>
+</button>
+</td>
+</tr>
+<!-- الصف الرابع: رفع ملف أمني -->
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer">
+<td class="py-2.5 px-space-sm font-code-num text-code-num text-on-surface whitespace-nowrap" dir="ltr">
+<div class="flex flex-col text-right">
+<span>14/10/2024</span>
+<span class="text-secondary text-[11px]">09:55:40 ص</span>
+</div>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center font-bold text-[11px] shrink-0">
+                    حل
+                  </div>
+<div class="flex flex-col">
+<span class="font-semibold text-on-surface">م. حسام الدين البدري</span>
+<span class="font-code-num text-[11px] text-secondary">EMP-4390 (نظم)</span>
+</div>
+</div>
+</td>
+<td class="py-2.5 px-space-sm text-center whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#F3E8FF] text-[#6B21A8] font-label-sm text-label-sm font-semibold">
+<span class="material-symbols-outlined text-[13px]">upload_file</span>
+<span>رفع وثيقة</span>
+</span>
+</td>
+<td class="py-2.5 px-space-sm text-on-surface font-medium whitespace-nowrap">وثائق الكفاءة والتقارير</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<span class="font-code-num text-code-num bg-surface-container-high px-1.5 py-0.5 rounded text-on-surface" dir="ltr">DOC-EVAL-2024</span>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap font-code-num text-code-num text-secondary" dir="ltr">
+<span>192.168.10.12</span>
+</td>
+<td class="py-2.5 px-space-sm text-center whitespace-nowrap">
+<button class="w-7 h-7 rounded-full bg-surface-container hover:bg-surface-container-high text-secondary inline-flex items-center justify-center transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+</button>
+</td>
+</tr>
+<!-- الصف الخامس: اعتماد وتوقيع إلكتروني -->
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer">
+<td class="py-2.5 px-space-sm font-code-num text-code-num text-on-surface whitespace-nowrap" dir="ltr">
+<div class="flex flex-col text-right">
+<span>14/10/2024</span>
+<span class="text-secondary text-[11px]">09:12:18 ص</span>
+</div>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-bold text-[11px] shrink-0">
+                    طع
+                  </div>
+<div class="flex flex-col">
+<span class="font-semibold text-on-surface">أ. طارق عبد الرحمن</span>
+<span class="font-code-num text-[11px] text-secondary">EMP-1082 (مسؤول)</span>
+</div>
+</div>
+</td>
+<td class="py-2.5 px-space-sm text-center whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary-container text-primary font-label-sm text-label-sm font-semibold">
+<span class="material-symbols-outlined text-[13px]">draw</span>
+<span>اعتماد قرار</span>
+</span>
+</td>
+<td class="py-2.5 px-space-sm text-on-surface font-medium whitespace-nowrap">حركات النقل والانتداب</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<span class="font-code-num text-code-num bg-surface-container-high px-1.5 py-0.5 rounded text-on-surface" dir="ltr">TRN-44819</span>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap font-code-num text-code-num text-secondary" dir="ltr">
+<span>192.168.10.45</span>
+</td>
+<td class="py-2.5 px-space-sm text-center whitespace-nowrap">
+<button class="w-7 h-7 rounded-full bg-surface-container hover:bg-surface-container-high text-secondary inline-flex items-center justify-center transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+</button>
+</td>
+</tr>
+<!-- الصف السادس: تعديل صلاحية -->
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer">
+<td class="py-2.5 px-space-sm font-code-num text-code-num text-on-surface whitespace-nowrap" dir="ltr">
+<div class="flex flex-col text-right">
+<span>13/10/2024</span>
+<span class="text-secondary text-[11px]">02:18:44 م</span>
+</div>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center font-bold text-[11px] shrink-0">
+                    سخ
+                  </div>
+<div class="flex flex-col">
+<span class="font-semibold text-on-surface">أ. سمير خليل حسن</span>
+<span class="font-code-num text-[11px] text-secondary">EMP-2219 (مراجع)</span>
+</div>
+</div>
+</td>
+<td class="py-2.5 px-space-sm text-center whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#EFF4FF] text-[#175CD3] font-label-sm text-label-sm font-semibold">
+<span class="material-symbols-outlined text-[13px]">edit_note</span>
+<span>تعديل بيانات</span>
+</span>
+</td>
+<td class="py-2.5 px-space-sm text-on-surface font-medium whitespace-nowrap">ملفات العاملين المدنيين</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap">
+<span class="font-code-num text-code-num bg-surface-container-high px-1.5 py-0.5 rounded text-on-surface" dir="ltr">CIV-10029</span>
+</td>
+<td class="py-2.5 px-space-sm whitespace-nowrap font-code-num text-code-num text-secondary" dir="ltr">
+<span>192.168.10.99</span>
+</td>
+<td class="py-2.5 px-space-sm text-center whitespace-nowrap">
+<button class="w-7 h-7 rounded-full bg-surface-container hover:bg-surface-container-high text-secondary inline-flex items-center justify-center transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- تذييل الجدول وأدوات الترقيم الرقمي الموثق -->
+<div class="p-space-sm px-space-md bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-space-xs font-label-sm text-label-sm text-secondary">
+<div class="flex items-center gap-1.5">
+<span>عرض</span>
+<select class="h-7 px-1 rounded bg-surface-container-lowest text-on-surface font-code-num focus:outline-none">
+<option>10</option>
+<option selected="">15</option>
+<option>50</option>
+<option>100</option>
+</select>
+<span>من إجمالي 84,920 عملية رقابية</span>
+</div>
+<div class="flex items-center gap-1">
+<button class="w-7 h-7 rounded bg-surface-container-lowest flex items-center justify-center text-on-surface hover:bg-surface-container disabled:opacity-40" disabled="" type="button">
+<span class="material-symbols-outlined text-[16px]">keyboard_double_arrow_right</span>
+</button>
+<button class="w-7 h-7 rounded bg-surface-container-lowest flex items-center justify-center text-on-surface hover:bg-surface-container disabled:opacity-40" disabled="" type="button">
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+<span class="px-2 py-0.5 rounded bg-primary-container text-on-primary font-code-num font-semibold">1</span>
+<button class="w-7 h-7 rounded bg-surface-container-lowest flex items-center justify-center text-on-surface hover:bg-surface-container font-code-num" type="button">2</button>
+<button class="w-7 h-7 rounded bg-surface-container-lowest flex items-center justify-center text-on-surface hover:bg-surface-container font-code-num" type="button">3</button>
+<span>...</span>
+<button class="w-7 h-7 rounded bg-surface-container-lowest flex items-center justify-center text-on-surface hover:bg-surface-container font-code-num" type="button">566</button>
+<button class="w-7 h-7 rounded bg-surface-container-lowest flex items-center justify-center text-on-surface hover:bg-surface-container" type="button">
+<span class="material-symbols-outlined text-[16px]">chevron_left</span>
+</button>
+<button class="w-7 h-7 rounded bg-surface-container-lowest flex items-center justify-center text-on-surface hover:bg-surface-container" type="button">
+<span class="material-symbols-outlined text-[16px]">keyboard_double_arrow_left</span>
+</button>
+</div>
+</div>
+</div>
+<!-- اللوحة الجانبية: مقارنة التغييرات الميدانية للحدث المختار (Side-by-side Diff View) -->
+<div class="lg:col-span-5 bg-surface-container-lowest rounded-lg shadow-md flex flex-col">
+<!-- ترويسة لوحة المقارنة والتفاصيل -->
+<div class="p-space-md bg-surface-container-low rounded-t-lg flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[22px]">compare_arrows</span>
+<h2 class="font-headline-md text-headline-md text-primary font-bold">مقارنة التغييرات المباشرة</h2>
+</div>
+<div class="flex items-center gap-1">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#EFF4FF] text-[#175CD3] font-label-sm text-label-sm font-semibold">
+<span class="material-symbols-outlined text-[14px]">history_edu</span>
+<span>حدث #84920</span>
+</span>
+<button class="w-7 h-7 rounded-lg text-secondary hover:text-on-surface hover:bg-surface-container-high flex items-center justify-center transition-colors" title="إغلاق اللوحة" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+</div>
+<!-- بطاقة الميتاداتا للحدث -->
+<div class="grid grid-cols-2 gap-space-xs bg-surface-container-lowest p-space-sm rounded-lg text-label-sm font-label-sm">
+<div class="flex flex-col">
+<span class="text-secondary">العملية والكيان:</span>
+<span class="font-semibold text-on-surface">تعديل بيانات تجنيد (#MIL-84920)</span>
+</div>
+<div class="flex flex-col">
+<span class="text-secondary">المستخدم المنفذ:</span>
+<span class="font-semibold text-on-surface">أ. طارق عبد الرحمن (EMP-1082)</span>
+</div>
+<div class="flex flex-col">
+<span class="text-secondary">توقيت التنفيذ:</span>
+<span class="font-code-num text-on-surface font-semibold" dir="ltr">14/10/2024 - 10:45:12 AM</span>
+</div>
+<div class="flex flex-col">
+<span class="text-secondary">عنوان المصدر (IP):</span>
+<span class="font-code-num text-on-surface font-semibold" dir="ltr">192.168.10.45 (LAN-D1)</span>
+</div>
+</div>
+</div>
+<!-- جسم جدول المقارنة (Diff Comparison Table) -->
+<div class="p-space-md flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface font-bold">الحقول المتأثرة بالعملية (3 حقول معدلة)</span>
+<div class="flex items-center gap-3 font-label-sm text-label-sm text-secondary">
+<div class="flex items-center gap-1">
+<span class="w-2.5 h-2.5 rounded bg-[#EFF4FF]"></span>
+<span>حقل معدّل</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="w-2.5 h-2.5 rounded bg-surface-container-low"></span>
+<span>غير معدّل</span>
+</div>
+</div>
+</div>
+<!-- جدول الحقول قبل وبعد -->
+<div class="overflow-x-auto rounded-lg shadow-sm">
+<table class="w-full text-right text-body-table font-body-table border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-secondary font-label-md text-label-md">
+<th class="py-2 px-3 font-semibold">البيان / الحقل</th>
+<th class="py-2 px-3 font-semibold text-[#BA1A1A]">القيمة السابقة (Old)</th>
+<th class="py-2 px-3 font-semibold text-[#1E7F4F]">القيمة المعدلة (New)</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container">
+<!-- حقل 1: رقم الشرطة (معدل) -->
+<tr class="bg-[#EFF4FF] transition-colors">
+<td class="py-2.5 px-3 font-semibold text-on-surface">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-[#175CD3]">change_circle</span>
+<span>رقم السجل العسكري</span>
+</div>
+</td>
+<td class="py-2.5 px-3 font-code-num text-code-num text-on-surface line-through decoration-[#BA1A1A] decoration-2" dir="ltr">
+                  POL-84919
+                </td>
+<td class="py-2.5 px-3 font-code-num text-code-num text-[#1E7F4F] font-bold" dir="ltr">
+                  POL-84920
+                </td>
+</tr>
+<!-- حقل 2: تاريخ بداية التجنيد (غير معدل / مطابق) -->
+<tr class="bg-surface-container-lowest transition-colors">
+<td class="py-2.5 px-3 text-secondary">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-secondary">check</span>
+<span>تاريخ بدء الخدمة</span>
+</div>
+</td>
+<td class="py-2.5 px-3 font-code-num text-code-num text-secondary" dir="ltr">
+                  01/01/2025
+                </td>
+<td class="py-2.5 px-3 font-code-num text-code-num text-secondary" dir="ltr">
+                  01/01/2025
+                </td>
+</tr>
+<!-- حقل 3: سلاح التوزيع (معدل) -->
+<tr class="bg-[#EFF4FF] transition-colors">
+<td class="py-2.5 px-3 font-semibold text-on-surface">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-[#175CD3]">change_circle</span>
+<span>سلاح التوزيع</span>
+</div>
+</td>
+<td class="py-2.5 px-3 text-secondary">
+<span class="px-2 py-0.5 rounded bg-[#FEE4E2] text-[#B42318] font-label-sm text-label-sm line-through">سلاح المشاة</span>
+</td>
+<td class="py-2.5 px-3">
+<span class="px-2 py-0.5 rounded bg-[#E8F5EE] text-[#1E7F4F] font-label-sm text-label-sm font-bold">سلاح الإشارة</span>
+</td>
+</tr>
+<!-- حقل 4: حالة الاعتماد والملف (معدل) -->
+<tr class="bg-[#EFF4FF] transition-colors">
+<td class="py-2.5 px-3 font-semibold text-on-surface">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-[#175CD3]">change_circle</span>
+<span>حالة الملف الأمني</span>
+</div>
+</td>
+<td class="py-2.5 px-3">
+<span class="px-2 py-0.5 rounded bg-[#FEF0C7] text-[#B54708] font-label-sm text-label-sm">مسودة قيد التدقيق</span>
+</td>
+<td class="py-2.5 px-3">
+<span class="px-2 py-0.5 rounded bg-primary-container text-on-primary font-label-sm text-label-sm font-bold flex items-center gap-1 w-max">
+<span class="material-symbols-outlined text-[13px]">lock</span>
+<span>معتمد ومقفل</span>
+</span>
+</td>
+</tr>
+<!-- حقل 5: الوحدة العسكرية (مطابق) -->
+<tr class="bg-surface-container-lowest transition-colors">
+<td class="py-2.5 px-3 text-secondary">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-secondary">check</span>
+<span>مركز التدريب</span>
+</div>
+</td>
+<td class="py-2.5 px-3 text-secondary">المنطقة المركزية - الهايكستب</td>
+<td class="py-2.5 px-3 text-secondary">المنطقة المركزية - الهايكستب</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- البصمة الرقمية والشهادة الأمنية (Immutable Audit Proof) -->
+<div class="bg-surface-container-low p-space-sm rounded-lg flex flex-col gap-2 mt-1">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-primary font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span>التوقيع الإلكتروني والبصمة التشفيرية (SHA-256)</span>
+</span>
+<span class="font-code-num text-[11px] text-[#1E7F4F] font-bold">سجل غير قابل للتعديل</span>
+</div>
+<div class="bg-surface-container-lowest p-2 rounded font-code-num text-[11px] text-secondary break-all select-all flex items-center justify-between" dir="ltr">
+<span>e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</span>
+<button class="text-primary hover:text-[#2B4C7E] ml-1 p-1 shrink-0" title="نسخ التجزئة التشفيرية" type="button">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+</button>
+</div>
+<div class="flex items-center justify-between pt-1 font-label-sm text-label-sm text-secondary">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px] text-[#1E7F4F]">lock</span>
+<span>سلسلة الكتل (Blockchain) الحكومية المؤمنة</span>
+</div>
+<span class="font-code-num text-code-num">كتلة #492,019</span>
+</div>
+</div>
+<!-- أزرار الإجراءات للوحة الجانبية -->
+<div class="flex items-center gap-2 pt-2">
+<button class="flex-1 h-9 rounded-lg bg-primary-container text-on-primary hover:bg-[#2B4C7E] font-label-md text-label-md flex items-center justify-center gap-1.5 transition-colors shadow-sm" type="button">
+<span class="material-symbols-outlined text-[18px]">print</span>
+<span>طباعة مستخرج تدقيق رسمي</span>
+</button>
+<button class="h-9 px-3 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high font-label-md text-label-md flex items-center gap-1 transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">download</span>
+<span>تفريغ JSON</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- مؤشرات إحصائية وتحذيرات سريعة أسفل الشاشة (Audit Metric Bento) -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-space-sm mt-1">
+<div class="bg-surface-container-lowest p-space-sm rounded-lg shadow-sm flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-lg bg-[#E8F5EE] text-[#1E7F4F] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[24px]">verified</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-secondary">معدل العمليات المعتمدة</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">99.4%</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-space-sm rounded-lg shadow-sm flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-lg bg-[#FEE4E2] text-[#B42318] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[24px]">security_update_warning</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-secondary">المحاولات المرفوضة اليوم</span>
+<span class="font-headline-sm text-headline-sm text-error font-bold font-code-num">3 محاولات (محيّدة)</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-space-sm rounded-lg shadow-sm flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-lg bg-[#EFF4FF] text-[#175CD3] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[24px]">sync_alt</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-secondary">إجمالي التعديلات خلال 24 ساعة</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold font-code-num">1,420 إجراء</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-space-sm rounded-lg shadow-sm flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high text-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[24px]">storage</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-secondary">حالة خادم التخزين المشفر</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">متصل - نسخة احتياطية</span>
+</div>
+</div>
+</div>
+</div></main></div></body></html>

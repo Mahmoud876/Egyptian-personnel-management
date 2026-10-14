@@ -13,9 +13,7 @@ Read before working on a module:
 
 ## Current goal
 
-Build the **skeleton** described in `docs/skeleton-plan.md`, one phase at a time. Stop after each phase, report what was built and how to run it, and wait for approval before starting the next.
-
-Skeleton means: the shared core works end to end (login, permissions, users, audit), and every module has its routes, schemas, screens and DB tables in place, with business logic left as stubs (`501 Not Implemented` on the API, a placeholder on the screen) and a `TODO(rules):` comment that points to the relevant section of `docs/business-rules.md`. **Do not implement module business logic unless asked.** Mahmoud builds it, or we build it together module by module.
+The owner explicitly requested the complete conscripts backend from `PoC 3f98b04e77e080368063da1908126936.md`. This supersedes the original skeleton-only scope and phase approval gates. Read [docs/backend-poc.md](docs/backend-poc.md) for current behavior, assumptions, migration and setup. The earlier skeleton plan remains historical; civilian employee workflows remain outside the new conscripts requirements.
 
 ## Stack
 
@@ -24,16 +22,17 @@ Skeleton means: the shared core works end to end (login, permissions, users, aud
 | Database | SQL Server 2022. `NVARCHAR` for all text, collation `Arabic_100_CI_AS` |
 | DB scripts | Hand-written T-SQL in `backend/sql/`, numbered (`001_database.sql`, `002_core.sql`… as listed in `docs/skeleton-plan.md`), idempotent (`IF NOT EXISTS`) |
 | Backend | Python 3.12, FastAPI, Uvicorn, SQLAlchemy 2.x (sync, 2.0-style API), `pyodbc` + ODBC Driver 18, Pydantic v2, `pydantic-settings` |
-| Auth | Server-side sessions: random session id in an HTTP-only, SameSite=Strict cookie, row in `user_session`. Passwords hashed with `pwdlib` (Argon2) |
+| Auth | Server-side sessions: random session id in an HTTP-only, SameSite=Strict cookie, hashed token keys in Redis; SQL user session versions for revocation. Passwords hashed with `pwdlib` (Argon2) |
 | Frontend | React 19, TypeScript 5.9 (strict; not 7, openapi-typescript needs the JS compiler API), Vite, MUI with RTL (`@emotion/cache` + `stylis-plugin-rtl`), React Router, TanStack Query, React Hook Form + Zod |
 | Fonts | `@fontsource/cairo` (bundled locally) |
 | API types | `openapi-typescript` generates `frontend/src/shared/api/schema.d.ts` from FastAPI's `/openapi.json` |
 | Tests | `pytest` + `httpx2` via FastAPI `TestClient` (backend), `vitest` + Testing Library + jsdom (frontend) |
+| Queue / sessions | Redis 7.2; Python RQ (Windows subprocess adapter / SpawnWorker elsewhere) with SQL checkpoint/recovery dispatcher |
 | Dev DB | `docker-compose.dev.yml` running `mcr.microsoft.com/mssql/server:2022-latest`. Dev only; production is on-prem |
 
 ## Hard rules
 
-- **Permission-based, never role-based.** Code checks permission codes only (`conscripts.import.upload`), never a role or template name. See `docs/permissions.md`.
+- **RBAC:** users have a fixed administrator or operator role; grants derive from `app/core/roles.py`. Routes check the specification's permission codes (`file:insert`, `profile:get`, etc.). Direct grants and editable templates are retired. See `docs/permissions.md`.
 - **Every API route declares a permission** with `Depends(require_permission("..."))`, except `POST /api/v1/auth/login`, `GET /api/v1/health`. A test enforces this (see plan, phase 2).
 - **The frontend hides what the user can't do, but the backend is what enforces it.** Never rely on the UI alone.
 - **Denied attempts are audited.** `require_permission` writes an `audit_log` row with `action='denied'` before raising 403.
@@ -54,11 +53,11 @@ backend/
     cli/               # command-line tools: db_init (applies backend/sql), create_admin
     core/              # config, db, models (Base + core tables), security, permissions, audit, errors, messages (Arabic API errors)
     auth/              # login, logout, me, change-password, permission-check
-    admin/             # users, permission assignment, templates, audit viewer, lookups
+    admin/             # users and roles, audit viewer, lookups
     modules/
       conscripts/      # router.py, schemas.py, service.py, models.py
       employees/
-    imports/           # shared upload -> stage -> validate -> approve/reject -> export pipeline
+    recruits/          # implemented PoC import, jobs, validation, profiles, labels and documents
     documents/         # attachments, SHA-256
     reports/
     migration/         # Oracle 11g -> SQL Server
@@ -70,7 +69,7 @@ frontend/
     shared/            # api client + generated types, auth, permissions (usePermission, <Can>), i18n, ui
     test/              # test helpers (render the app with a given user, stub fetch)
     features/
-      admin/           # users, permissions editor, templates, audit log, lookups
+      admin/           # users and roles, audit log, lookups
       conscripts/
       employees/
 docs/

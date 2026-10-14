@@ -51,9 +51,9 @@ function Get-EnvValue {
 }
 
 function Start-Database {
-    Write-Host 'Starting SQL Server container and waiting until it is healthy...'
+    Write-Host 'Starting SQL Server and Redis; waiting until both are healthy...'
     Invoke-Native docker @('compose', '-f', $ComposeFile, 'up', '-d', '--wait', '--wait-timeout', '180')
-    Write-Host 'SQL Server is healthy.'
+    Write-Host 'SQL Server and Redis are healthy.'
 }
 
 function Test-PortListening {
@@ -62,9 +62,23 @@ function Test-PortListening {
 }
 
 function Start-InNewWindow {
-    # Opens a new PowerShell window running $Command. EncodedCommand avoids quoting problems with spaces in paths.
+    # Background process with local logs. EncodedCommand handles spaces in paths.
     param([Parameter(Mandatory)][string]$Title, [Parameter(Mandatory)][string]$Command)
-    $script = "`$Host.UI.RawUI.WindowTitle = '$Title'`r`n$Command"
+    $logDir = Join-Path $RepoRoot 'storage\logs'
+    New-Item -ItemType Directory -Path $logDir -Force | Out-Null
+    $name = $Title -replace '[^a-zA-Z0-9_-]', '_'
+    $pidFile = Join-Path $logDir "$name.pid"
+    if (Test-Path -LiteralPath $pidFile) {
+        $saved = Get-Content -LiteralPath $pidFile -Raw | ConvertFrom-Json
+        $existing = Get-CimInstance Win32_Process -Filter "ProcessId = $($saved.pid)"
+        if ($existing -and $existing.CommandLine -like "*$($saved.command)*") {
+            Write-Host "$Title is already running (PID $($saved.pid))."
+            return
+        }
+    }
+    $script = "`$ErrorActionPreference = 'Stop'`r`n$Command"
     $encoded = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($script))
-    Start-Process powershell.exe -ArgumentList @('-NoExit', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-EncodedCommand', $encoded)
+    $process = Start-Process powershell.exe -WindowStyle Hidden -PassThru -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-EncodedCommand', $encoded) -RedirectStandardOutput (Join-Path $logDir "$name.log") -RedirectStandardError (Join-Path $logDir "$name.error.log")
+    @{ pid = $process.Id; command = $encoded } | ConvertTo-Json | Set-Content -LiteralPath $pidFile -Encoding ASCII
+    Write-Host "$Title started (PID $($process.Id)). Logs: $logDir. Stop: taskkill /PID $($process.Id) /T /F"
 }

@@ -34,12 +34,25 @@ class Settings(BaseSettings):
     db_admin_user: str | None = None
     db_admin_password: SecretStr | None = None
 
-    # Sessions: random token in an HTTP-only, SameSite=Strict cookie; SHA-256 of it in user_session.id.
+    # Sessions: opaque HTTP-only, SameSite=Strict cookie; hashed session keys in Redis.
     session_cookie_name: str = "session"
     # Keep true in production (HTTPS). Dev runs over plain HTTP, so .env sets it to false there.
     session_cookie_secure: bool = True
     session_idle_minutes: int = 30
     session_max_hours: int = 12
+
+    redis_url: SecretStr = SecretStr("redis://127.0.0.1:6379/0")
+    redis_prefix: str = "personnel"
+    queue_name: str = "personnel"
+    storage_root: Path = REPO_ROOT / "storage"
+    upload_max_bytes: int = 50 * 1024 * 1024
+    import_max_rows: int = 100_000
+    import_duplicate_policy: Literal["reject_all", "keep_first"] = "reject_all"
+    job_max_attempts: int = 3
+    job_timeout_seconds: int = 3600
+    recovery_interval_seconds: int = 30
+    access_table: str = "person_data"
+    access_template: Path | None = None
 
     frontend_dist: Path = REPO_ROOT / "frontend" / "dist"
 

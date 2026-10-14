@@ -8,39 +8,21 @@ from fastapi.testclient import TestClient
 
 from tests.helpers import UserInfo, audit_rows, login
 
-# --- templates ---------------------------------------------------------------
+def test_roles_are_listed_for_admin(client, make_user):
+    login(client, make_user(role="system_administrator"))
+    roles = {r["role"]: r["permissions"] for r in client.get("/api/v1/roles").json()}
+    assert "file:insert" in roles["system_administrator"]
+    assert set(roles["data_entry_operator"]) == {"profile:get", "profile:insert", "barcode:get"}
 
 
-def test_seed_templates_are_listed_for_user_managers(client: TestClient, make_user: Callable[..., UserInfo]) -> None:
-    login(client, make_user("users.manage"))
-
-    templates = {t["name_ar"]: t["permissions"] for t in client.get("/api/v1/templates").json()}
-
-    assert templates["مدخل بيانات — المجندين"] == ["conscripts.enter", "conscripts.label.print", "conscripts.view"]
+def test_legacy_templates_are_retired(client, make_user):
+    login(client, make_user(role="system_administrator"))
+    assert client.post("/api/v1/templates", json={"name_ar": "test", "permissions": []}).status_code == 404
 
 
-def test_create_and_update_template(client: TestClient, make_user: Callable[..., UserInfo]) -> None:
-    admin = make_user("templates.manage")
-    login(client, admin)
-    name = f"قالب {uuid4().hex[:6]}"
-
-    created = client.post("/api/v1/templates", json={"name_ar": name, "permissions": ["reports.view"]})
-    updated = client.put(
-        f"/api/v1/templates/{created.json()['id']}",
-        json={"name_ar": name, "description_ar": "وصف", "permissions": ["reports.view", "reports.export"]},
-    )
-    duplicate = client.post("/api/v1/templates", json={"name_ar": name, "permissions": []})
-
-    assert created.status_code == 201
-    assert updated.json()["permissions"] == ["reports.export", "reports.view"]
-    assert duplicate.json()["code"] == "template_name_taken"
-    assert [r.action for r in audit_rows(admin.id) if r.entity == "permission_template"] == ["create", "update"]
-
-
-def test_templates_need_template_or_user_management(client: TestClient, make_user: Callable[..., UserInfo]) -> None:
-    login(client, make_user("conscripts.view"))
-
-    assert client.get("/api/v1/templates").status_code == 403
+def test_operator_cannot_list_roles(client, make_user):
+    login(client, make_user(role="data_entry_operator"))
+    assert client.get("/api/v1/roles").status_code == 403
 
 
 # --- audit viewer --------------------------------------------------------------
@@ -58,8 +40,8 @@ def test_audit_log_filters_by_user_and_action(client: TestClient, make_user: Cal
     assert page["total"] == 1
     entry = page["items"][0]
     assert entry["username"] == someone.username
-    assert entry["permission_code"] == "users.view"
-    assert entry["new_values"] == {"missing": ["users.view"], "required": ["users.view"]}
+    assert entry["permission_code"] == "user:get"
+    assert entry["new_values"] == {"missing": ["user:get"], "required": ["user:get"]}
     assert entry["at"].endswith("Z") or entry["at"].endswith("+00:00")
 
 
@@ -92,7 +74,7 @@ def test_audit_facets(client: TestClient, make_user: Callable[..., UserInfo]) ->
 
 
 def test_audit_log_needs_audit_view(client: TestClient, make_user: Callable[..., UserInfo]) -> None:
-    login(client, make_user("users.manage"))
+    login(client, make_user(role="data_entry_operator"))
 
     assert client.get("/api/v1/audit").status_code == 403
 
@@ -160,7 +142,7 @@ def test_batch_schedule_rejects_impossible_dates(client: TestClient, make_user: 
 
 
 def test_writing_lookups_needs_lookups_manage(client: TestClient, make_user: Callable[..., UserInfo]) -> None:
-    user = make_user("users.manage")
+    user = make_user(role="data_entry_operator")
     login(client, user)
 
     response = client.post("/api/v1/lookups/action-types", json={"code": "x", "name_ar": "س"})

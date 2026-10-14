@@ -51,6 +51,8 @@ class AppUser(AuditColumnsMixin, Base):
     work_entity_id: Mapped[int | None] = mapped_column(INTEGER, ForeignKey("work_entity.id"))
     must_change_password: Mapped[bool] = mapped_column(BIT, server_default=server_default())
     last_login_at: Mapped[datetime | None] = mapped_column(DATETIME2(3))
+    role: Mapped[str] = mapped_column(NVARCHAR(30), server_default=server_default())
+    session_version: Mapped[int] = mapped_column(INTEGER, server_default=server_default())
 
 
 class UserPermission(Base):

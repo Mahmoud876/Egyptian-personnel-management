@@ -20,7 +20,7 @@ def guarded() -> Iterator[TestClient]:
         return {"ok": True}
 
     @router.get("/needs-all")
-    def needs_all(_: object = Depends(require_permission("users.view", "users.manage"))) -> dict[str, bool]:
+    def needs_all(_: object = Depends(require_permission("profile:get", "user:update"))) -> dict[str, bool]:
         return {"ok": True}
 
     @router.get("/needs-any")
@@ -53,12 +53,12 @@ def test_user_without_the_code_gets_403_and_is_audited(guarded: TestClient, make
 
 
 def test_all_listed_codes_are_required(guarded: TestClient, make_user: Callable[..., UserInfo]) -> None:
-    user = make_user("users.view")
+    user = make_user(role="data_entry_operator")
     login(guarded, user)
 
     assert guarded.get("/api/v1/_test/needs-all").status_code == 403
     [row] = audit_rows(user.id, "denied")
-    assert row.permission_code == "users.manage"
+    assert row.permission_code == "user:update"
 
 
 def test_any_permission_needs_one_of_the_codes(guarded: TestClient, make_user: Callable[..., UserInfo]) -> None:

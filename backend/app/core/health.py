@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from sqlalchemy import text
 
 from app.core.db import get_engine
+from app.core.redis_client import get_redis
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +22,7 @@ class DatabaseHealth(BaseModel):
 class HealthResponse(BaseModel):
     status: Literal["ok", "degraded"]
     database: DatabaseHealth
+    redis: DatabaseHealth
 
 
 def check_database() -> DatabaseHealth:
@@ -41,6 +43,11 @@ def check_database() -> DatabaseHealth:
 )
 def health(response: Response) -> HealthResponse:
     database = check_database()
-    if not database.reachable:
+    try:
+        redis = DatabaseHealth(reachable=bool(get_redis().ping()))
+    except Exception:
+        redis = DatabaseHealth(reachable=False)
+    healthy = database.reachable and redis.reachable
+    if not healthy:
         response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
-    return HealthResponse(status="ok" if database.reachable else "degraded", database=database)
+    return HealthResponse(status="ok" if healthy else "degraded", database=database, redis=redis)

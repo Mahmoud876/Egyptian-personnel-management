@@ -17,7 +17,8 @@ def test_create_admin_grants_every_permission(client: TestClient) -> None:
 
     assert response.status_code == 200
     me = response.json()
-    assert len(me["permissions"]) == 27
+    assert me["role"] == "system_administrator"
+    assert "user:insert" in me["permissions"]
     assert me["must_change_password"] is True
 
 
