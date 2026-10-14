@@ -1,0 +1,48 @@
+"""Application factory. Run with: uvicorn --factory app.main:create_app"""
+
+from fastapi import APIRouter, FastAPI
+from fastapi.staticfiles import StaticFiles
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.responses import Response
+from starlette.types import Scope
+
+from app.core import health
+from app.core.config import get_settings
+
+API_PREFIX = "/api/v1"
+
+
+class SpaStaticFiles(StaticFiles):
+    """Serves the built frontend. Unknown non-API paths fall back to index.html for client-side routing."""
+
+    async def get_response(self, path: str, scope: Scope) -> Response:
+        try:
+            return await super().get_response(path, scope)
+        except StarletteHTTPException as exc:
+            request_path: str = scope["path"]
+            if exc.status_code != 404 or request_path == "/api" or request_path.startswith("/api/"):
+                raise
+            return await super().get_response("index.html", scope)
+
+
+def create_app() -> FastAPI:
+    settings = get_settings()
+    dev = settings.env == "dev"
+
+    app = FastAPI(
+        title="Personnel Systems API",
+        version="0.1.0",
+        docs_url="/docs" if dev else None,
+        redoc_url=None,
+        openapi_url="/openapi.json" if dev else None,
+    )
+
+    api = APIRouter(prefix=API_PREFIX)
+    api.include_router(health.router)
+    app.include_router(api)
+
+    # Production: the backend serves the built frontend. Mounted last so API routes win.
+    if settings.frontend_dist.is_dir():
+        app.mount("/", SpaStaticFiles(directory=settings.frontend_dist, html=True), name="frontend")
+
+    return app

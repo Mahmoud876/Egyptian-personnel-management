@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+
+# Node
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+# Environment (commit only .env.example)
+.env
+.env.*
+!.env.example
+
+# Runtime data: uploaded files, exports, temp output
+uploads/
+storage/
+*.log
+
+# Original specs and sample data in the repo root: kept out of git because
+# the sample may contain real personal data (names, national IDs).
+/*.mdb
+/*.accdb
+/*.docx
+/*.pdf
+# Access lock files (created while a .mdb/.accdb is open)
+*.ldb
+*.laccdb
+
+# Editor / tool folders
+.idea/
+.qodo/
+.claude/settings.local.json
