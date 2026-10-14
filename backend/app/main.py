@@ -6,8 +6,10 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.responses import Response
 from starlette.types import Scope
 
+from app.auth.router import router as auth_router
 from app.core import health
 from app.core.config import get_settings
+from app.core.errors import install_error_handlers
 
 API_PREFIX = "/api/v1"
 
@@ -36,9 +38,11 @@ def create_app() -> FastAPI:
         redoc_url=None,
         openapi_url="/openapi.json" if dev else None,
     )
+    install_error_handlers(app)
 
     api = APIRouter(prefix=API_PREFIX)
     api.include_router(health.router)
+    api.include_router(auth_router)
     app.include_router(api)
 
     # Production: the backend serves the built frontend. Mounted last so API routes win.

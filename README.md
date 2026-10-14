@@ -45,6 +45,7 @@ Stop: close the two windows; `docker compose -f docker-compose.dev.yml stop` sto
 | `scripts\db-init.ps1` | Starts the DB and applies `backend\sql\*.sql` in order. Idempotent; called by `dev.ps1` and `test.ps1` |
 | `scripts\dev.ps1` | Starts the DB, backend and frontend |
 | `scripts\test.ps1` | Starts and initialises the DB, then runs pytest, `tsc --noEmit` and vitest. Exits 1 on any failure |
+| `scripts\create-admin.ps1` | Creates the first admin (`-Username admin` by default) with every permission and prints a one-time password; `-Reset` resets an existing one |
 | `scripts\gen-types.ps1` | Regenerates `frontend/src/shared/api/schema.d.ts` from the FastAPI OpenAPI schema (no running server needed) |
 
 If PowerShell refuses to run scripts: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`, or run with `powershell -ExecutionPolicy Bypass -File scripts\dev.ps1`.
@@ -56,6 +57,7 @@ If PowerShell refuses to run scripts: `Set-ExecutionPolicy -Scope CurrentUser Re
   - `DB_ADMIN_USER` (sa in dev): used only by `db-init` to create the database, tables and the app login.
   - `DB_USER` (`personnel_app`): what the app runs as. Read/write on data, no DDL, cannot `UPDATE`/`DELETE` `audit_log`, cannot change permission codes. `db-init` creates it and resets its password to the one in `.env`.
 - Timestamps are stored in UTC.
+- Backend tests use their own database, `personnel_test`, dropped and rebuilt from `backend/sql` at the start of every run (needs `DB_ADMIN_*`). The dev database is never touched by tests.
 - A DBA can run the scripts without Python: `sqlcmd -S <server> -U <admin> -I -f 65001 -v DB_NAME=personnel APP_DB_USER=personnel_app APP_DB_PASSWORD=<...> -i backend\sql\001_database.sql` (and so on, in order).
 
 ## Production build (outline)

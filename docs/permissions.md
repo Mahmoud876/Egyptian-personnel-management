@@ -13,7 +13,7 @@ app_user              id PK, username UQ, full_name, password_hash, is_active, w
 user_permission       user_id FK, permission_code FK, granted_at, granted_by    PK (user_id, permission_code)
 permission_template   id PK, name_ar UQ, description_ar
 template_permission   template_id FK, permission_code FK                        PK (template_id, permission_code)
-user_session          id PK (random 32 bytes, hex), user_id FK, created_at, expires_at, last_seen_at, ip
+user_session          id PK (SHA-256 hex of the cookie token), user_id FK, created_at, expires_at, last_seen_at, ip
 audit_log             id PK, at, user_id FK NULL, ip, action, entity, entity_id, permission_code,
                       old_values NVARCHAR(MAX) JSON, new_values NVARCHAR(MAX) JSON, batch_id NULL
 ```
@@ -28,7 +28,13 @@ Backend:
 def upload(..., user = Depends(require_permission("conscripts.import.upload"))): ...
 ```
 - `require_permission(*codes)` loads the session user and their codes (cache per request), allows if the user has **all** listed codes, otherwise writes `audit_log(action='denied', permission_code=...)` and raises 403.
+  - `require_permission()` with no codes means any signed-in user (used by `/auth/me`, `/auth/logout`, `/auth/change-password`, and reading lookups).
+  - `require_any_permission(*codes)` allows if the user has **at least one** code (e.g. listing templates: `users.manage` or `templates.manage`).
+  - `tests/test_route_permissions.py` fails if any route other than login and health lacks one of these.
 - `has_permission(user, code)` for checks inside services (e.g. data scoping).
+- Sessions: the cookie holds a random 32-byte token; `user_session.id` stores its SHA-256, so reading the table does not reveal usable sessions. Idle timeout `SESSION_IDLE_MINUTES`, absolute limit `SESSION_MAX_HOURS`.
+- A user with `must_change_password` can only call `/auth/me`, `/auth/logout` and `/auth/change-password` until they change it.
+- `POST /auth/permission-check {permission, path}`: the frontend route guard calls it when it blocks a screen, so the attempt is audited server-side (`action='denied'`, `entity_id='screen <path>'`).
 - Data scope: a user **without** `employees.scope.all` only sees employees whose `work_entity_id` equals their own. Apply in the query layer, not in the router.
 
 Frontend:

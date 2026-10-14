@@ -34,6 +34,13 @@ class Settings(BaseSettings):
     db_admin_user: str | None = None
     db_admin_password: SecretStr | None = None
 
+    # Sessions: random token in an HTTP-only, SameSite=Strict cookie; SHA-256 of it in user_session.id.
+    session_cookie_name: str = "session"
+    # Keep true in production (HTTPS). Dev runs over plain HTTP, so .env sets it to false there.
+    session_cookie_secure: bool = True
+    session_idle_minutes: int = 30
+    session_max_hours: int = 12
+
     frontend_dist: Path = REPO_ROOT / "frontend" / "dist"
 
 

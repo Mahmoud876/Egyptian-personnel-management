@@ -65,7 +65,8 @@ CREATE TABLE dbo.app_user (
     updated_at            DATETIME2(3)  NULL,
     updated_by            INT           NULL CONSTRAINT FK_app_user_updated_by REFERENCES dbo.app_user (id),
     CONSTRAINT CK_app_user_username CHECK (
-        LEN(username) >= 3 AND username COLLATE Latin1_General_BIN2 NOT LIKE N'%[^a-zA-Z0-9._-]%'
+        -- Hyphen first in the class: elsewhere LIKE reads it as a range.
+        LEN(username) >= 3 AND username COLLATE Latin1_General_BIN2 NOT LIKE N'%[^-a-zA-Z0-9._]%'
     ),
     CONSTRAINT CK_app_user_full_name CHECK (LEN(full_name) > 0)
 );

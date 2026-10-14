@@ -16,8 +16,9 @@ Check again after adding a dependency:
 | pyodbc | 5.3.0 | MIT | ODBC driver binding for SQL Server |
 | pydantic | 2.14.1 | MIT | Request/response validation |
 | pydantic-settings | 2.15.0 | MIT | Config from `.env` |
+| pwdlib[argon2] | 0.3.1 | MIT | Password hashing (Argon2id) |
 
-Notable transitive: starlette (BSD-3-Clause), anyio (MIT), opentelemetry-api (Apache-2.0, pulled in by fastapi), python-dotenv (BSD-3-Clause), **typing_extensions (PSF-2.0)**.
+Notable transitive: starlette (BSD-3-Clause), anyio (MIT), opentelemetry-api (Apache-2.0, pulled in by fastapi), python-dotenv (BSD-3-Clause), argon2-cffi (MIT), argon2-cffi-bindings (MIT), cffi (MIT-0), pycparser (BSD-3-Clause), **typing_extensions (PSF-2.0)**.
 
 ## Backend, dev (`backend/requirements-dev.txt`)
 
