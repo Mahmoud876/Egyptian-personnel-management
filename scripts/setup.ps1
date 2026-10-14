@@ -94,9 +94,12 @@ $lockFile = Join-Path $FrontendDir 'package-lock.json'
 $npmStamp = Join-Path $FrontendDir 'node_modules\.setup.sha256'
 $npmHash = Get-FilesHash @($lockFile)
 if (-not (Test-Path -LiteralPath $npmStamp) -or (Get-Content -LiteralPath $npmStamp) -ne $npmHash) {
-    Write-Host 'Installing frontend dependencies (npm ci)...'
+    # npm ci deletes node_modules first, which fails while the Vite dev server has files open (EPERM).
+    # Use it only for a fresh checkout; afterwards npm install updates in place from the lockfile.
+    $npmCommand = if (Test-Path -LiteralPath (Join-Path $FrontendDir 'node_modules')) { 'install' } else { 'ci' }
+    Write-Host "Installing frontend dependencies (npm $npmCommand)..."
     Push-Location $FrontendDir
-    try { Invoke-Native npm.cmd @('ci', '--no-audit', '--no-fund') }
+    try { Invoke-Native npm.cmd @($npmCommand, '--no-audit', '--no-fund') }
     finally { Pop-Location }
     Set-Content -LiteralPath $npmStamp -Value $npmHash -Encoding ASCII
 }

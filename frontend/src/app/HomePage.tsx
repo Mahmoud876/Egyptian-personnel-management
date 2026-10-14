@@ -1,9 +1,10 @@
 import Chip from '@mui/material/Chip';
-import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import { useMe } from '../shared/auth/auth';
 import { ar } from '../shared/i18n/ar';
+import { PageHeader } from '../shared/ui/PageHeader';
 import { useHealthQuery } from './useHealthQuery';
 
 type Status = 'checking' | 'connected' | 'disconnected';
@@ -25,6 +26,7 @@ function StatusRow({ label, status }: { label: string; status: Status }) {
 }
 
 export function HomePage() {
+  const { data: me } = useMe();
   const health = useHealthQuery();
 
   let server: Status = 'checking';
@@ -38,20 +40,15 @@ export function HomePage() {
   }
 
   return (
-    <Container maxWidth="sm" sx={{ py: 8 }}>
-      <Stack spacing={1} sx={{ mb: 4 }}>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>
-          {ar.app.title}
-        </Typography>
-        <Typography sx={{ color: 'text.secondary' }}>{ar.app.subtitle}</Typography>
-      </Stack>
-      <Paper variant="outlined" sx={{ p: 3 }}>
+    <>
+      <PageHeader title={ar.home.welcome(me?.full_name ?? '')} subtitle={ar.home.intro} />
+      <Paper variant="outlined" sx={{ p: 3, maxWidth: 480 }}>
         <Typography variant="h6" component="h2" sx={{ mb: 1 }}>
           {ar.health.heading}
         </Typography>
         <StatusRow label={ar.health.server} status={server} />
         <StatusRow label={ar.health.database} status={database} />
       </Paper>
-    </Container>
+    </>
   );
 }

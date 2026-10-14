@@ -13,3 +13,21 @@ METHOD_NOT_ALLOWED = "طريقة الطلب غير مسموح بها"
 CONFLICT = "تتعارض البيانات مع بيانات مسجلة من قبل"
 NOT_IMPLEMENTED = "هذه الخاصية قيد التطوير"
 SERVER_ERROR = "حدث خطأ غير متوقع"
+
+# Users and permissions
+USER_NOT_FOUND = "المستخدم غير موجود"
+USERNAME_TAKEN = "اسم المستخدم مسجل من قبل"
+UNKNOWN_PERMISSIONS = "توجد رموز صلاحيات غير معروفة"
+UNKNOWN_WORK_ENTITY = "جهة العمل غير موجودة"
+CANNOT_DEACTIVATE_SELF = "لا يمكنك إيقاف حسابك"
+CANNOT_REMOVE_OWN_USER_MANAGEMENT = "لا يمكنك إزالة صلاحية إدارة المستخدمين من حسابك"
+TEMPLATE_NOT_FOUND = "القالب غير موجود"
+TEMPLATE_NAME_TAKEN = "اسم القالب مسجل من قبل"
+
+# Lookups
+LOOKUP_NOT_FOUND = "العنصر غير موجود"
+LOOKUP_DUPLICATE = "الكود أو الاسم مسجل من قبل"
+LOOKUP_INVALID = "قيمة غير صحيحة"
+UNKNOWN_GOVERNORATE = "المحافظة غير موجودة"
+POLICE_STATION_CODE_MISMATCH = "أول رقمين من كود القسم يجب أن يطابقا كود المحافظة"
+INVALID_BATCH_START = "تاريخ بداية الدفعة غير صحيح"

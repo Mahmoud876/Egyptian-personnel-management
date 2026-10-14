@@ -56,6 +56,11 @@ function Start-Database {
     Write-Host 'SQL Server is healthy.'
 }
 
+function Test-PortListening {
+    param([int]$Port)
+    return [bool](Get-NetTCPConnection -State Listen -LocalPort $Port -ErrorAction SilentlyContinue)
+}
+
 function Start-InNewWindow {
     # Opens a new PowerShell window running $Command. EncodedCommand avoids quoting problems with spaces in paths.
     param([Parameter(Mandatory)][string]$Title, [Parameter(Mandatory)][string]$Command)

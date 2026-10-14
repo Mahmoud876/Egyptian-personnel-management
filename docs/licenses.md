@@ -43,8 +43,14 @@ Transitive: httpcore2 (BSD-3-Clause), truststore (MIT), pluggy (MIT), iniconfig 
 | @fontsource/cairo | 5.3.0 | **OFL-1.1** | Cairo font, bundled locally (no Google Fonts). See exceptions |
 | react-router | 8.4.0 | MIT | Routing |
 | @tanstack/react-query | 5.104.2 | MIT | Server state / data fetching |
+| react-hook-form | 7.90.0 | MIT | Forms |
+| zod | 4.6.7 | MIT | Form validation schemas |
+| @hookform/resolvers | 5.9.1 | MIT | Connects zod to react-hook-form |
+| openapi-fetch | 0.17.0 | MIT | Typed API client over `schema.d.ts` (~6 kB) |
 
-Full production tree (94 packages): MIT 87, BSD-3-Clause 3, ISC 2, Apache-2.0 1, OFL-1.1 1 (Cairo).
+Icons: a handful of Material Design icon paths (Apache-2.0) inlined in `src/shared/ui/icons.tsx`, instead of the large `@mui/icons-material` package.
+
+Production tree: MIT, BSD-3-Clause, ISC and Apache-2.0 only, apart from OFL-1.1 (Cairo).
 
 ## Frontend, dev (`frontend/package.json` devDependencies)
 

@@ -150,7 +150,8 @@ def test_seed_templates_match_docs(db: Connection) -> None:
         seeded.setdefault(name, set()).add(code)
     expected = _doc_templates(set(_doc_permissions()))
     assert len(expected) == 6
-    assert seeded == expected
+    # Other tests may add templates to the shared test database; compare the seeded ones only.
+    assert {name: seeded.get(name) for name in expected} == expected
 
 
 def test_lookup_seeds(db: Connection) -> None:

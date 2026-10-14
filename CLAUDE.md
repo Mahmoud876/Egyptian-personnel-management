@@ -68,6 +68,7 @@ frontend/
   src/
     app/               # router, providers, layout (RTL shell, sidebar, top bar)
     shared/            # api client + generated types, auth, permissions (usePermission, <Can>), i18n, ui
+    test/              # test helpers (render the app with a given user, stub fetch)
     features/
       admin/           # users, permissions editor, templates, audit log, lookups
       conscripts/

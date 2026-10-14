@@ -12,6 +12,7 @@ import sys
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
+import app.models  # noqa: F401  (registers every table, so foreign keys such as app_user.work_entity_id resolve)
 from app.core import audit
 from app.core.db import get_sessionmaker
 from app.core.models import AppUser, Permission, UserPermission

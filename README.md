@@ -35,6 +35,8 @@ On first run this creates `.env` from `.env.example` with generated database pas
 
 Ports are in `.env`. If 8000 is taken, setup picks the next free port.
 
+First sign-in: run `scripts\create-admin.ps1` once. It prints a one-time password for `admin`; the app asks for a new one at first login. The admin then creates other users under إدارة النظام ← المستخدمون.
+
 Stop: close the two windows; `docker compose -f docker-compose.dev.yml stop` stops the database (data stays in the `personnel-dev_mssql-data` volume).
 
 ## Scripts

@@ -6,6 +6,11 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.responses import Response
 from starlette.types import Scope
 
+import app.models  # noqa: F401  (registers every table before any query)
+from app.admin.audit.router import router as audit_router
+from app.admin.lookups.router import router as lookups_router
+from app.admin.templates.router import router as templates_router
+from app.admin.users.router import router as users_router
 from app.auth.router import router as auth_router
 from app.core import health
 from app.core.config import get_settings
@@ -41,8 +46,8 @@ def create_app() -> FastAPI:
     install_error_handlers(app)
 
     api = APIRouter(prefix=API_PREFIX)
-    api.include_router(health.router)
-    api.include_router(auth_router)
+    for router in (health.router, auth_router, users_router, templates_router, audit_router, lookups_router):
+        api.include_router(router)
     app.include_router(api)
 
     # Production: the backend serves the built frontend. Mounted last so API routes win.
