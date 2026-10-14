@@ -21,12 +21,18 @@ class Settings(BaseSettings):
 
     db_host: str = "127.0.0.1"
     db_port: int = 1433
-    db_name: str = "master"
-    db_user: str
-    db_password: SecretStr
+    db_name: str = "personnel"
     db_driver: str = "ODBC Driver 18 for SQL Server"
     db_trust_server_certificate: bool = False
     db_login_timeout_seconds: int = 5
+
+    # Least-privilege login the app runs as (created by backend/sql/007_app_login.sql).
+    db_user: str
+    db_password: SecretStr
+
+    # Admin login, only for db_init. Not needed by the running app.
+    db_admin_user: str | None = None
+    db_admin_password: SecretStr | None = None
 
     frontend_dist: Path = REPO_ROOT / "frontend" / "dist"
 

@@ -7,7 +7,7 @@ Access is decided by **permission codes assigned directly to each user**. There 
 ## Tables
 
 ```
-permission            code PK (varchar 100), module, name_ar, name_en, description_ar
+permission            code PK (nvarchar 100), module, name_ar, name_en, description_ar, sort_order
 app_user              id PK, username UQ, full_name, password_hash, is_active, work_entity_id FK NULL,
                       must_change_password, last_login_at, created_at/by, updated_at/by
 user_permission       user_id FK, permission_code FK, granted_at, granted_by    PK (user_id, permission_code)
@@ -18,7 +18,7 @@ audit_log             id PK, at, user_id FK NULL, ip, action, entity, entity_id,
                       old_values NVARCHAR(MAX) JSON, new_values NVARCHAR(MAX) JSON, batch_id NULL
 ```
 
-`permission` rows are seeded by script (`sql/003_permissions_seed.sql`); the app never creates codes at runtime. The DB login used by the app has `INSERT` only on `audit_log` (no `UPDATE`/`DELETE`).
+`permission` rows are seeded by script (`sql/003_permissions_seed.sql`); the app never creates codes at runtime. The DB login used by the app (`sql/007_app_login.sql`) has `SELECT`/`INSERT` only on `audit_log` (no `UPDATE`/`DELETE`) and cannot write to `permission`.
 
 ## How checks work
 

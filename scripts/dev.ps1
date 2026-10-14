@@ -1,16 +1,15 @@
 <#
 .SYNOPSIS
-    Starts the dev environment: SQL Server container, then the backend (uvicorn --reload)
-    and the frontend (vite) each in its own window.
+    Starts the dev environment: SQL Server container (with backend/sql applied), then the backend
+    (uvicorn --reload) and the frontend (vite) each in its own window.
 #>
 . "$PSScriptRoot\_common.ps1"
 
-& "$PSScriptRoot\setup.ps1"
+# Setup, start the database and apply backend/sql (idempotent).
+& "$PSScriptRoot\db-init.ps1"
 $envValues = Read-DotEnv
 $apiPort = Get-EnvValue $envValues 'API_PORT' '8000'
 $webPort = Get-EnvValue $envValues 'WEB_PORT' '5173'
-
-Start-Database
 
 Start-InNewWindow -Title "backend :$apiPort" -Command @"
 Remove-Item Env:PYTHONHOME -ErrorAction SilentlyContinue

@@ -30,22 +30,45 @@ function Get-FilesHash {
     return ($digest | ForEach-Object { $_.ToString('x2') }) -join ''
 }
 
+function Write-EnvFile([string[]]$Lines) {
+    # UTF-8 without BOM: docker compose and python-dotenv both choke on a BOM.
+    [System.IO.File]::WriteAllLines($EnvFile, $Lines, (New-Object System.Text.UTF8Encoding $false))
+}
+
 # --- .env ---------------------------------------------------------------
+$exampleLines = Get-Content -LiteralPath (Join-Path $RepoRoot '.env.example') -Encoding UTF8
 if (-not (Test-Path -LiteralPath $EnvFile)) {
-    Write-Host 'Creating .env from .env.example with a generated database password...'
-    $password = New-DbPassword
+    Write-Host 'Creating .env from .env.example with generated database passwords...'
+    $saPassword = New-DbPassword
+    $appPassword = New-DbPassword
     $apiPort = Find-FreePort 8000
     $webPort = Find-FreePort 5173
-    $lines = Get-Content -LiteralPath (Join-Path $RepoRoot '.env.example') -Encoding UTF8 | ForEach-Object {
-        if ($_ -match '^(MSSQL_SA_PASSWORD|DB_PASSWORD)=') { "$($Matches[1])=$password" }
+    $lines = $exampleLines | ForEach-Object {
+        if ($_ -match '^(MSSQL_SA_PASSWORD|DB_ADMIN_PASSWORD)=') { "$($Matches[1])=$saPassword" }
+        elseif ($_ -match '^DB_PASSWORD=') { "DB_PASSWORD=$appPassword" }
         elseif ($_ -match '^API_PORT=') { "API_PORT=$apiPort" }
         elseif ($_ -match '^WEB_PORT=') { "WEB_PORT=$webPort" }
         else { $_ }
     }
-    # UTF-8 without BOM: docker compose and python-dotenv both choke on a BOM.
-    [System.IO.File]::WriteAllLines($EnvFile, [string[]]$lines, (New-Object System.Text.UTF8Encoding $false))
+    Write-EnvFile ([string[]]$lines)
     if ($apiPort -ne 8000) { Write-Host "  Port 8000 is busy; API_PORT set to $apiPort." }
     if ($webPort -ne 5173) { Write-Host "  Port 5173 is busy; WEB_PORT set to $webPort." }
+}
+else {
+    # Append keys added to .env.example since this .env was created.
+    $current = Read-DotEnv
+    $missing = @($exampleLines | Where-Object { $_ -match '^([A-Z0-9_]+)=' -and -not $current.ContainsKey($Matches[1]) })
+    if ($missing.Count -gt 0) {
+        $added = $missing | ForEach-Object {
+            $key = ($_ -split '=', 2)[0]
+            if ($key -eq 'DB_ADMIN_PASSWORD') { "DB_ADMIN_PASSWORD=$($current['MSSQL_SA_PASSWORD'])" }
+            elseif ($key -like '*PASSWORD') { "$key=$(New-DbPassword)" }
+            else { $_ }
+        }
+        Write-Host "Adding new keys to .env: $(($added | ForEach-Object { ($_ -split '=', 2)[0] }) -join ', ')"
+        $lines = @(Get-Content -LiteralPath $EnvFile -Encoding UTF8) + @('') + @($added)
+        Write-EnvFile ([string[]]$lines)
+    }
 }
 
 # --- Backend venv -------------------------------------------------------

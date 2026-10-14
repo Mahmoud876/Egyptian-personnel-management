@@ -42,7 +42,7 @@ Skeleton means: the shared core works end to end (login, permissions, users, aud
 - **Licences:** only MIT, BSD, Apache-2.0 or ISC dependencies. Record every new dependency in `docs/licenses.md` (name, version, licence, why). Ask before adding anything heavy.
 - **Validation lives in both layers:** Pydantic in the API, and `CHECK`/`UNIQUE`/FK constraints in SQL Server.
 - **No secrets in code.** Config from `.env` (commit only `.env.example`).
-- Target OS for dev is **Windows**: provide PowerShell scripts in `scripts/` (`setup.ps1`, `dev.ps1`, `test.ps1`, `gen-types.ps1`), not only bash. Keep `.ps1` files ASCII-only (Windows PowerShell 5.1 misreads UTF-8 without a BOM).
+- Target OS for dev is **Windows**: provide PowerShell scripts in `scripts/` (`setup.ps1`, `db-init.ps1`, `dev.ps1`, `test.ps1`, `gen-types.ps1`), not only bash. Keep `.ps1` files ASCII-only (Windows PowerShell 5.1 misreads UTF-8 without a BOM).
 
 ## Project layout
 
@@ -50,7 +50,9 @@ Skeleton means: the shared core works end to end (login, permissions, users, aud
 backend/
   app/
     main.py            # app factory, routers, static files (serves frontend/dist in prod)
-    core/              # config, db, security (sessions, hashing), permissions, audit, errors
+    models.py          # imports every models module (complete Base.metadata)
+    cli/               # command-line tools: db_init (applies backend/sql), create_admin
+    core/              # config, db, models (Base + core tables), security, permissions, audit, errors
     admin/             # users, permission assignment, templates, audit viewer, lookups
     modules/
       conscripts/      # router.py, schemas.py, service.py, models.py

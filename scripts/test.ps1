@@ -5,8 +5,8 @@
 #>
 . "$PSScriptRoot\_common.ps1"
 
-& "$PSScriptRoot\setup.ps1"
-Start-Database
+# Setup, start the database and apply backend/sql (idempotent).
+& "$PSScriptRoot\db-init.ps1"
 
 $failed = New-Object System.Collections.Generic.List[string]
 
