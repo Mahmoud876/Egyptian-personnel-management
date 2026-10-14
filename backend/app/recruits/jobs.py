@@ -12,7 +12,7 @@ from rq import Queue
 from rq.job import Job
 from rq.exceptions import NoSuchJobError
 from rq.serializers import JSONSerializer
-from sqlalchemy import select, text, insert
+from sqlalchemy import select, text, insert, update, delete, func
 
 import app.models  # Register shared FK targets before worker queries.
 from app.admin.models import Qualification
@@ -21,9 +21,10 @@ from app.core.config import get_settings
 from app.core.db import get_engine, get_sessionmaker
 from app.core.redis_client import get_redis, key
 from app.core.security import utcnow
+from app.core.models import AuditLog
 from .files import path_for, read_records, write_export, new_key
 from .models import ImportJob, ImportRecord, ImportRecordError, Recruit, ExportJob
-from .validation import validate_row
+from .validation import validate_row, readable_error, FIELD_LABELS
 
 logger = logging.getLogger(__name__)
 IMPORT_TERMINAL = {"READY_FOR_REVIEW", "APPROVED", "CANCELLED", "FAILED"}
@@ -114,12 +115,22 @@ def process_import(job_id: str):
                 job.progress_version += 1
                 db.commit()
                 publish(job)
-                path = path_for(job.storage_key)
-                with path.open("rb") as uploaded:
-                    digest = hashlib.file_digest(uploaded, "sha256").hexdigest()
-                if digest != job.file_sha256:
-                    raise ValueError("UPLOADED_FILE_CHANGED")
-                rows = read_records(path)
+                staged_ids = []
+                if job.validation_run:
+                    originals = db.execute(select(ImportRecord.id, ImportRecord.raw_data_json,
+                        ImportRecord.corrected_data_json).where(ImportRecord.import_job_id == job.id)
+                        .order_by(ImportRecord.row_number)).all()
+                    staged_ids = [record.id for record in originals]
+                    rows = [json.loads(record.corrected_data_json or record.raw_data_json) for record in originals]
+                    if len(rows) != job.total_rows:
+                        raise ValueError("INCOMPLETE_STAGING")
+                else:
+                    path = path_for(job.storage_key)
+                    with path.open("rb") as uploaded:
+                        digest = hashlib.file_digest(uploaded, "sha256").hexdigest()
+                    if digest != job.file_sha256:
+                        raise ValueError("UPLOADED_FILE_CHANGED")
+                    rows = read_records(path)
                 counts = Counter(str(row.get("national_id") or "").strip() for row in rows)
                 first = {}
                 for index, row in enumerate(rows, 1):
@@ -142,18 +153,26 @@ def process_import(job_id: str):
                         nid = str(raw.get("national_id") or "").strip()
                         duplicate = counts[nid] > 1 and (job.duplicate_policy == "reject_all" or first[nid] != number)
                         parsed, errors = validate_row(raw, existing, duplicate, qualifications)
-                        record_id = uuid4()
+                        record_id = staged_ids[number - 1] if job.validation_run else uuid4()
                         record = dict(id=record_id, import_job_id=job.id, row_number=number,
                             source_record_id=str(raw.get("id") or "")[:100], raw_data_json=json.dumps(raw, ensure_ascii=False),
                             national_id_raw=str(raw.get("national_id") or ""),
                             normalized_national_id=nid if len(nid) == 14 else None,
                             parsed_data_json=json.dumps(parsed, ensure_ascii=False), parsed_type_id=parsed["type_id"],
                             validation_status="INVALID" if errors else "VALID")
+                        if job.validation_run:
+                            # The source snapshot never changes, even after repeated corrections/retries.
+                            del record["raw_data_json"]
                         staged.append(record)
                         row_errors.extend(dict(id=uuid4(), import_row_id=record_id, **error) for error in errors)
                         batch_invalid += bool(errors)
                         batch_valid += not bool(errors)
-                    db.execute(insert(ImportRecord), staged)
+                    if job.validation_run:
+                        db.execute(delete(ImportRecordError).where(ImportRecordError.import_row_id.in_(
+                            [record["id"] for record in staged])))
+                        db.execute(update(ImportRecord), staged)
+                    else:
+                        db.execute(insert(ImportRecord), staged)
                     if row_errors:
                         db.execute(insert(ImportRecordError), row_errors)
                     job.invalid_rows += batch_invalid
@@ -168,8 +187,13 @@ def process_import(job_id: str):
                 job.status = "READY_FOR_REVIEW"
                 job.completed_at = utcnow()
                 job.progress_version += 1
+                initiator = job.uploaded_by_user_id if job.validation_run == 0 else db.scalar(
+                    select(AuditLog.user_id).where(AuditLog.action == "revalidation_requested",
+                        AuditLog.entity == "import_job", AuditLog.entity_id == str(job.id),
+                        func.json_value(AuditLog.new_values, "$.validation_run") == str(job.validation_run))
+                    .order_by(AuditLog.id.desc()).limit(1))
                 audit.write(db, action="validation_complete", entity="import_job", entity_id=str(job.id),
-                            user_id=job.uploaded_by_user_id, new_values=snapshot(job))
+                            user_id=initiator, new_values={**snapshot(job), "validation_run": job.validation_run})
                 db.commit()
                 publish(job)
         except Exception as exc:
@@ -195,18 +219,28 @@ def process_export(job_id: str):
                 rows = []
                 records = db.scalars(select(ImportRecord).where(ImportRecord.import_job_id == job.import_job_id,
                             ImportRecord.validation_status == "INVALID").order_by(ImportRecord.row_number)).all()
-                error_rows = db.execute(select(ImportRecordError.import_row_id, ImportRecordError.error_message)
+                error_rows = db.execute(select(ImportRecordError.import_row_id, ImportRecordError.error_code,
+                                              ImportRecordError.field_name, ImportRecordError.error_message)
                     .join(ImportRecord, ImportRecord.id == ImportRecordError.import_row_id)
-                    .where(ImportRecord.import_job_id == job.import_job_id)).all()
+                    .where(ImportRecord.import_job_id == job.import_job_id)
+                    .order_by(ImportRecordError.field_name, ImportRecordError.error_code)).all()
                 errors = {}
-                for record_id, message in error_rows:
-                    errors.setdefault(record_id, []).append(message)
+                values = {record.id: json.loads(record.corrected_data_json or record.raw_data_json) for record in records}
+                for record_id, code, field, message in error_rows:
+                    if record_id in values:
+                        error = readable_error(code, field, message, values[record_id])
+                        errors.setdefault(record_id, []).append(f"{FIELD_LABELS.get(field, field)} ({field}): {error['error_message']}")
                 source_headers = {h for record in records for h in json.loads(record.raw_data_json)}
                 original_reasons = "source_rejection_reasons"
                 while original_reasons in source_headers:
                     original_reasons = "source_" + original_reasons
+                original_column = "original_uploaded_data"
+                while original_column in source_headers or original_column == original_reasons:
+                    original_column = "source_" + original_column
                 for record in records:
-                    raw = json.loads(record.raw_data_json)
+                    raw = json.loads(record.corrected_data_json or record.raw_data_json)
+                    if record.corrected_data_json:
+                        raw[original_column] = record.raw_data_json
                     # Preserve even a source column called rejection_reasons.
                     if "rejection_reasons" in raw:
                         raw[original_reasons] = raw.pop("rejection_reasons")
@@ -275,7 +309,8 @@ def dispatch_pending():
                         if model is ImportJob:
                             publish(item)
                         continue
-                    identity = f"{model.__tablename__}-{item.id}-{item.retry_count + 1}"
+                    generation = f"-r{item.validation_run}" if model is ImportJob and item.validation_run else ""
+                    identity = f"{model.__tablename__}-{item.id}{generation}-{item.retry_count + 1}"
                     item.rq_job_id = identity
                     db.commit()  # Enqueue may fail; the next dispatcher tick retries this same identity.
                     q = queue()

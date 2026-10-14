@@ -17,7 +17,7 @@ from app.core.security import hash_password
 from app.core.redis_client import get_redis
 from app.main import create_app
 from app.recruits.jobs import process_import, process_export, dispatch_pending, queue
-from app.recruits.models import ImportJob, Recruit, ImportRecord, ExportJob
+from app.recruits.models import ImportJob, Recruit, ImportRecord, ImportRecordError, ExportJob
 from app.recruits.validation import FIELDS
 
 PASSWORD = "Synthetic-test-42!"
@@ -160,6 +160,191 @@ def test_duplicate_file_and_database_recheck_on_approval(actors):
     assert admin.post(f"/api/v1/imports/{first}/approve").status_code == 200
     assert admin.post(f"/api/v1/imports/{second}/approve").status_code == 409
     assert admin.get(f"/api/v1/imports/{second}").json()["status"] == "READY_FOR_REVIEW"
+    version = admin.get(f"/api/v1/imports/{second}").json()["progress_version"]
+    assert admin.post(f"/api/v1/imports/{second}/revalidate", json={"version": version}).status_code == 202
+    process_import(second)
+    report = admin.get(f"/api/v1/imports/{second}/report").json()
+    assert report["summary"]["valid_rows"] == 0
+    assert any(error["error_code"] == "DUPLICATE_DATABASE" for error in report["invalid"]["items"][0]["errors"])
+
+
+def test_correction_preserves_source_rechecks_all_rows_and_locks_review(actors):
+    admin, operator = actors
+    original = row()
+    job = upload(admin, [original, original])
+    process_import(job)
+    report = admin.get(f"/api/v1/imports/{job}/report").json()
+    target = report["invalid"]["items"][0]
+    version = report["summary"]["progress_version"]
+    body = {"version": version, "changes": {"national_id": row()["national_id"]}}
+    path = f"/api/v1/imports/{job}/rows/{target['id']}"
+    assert operator.patch(path, json=body).status_code == 403
+    assert admin.patch(f"/api/v1/imports/{job}/rows/{uuid4()}", json=body).status_code == 404
+    assert admin.patch(path, json={**body, "version": version - 1}).status_code == 409
+    assert admin.patch(path, json={**body, "changes": {"validation_status": "VALID"}}).status_code == 422
+    assert admin.patch(path, json=body).status_code == 202
+    assert admin.post(f"/api/v1/imports/{job}/approve").status_code == 409
+    assert admin.patch(path, json=body).status_code == 409
+    assert admin.post(f"/api/v1/imports/{job}/exports", json={"format": "xlsx"}).status_code == 409
+    process_import(job)
+    report = admin.get(f"/api/v1/imports/{job}/report").json()
+    assert report["summary"]["valid_rows"] == 2 and report["summary"]["invalid_rows"] == 0
+    corrected = next(item for item in report["valid"]["items"] if item["id"] == target["id"])
+    assert corrected["raw_data"] == original
+    assert corrected["corrected_data"]["national_id"] == body["changes"]["national_id"]
+    assert corrected["errors"] == []
+    assert admin.patch(path, json=body).status_code == 409  # old review remains stale after revalidation
+    with get_sessionmaker()() as db:
+        log = db.scalar(select(AuditLog).where(AuditLog.entity_id == target["id"], AuditLog.action == "import_row_corrected"))
+        assert log is not None
+    assert admin.post(f"/api/v1/imports/{job}/approve").json()["inserted_count"] == 2
+    assert admin.patch(path, json={**body, "version": report["summary"]["progress_version"]}).status_code == 409
+
+
+def test_correction_export_keeps_current_and_original_values(actors):
+    from openpyxl import load_workbook
+    admin, _ = actors
+    job = upload(admin, [row(nid="bad", name="")])
+    process_import(job)
+    report = admin.get(f"/api/v1/imports/{job}/report").json()
+    target = report["invalid"]["items"][0]
+    path = f"/api/v1/imports/{job}/rows/{target['id']}"
+    body = {"version": report["summary"]["progress_version"], "changes": {"name": "اسم مصحح من المصدر"}}
+    export = admin.post(f"/api/v1/imports/{job}/exports", json={"format": "xlsx"}).json()["id"]
+    assert admin.patch(path, json=body).json()["code"] == "export_in_progress"
+    process_export(export)
+    assert admin.patch(path, json=body).status_code == 202
+    process_import(job)
+    report = admin.get(f"/api/v1/imports/{job}/report").json()
+    assert report["summary"]["invalid_rows"] == 1
+    assert not any(error["field_name"] == "name" for error in report["invalid"]["items"][0]["errors"])
+    export = admin.post(f"/api/v1/imports/{job}/exports", json={"format": "xlsx"}).json()["id"]
+    process_export(export)
+    book = load_workbook(BytesIO(admin.get(f"/api/v1/exports/{export}/download").content))
+    values = list(book.active.values)
+    data = dict(zip(values[0], values[1]))
+    assert data["name"] == body["changes"]["name"]
+    assert json.loads(data["original_uploaded_data"])["name"] == ""
+    assert data["rejection_reasons"]
+
+
+def test_rejection_reasons_distinguish_missing_and_length_in_existing_reports_and_exports(actors):
+    from openpyxl import load_workbook
+    admin, _ = actors
+    job = upload(admin, [row(ps_name="", gov_name="", name="س" * 201)])
+    process_import(job)
+    report = admin.get(f"/api/v1/imports/{job}/report").json()
+    target = report["invalid"]["items"][0]
+    errors = {e["field_name"]: e for e in target["errors"]}
+    assert errors["name"]["error_code"] == "FIELD_TOO_LONG"
+    assert "200" in errors["name"]["error_message"] and "201" in errors["name"]["error_message"]
+    assert errors["ps_name"]["error_code"] == "FIELD_REQUIRED"
+    # Simulate a report persisted before this fix: it must improve without revalidation.
+    with get_sessionmaker()() as db:
+        for error in db.scalars(select(ImportRecordError).where(ImportRecordError.import_row_id == UUID(target["id"]))):
+            error.error_code = "FIELD_REQUIRED"
+            error.error_message = "البيان مطلوب أو يتجاوز الطول المسموح"
+        db.commit()
+    current = admin.get(f"/api/v1/imports/{job}/rows?status=INVALID").json()["items"][0]
+    assert {e["field_name"]: e for e in current["errors"]} == errors
+    export = admin.post(f"/api/v1/imports/{job}/exports", json={"format": "xlsx"}).json()["id"]
+    process_export(export)
+    sheet = load_workbook(BytesIO(admin.get(f"/api/v1/exports/{export}/download").content)).active
+    values = list(sheet.values)
+    result = dict(zip(values[0], values[1]))
+    assert result["name"] == "س" * 201
+    for field in ["ps_name", "gov_name", "name"]:
+        assert f"({field}):" in result["rejection_reasons"]
+    assert "200" in result["rejection_reasons"] and "201" in result["rejection_reasons"]
+
+
+def test_validation_completion_uses_the_requester_of_each_run(actors, make_user):
+    admin, _ = actors
+    uploader = admin.get("/api/v1/auth/me").json()["id"]
+    second_user = make_user(role="system_administrator")
+    with TestClient(create_app()) as second:
+        assert second.post("/api/v1/auth/login", json={"username": second_user.username,
+            "password": second_user.password}).status_code == 200
+        job = upload(admin, [row(nid="bad")])
+        process_import(job)
+        report = admin.get(f"/api/v1/imports/{job}/report").json()
+        target = report["invalid"]["items"][0]
+        assert second.patch(f"/api/v1/imports/{job}/rows/{target['id']}", json={
+            "version": report["summary"]["progress_version"], "changes": {"name": "تصحيح المدير الثاني"}}).status_code == 202
+        # Recovery/retries must keep the initiating administrator, not revert to the uploader.
+        with get_sessionmaker()() as db:
+            item = db.get(ImportJob, UUID(job))
+            item.retry_count = 1
+            db.commit()
+        process_import(job)
+        version = admin.get(f"/api/v1/imports/{job}").json()["progress_version"]
+        assert admin.post(f"/api/v1/imports/{job}/revalidate", json={"version": version}).status_code == 202
+        process_import(job)
+        with get_sessionmaker()() as db:
+            entries = list(db.scalars(select(AuditLog).where(AuditLog.entity_id == job,
+                AuditLog.action == "validation_complete").order_by(AuditLog.id)))
+            assert [entry.user_id for entry in entries] == [uploader, second_user.id, uploader]
+            assert [json.loads(entry.new_values)["validation_run"] for entry in entries] == [0, 1, 2]
+
+
+def test_audit_search_finds_arabic_actions_and_related_recruit_events(actors):
+    admin, operator = actors
+    rid = approved_recruit(admin)
+    unrelated = approved_recruit(admin)
+    assert operator.post(f"/api/v1/recruits/{rid}/complete", json=completion()).status_code == 200
+    assert operator.get(f"/api/v1/recruits/{rid}/barcode").status_code == 200
+    profile = operator.get(f"/api/v1/recruits/{rid}").json()
+    assert admin.post(f"/api/v1/recruits/{rid}/documents", files={
+        "file": ("synthetic.pdf", b"%PDF-synthetic", "application/pdf")}).status_code == 201
+    result = admin.get("/api/v1/audit", params={"q": profile["national_id"], "page_size": 100})
+    assert result.status_code == 200, result.text
+    entries = result.json()["items"]
+    assert {"label", "complete", "document_upload", "approve", "validation_complete"} <= {e["action"] for e in entries}
+    assert all(e["entity_id"] != unrelated for e in entries)
+    for query, action in [("طباعة ملصق", "label"), ("إعتماد", "approve"), ("إرفاق مستند", "document_upload")]:
+        result = admin.get("/api/v1/audit", params={"q": query})
+        assert result.status_code == 200, result.text
+        assert action in {e["action"] for e in result.json()["items"]}
+    # Exact filters still narrow global search and wildcard characters stay literal.
+    result = admin.get("/api/v1/audit", params={"q": profile["national_id"], "action": "label"}).json()
+    assert result["total"] == 1 and result["items"][0]["entity_id"] == rid
+    assert admin.get("/api/v1/audit", params={"q": "%[_]"}).json()["total"] == 0
+
+
+@pytest.mark.parametrize("status", ["QUEUED", "PARSING", "VALIDATING", "FAILED"])
+def test_revalidation_rows_remain_readable_but_review_actions_are_locked(actors, status):
+    admin, operator = actors
+    original = row(nid="bad")
+    job = upload(admin, [original, row()])
+    base = f"/api/v1/imports/{job}"
+    # An initial upload has no completed staging report to inspect yet.
+    assert admin.get(base + "/rows").status_code == 409
+    process_import(job)
+    report = admin.get(base + "/report").json()
+    target = report["invalid"]["items"][0]
+    correction = {"version": report["summary"]["progress_version"], "changes": {"name": "اسم مصحح"}}
+    assert admin.patch(base + f"/rows/{target['id']}", json=correction).status_code == 202
+    with get_sessionmaker()() as db:
+        item = db.get(ImportJob, UUID(job))
+        item.status = status
+        db.commit()
+    result = admin.get(base + "/rows?status=INVALID&page_size=1")
+    assert result.status_code == 200, result.text
+    record = result.json()["items"][0]
+    assert record["raw_data"] == original
+    assert record["corrected_data"]["name"] == "اسم مصحح"
+    assert record["errors"]  # explicitly provisional until validation completes
+    assert admin.get(base + "/rows?status=VALID").json()["total"] == 1
+    assert admin.get(base + "/report").status_code == 200
+    assert operator.get(base + "/rows").status_code == 403
+    current = admin.get(base).json()["progress_version"]
+    assert admin.patch(base + f"/rows/{target['id']}", json={**correction, "version": current}).status_code == 409
+    assert admin.post(base + "/approve").status_code == 409
+    assert admin.post(base + "/exports", json={"format": "xlsx"}).status_code == 409
+    if status == "FAILED":
+        assert admin.post(base + "/revalidate", json={"version": current}).status_code == 202
+    process_import(job)
+    assert admin.get(base).json()["status"] == "READY_FOR_REVIEW"
 
 
 def test_export_and_terminal_sse(actors):
@@ -312,6 +497,7 @@ def test_accdb_export_preserves_arabic(actors, monkeypatch):
             result = conn.execute("SELECT [name], [rejection_reasons] FROM [rejected_records]").fetchone()
             assert result[0] == "أحمد محمد حسن علي"
             assert "الرقم القومي" in result[1]
+            assert "(national_id):" in result[1]
         monkeypatch.setattr(get_settings(), "access_table", "rejected_records")
         imported = read_records(path_for(item.storage_key))
         assert len(imported) == 1 and imported[0]["name"] == "أحمد محمد حسن علي"
@@ -350,5 +536,14 @@ def test_windows_worker_processes_import_and_export_in_child_processes(actors, t
             export = admin.post(f'/api/v1/imports/{job}/exports', json={'format': 'xlsx'}).json()['id']
             wait_for(f'/api/v1/exports/{export}', 'COMPLETED')
             assert admin.get(f'/api/v1/exports/{export}/download').content.startswith(b'PK')
+            staged = admin.get(f'/api/v1/imports/{job}/report').json()['invalid']['items'][0]
+            result = admin.patch(f'/api/v1/imports/{job}/rows/{staged["id"]}', json={
+                'version': state['progress_version'], 'changes': {'national_id': row()['national_id']}})
+            assert result.status_code == 202, result.text
+            state = wait_for(f'/api/v1/imports/{job}', 'READY_FOR_REVIEW')
+            assert state['valid_rows'] == 1 and state['invalid_rows'] == 0 and state['validation_run'] == 1
+            assert admin.post(f'/api/v1/imports/{job}/revalidate', json={'version': state['progress_version']}).status_code == 202
+            state = wait_for(f'/api/v1/imports/{job}', 'READY_FOR_REVIEW')
+            assert state['validation_run'] == 2 and state['valid_rows'] == 1
         finally:
             subprocess.run(['taskkill', '/PID', str(worker.pid), '/T', '/F'], capture_output=True)

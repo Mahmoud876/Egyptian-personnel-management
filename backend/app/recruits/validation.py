@@ -14,6 +14,27 @@ GOVERNORATES = {
 }
 SERVICE_MONTHS = {1: 14, 3: 20, 2: 26, 4: 38}
 FIELDS = ("id", "name", "national_id", "birth_date", "gov_name", "gov_id", "ps_name", "ps_id", "type_id", "type_name")
+FIELD_LABELS = {
+    "id": "رقم السجل بالمصدر", "name": "الاسم الرباعي", "national_id": "الرقم القومي",
+    "birth_date": "تاريخ الميلاد", "gov_name": "اسم المحافظة", "gov_id": "كود المحافظة",
+    "ps_name": "اسم قسم / مركز الشرطة", "ps_id": "كود قسم / مركز الشرطة",
+    "type_id": "كود المؤهل", "type_name": "اسم المؤهل",
+}
+FIELD_LIMITS = {"name": 200, "ps_name": 200, "ps_id": 20, "gov_name": 100, "type_name": 100}
+
+
+def readable_error(code: str, field: str, message: str, raw: dict) -> dict:
+    """Clarify legacy combined errors without rewriting the stored validation history."""
+    if code == "FIELD_REQUIRED" and field in FIELD_LIMITS:
+        value = str(raw.get(field) or "").strip()
+        if not value:
+            message = "هذا الحقل مطلوب"
+        elif len(value) > FIELD_LIMITS[field]:
+            code = "FIELD_TOO_LONG"
+            message = f"الحد الأقصى {FIELD_LIMITS[field]} حرفاً؛ القيمة تحتوي على {len(value)} حرفاً"
+    if code == "SOURCE_ID_LENGTH":
+        message = f"الحد الأقصى 100 حرف؛ القيمة تحتوي على {len(str(raw.get('id') or '').strip())} حرفاً"
+    return {"error_code": code, "field_name": field, "error_message": message}
 
 
 def normalize_name(value: str) -> str:
@@ -69,11 +90,13 @@ def validate_row(raw: dict, existing: set[str], duplicate: bool, qualification_i
         fail("DUPLICATE_FILE", "national_id", "الرقم القومي مكرر داخل الملف")
     if nid in existing:
         fail("DUPLICATE_DATABASE", "national_id", "الرقم القومي مسجل من قبل")
-    for field, maximum in (("name", 200), ("ps_name", 200), ("ps_id", 20), ("gov_name", 100), ("type_name", 100)):
-        if not value(field) or len(value(field)) > maximum:
-            fail("FIELD_REQUIRED", field, "البيان مطلوب أو يتجاوز الطول المسموح")
+    for field, maximum in FIELD_LIMITS.items():
+        if not value(field):
+            fail("FIELD_REQUIRED", field, "هذا الحقل مطلوب")
+        elif len(value(field)) > maximum:
+            fail("FIELD_TOO_LONG", field, f"الحد الأقصى {maximum} حرفاً؛ القيمة تحتوي على {len(value(field))} حرفاً")
     if len(value("id")) > 100:
-        fail("SOURCE_ID_LENGTH", "id", "معرف السجل يتجاوز الطول المسموح")
+        fail("SOURCE_ID_LENGTH", "id", f"الحد الأقصى 100 حرف؛ القيمة تحتوي على {len(value('id'))} حرفاً")
     try:
         type_id = int(value("type_id"))
         if type_id not in SERVICE_MONTHS or type_id not in qualification_ids:

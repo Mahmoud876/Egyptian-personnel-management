@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -12,7 +13,7 @@ import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { type ReactNode, useEffect, useState } from 'react';
-import { formatDateTimeNumeric, formatNumber, localDayToIso } from '../../../shared/format';
+import { formatDateTimeNumeric, formatNumber, localDateTimeToIso } from '../../../shared/format';
 import { ar } from '../../../shared/i18n/ar';
 import { Mono } from '../../../shared/ui/DataText';
 import { CloseIcon, CompareArrowsIcon, FilterListIcon, HistoryIcon, RefreshIcon, SearchIcon } from '../../../shared/ui/icons';
@@ -66,8 +67,10 @@ function toQuery(filters: Filters, q: string, page: number, pageSize: number): A
   if (filters.userId) query.user_id = Number(filters.userId);
   if (filters.action) query.action = filters.action;
   if (filters.entity) query.entity = filters.entity;
-  if (filters.dateFrom) query.date_from = localDayToIso(filters.dateFrom);
-  if (filters.dateTo) query.date_to = localDayToIso(filters.dateTo, true);
+  const from = localDateTimeToIso(filters.dateFrom);
+  const to = localDateTimeToIso(filters.dateTo);
+  if (from) query.date_from = from;
+  if (to) query.date_to = to;
   return query;
 }
 
@@ -212,7 +215,10 @@ export function AuditLogPage() {
   const [pageSize, setPageSize] = useState(25);
   const [selected, setSelected] = useState<AuditEntry | null>(null);
   const q = useDebounced(filters.q.trim(), 300);
-  const audit = useAuditQuery(toQuery(filters, q, page, pageSize));
+  const query = toQuery(filters, q, page, pageSize);
+  const invalidRange = Boolean((filters.dateFrom && !query.date_from) || (filters.dateTo && !query.date_to)
+    || (query.date_from && query.date_to && query.date_from >= query.date_to));
+  const audit = useAuditQuery(query, !invalidRange);
 
   useEffect(() => setPage(0), [filters.userId, filters.action, filters.entity, filters.dateFrom, filters.dateTo, q]);
 
@@ -225,7 +231,7 @@ export function AuditLogPage() {
         title={ar.audit.title}
         subtitle={ar.audit.subtitle}
         actions={
-          <Button variant="outlined" startIcon={<RefreshIcon />} onClick={() => void audit.refetch()}>
+          <Button disabled={invalidRange} variant="outlined" startIcon={<RefreshIcon />} onClick={() => void audit.refetch()}>
             {ar.home.refresh}
           </Button>
         }
@@ -235,7 +241,7 @@ export function AuditLogPage() {
           icon={<FilterListIcon />}
           title={ar.audit.filtersTitle}
           actions={
-            audit.data && (
+            audit.data && !invalidRange && (
               <StatusBadge tone="primary" dot={false}>
                 {ar.audit.matches(formatNumber(audit.data.total))}
               </StatusBadge>
@@ -275,20 +281,26 @@ export function AuditLogPage() {
               ))}
             </TextField>
             <TextField
-              type="date"
+              type="datetime-local"
               label={ar.audit.dateFrom}
               value={filters.dateFrom}
               onChange={set('dateFrom')}
-              slotProps={{ htmlInput: { dir: 'ltr' } }}
+              error={invalidRange}
+              slotProps={{ htmlInput: { dir: 'ltr', step: 1 }, inputLabel: { shrink: true } }}
             />
             <TextField
-              type="date"
+              type="datetime-local"
               label={ar.audit.dateTo}
               value={filters.dateTo}
               onChange={set('dateTo')}
-              slotProps={{ htmlInput: { dir: 'ltr' } }}
+              error={invalidRange}
+              slotProps={{ htmlInput: { dir: 'ltr', step: 1 }, inputLabel: { shrink: true } }}
             />
           </Box>
+          <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
+            {ar.audit.timeRangeHint(Intl.DateTimeFormat().resolvedOptions().timeZone)}
+          </Typography>
+          {invalidRange && <Alert severity="error" sx={{ mt: 1 }}>{ar.audit.invalidRange}</Alert>}
           <Box sx={{ display: 'flex', gap: 2, mt: 2, alignItems: 'flex-end', flexWrap: 'wrap' }}>
             <TextField
               label={ar.audit.textSearch}
@@ -326,7 +338,7 @@ export function AuditLogPage() {
                 <ErrorAlert error={audit.error} onRetry={() => void audit.refetch()} />
               </Box>
             )}
-            {audit.isPending ? (
+            {invalidRange ? null : audit.isPending ? (
               <LoadingState />
             ) : (
               audit.data && (

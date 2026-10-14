@@ -10,6 +10,8 @@ FastAPI handles authentication, private uploads, reports, approval and recruit r
 2. The worker dispatcher delivers committed jobs to RQ. A Redis outage during delivery does not discard the SQL job. Dispatch is retried every `RECOVERY_INTERVAL_SECONDS` (default 30).
 3. Parsing checks the file structure. Validation checks every row and records all rejection reasons. Each 250-row transaction commits staged records, errors, counters and checkpoint together. SSE uses Redis Pub/Sub with fresh SQL snapshots; reconnecting clients receive current state.
 4. `READY_FOR_REVIEW` exposes separate valid/invalid groups. Approval atomically inserts valid recruits only; cancellation inserts none. Approval rechecks database duplicates, so competing imports cannot insert the same national ID. A conflict returns 409 and leaves the job reviewable.
+
+   Subsequent revalidation keeps `/imports/{id}/rows` and `/report` readable for administrators while queued, parsing, validating or failed (`validation_run > 0`). These staged classifications/errors are provisional, not a completed validation result. Consumers must inspect the job status; correction, approval and export still require `READY_FOR_REVIEW`. The frontend keeps the table visible and marks it read-only during this interval.
 5. Invalid rows can be exported asynchronously to real `.xlsx` or `.accdb` files with original values and `rejection_reasons`. A source field of that name is preserved under an unused `source_...rejection_reasons` name. Excel formula-like source strings remain literal text.
 6. An operator retrieves an approved recruit, supplies police number and both enlistment dates, then completes the profile. This locks the record and allocates an immutable barcode. Only administrators may subsequently correct the name, police number or dates; they must supply the current revision.
 7. Users can search by national ID, barcode, name or police number plus year and retrieve a printable Code 128 label containing name, police number and year.
@@ -49,6 +51,8 @@ All paths below have prefix `/api/v1`. Interactive request/response documentatio
 | `GET /imports/{id}/report` | Summary plus independently paginated valid/invalid groups |
 | `GET /imports/{id}/rows?status=INVALID` | Paginated raw rows and structured errors |
 | `POST /imports/{id}/approve` or `/cancel` | Final review decision |
+| `PATCH /imports/{id}/rows/{row_id}` | Administrator correction of named source fields, with inspected `version`; preserves original values and queues full revalidation |
+| `POST /imports/{id}/revalidate` | Recheck all staged rows against current duplicates/rules; `version` required; supports retry of failed revalidation |
 | `POST /imports/{id}/exports` | JSON `{"format":"xlsx"}` or `{"format":"accdb"}`; returns 202 |
 | `GET /exports/{id}`, `GET /exports/{id}/download` | Export state and protected download |
 | `GET /recruits` | `search`, `national_id`, `barcode`, `name`, or `police_number` + `enlistment_year` |
@@ -97,6 +101,10 @@ Existing user IDs remain integers to preserve established core foreign keys; new
 The user-management frontend now selects roles and displays derived permissions. The conscript workflow screens (upload and review with live progress, search, enlistment data entry, label printing) are built on this API; see [ui-design.md](ui-design.md).
 
 ## Verification and local machine notes
+
+2026-10-15 audit/rejection follow-up: distinct missing/overlong rejection messages, field-labelled exports (including legacy report messages), exact audit date/time filters, per-validation-run completion attribution, and Arabic/related-record audit search are implemented. See [integration-status.md](integration-status.md#audit-and-rejection-reason-fixes--2026-10-15). Historical audit entries and previously generated export files are retained unchanged; regenerate exports to obtain the clearer reasons. No migration is needed for this follow-up.
+
+Correction/revalidation follow-up: **145 backend tests and 28 frontend tests passed**; type checks and production build passed. Migration `010_import_corrections.sql` preserves original row data and stores corrections separately. The worker revalidates all rows and uses a fresh queue identity for each validation run. See [integration-status.md](integration-status.md) for the correction workflow and remaining limits.
 
 Verified after Stitch integration on 2026-10-14: **143 backend tests passed**, **25 standalone frontend tests passed**, both TypeScript projects type-checked, and the production frontend built successfully. Integration coverage includes real SQL Server/Redis, queue delivery and failure recovery, checkpoint resume, concurrent completion, approval conflicts, native Arabic ACCDB export/readback, protected downloads and the React workflow through a real Vite proxy/API/worker. The live frontend test is launched by the backend suite and skipped in standalone frontend runs. PowerShell scripts were also parsed successfully during the earlier setup pass.
 

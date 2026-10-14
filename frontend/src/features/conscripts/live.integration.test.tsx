@@ -63,7 +63,7 @@ it.skipIf(!origin)('uploads, reviews, exports, approves, completes, searches and
   });
   fireEvent.change(screen.getByLabelText(new RegExp(ar.conscripts.enlistmentYear)), { target: { value: '2026' } });
   fireEvent.click(screen.getByRole('button', { name: ar.conscripts.upload.submit }));
-  const approve = await screen.findByRole('button', { name: ar.conscripts.report.approve(formatNumber(1)) }, { timeout: 45_000 });
+  await screen.findByRole('button', { name: ar.conscripts.report.approve(formatNumber(1)) }, { timeout: 45_000 });
   const jobId = ui.router.state.location.pathname.split('/').at(-1)!;
   const report = await (await request(`/api/v1/imports/${jobId}/report`)).json();
   expect(report.summary.valid_rows).toBe(1);
@@ -75,6 +75,18 @@ it.skipIf(!origin)('uploads, reviews, exports, approves, completes, searches and
   const workbook = await request(download.getAttribute('href')!);
   expect(workbook.status).toBe(200);
   expect(new Uint8Array(await workbook.arrayBuffer()).slice(0, 2)).toEqual(new Uint8Array([80, 75]));
+  fireEvent.click(await screen.findByRole('button', { name: ar.conscripts.correction.view }));
+  const correction = within(await screen.findByRole('dialog'));
+  expect((correction.getByLabelText(ar.conscripts.correction.fields.national_id!) as HTMLInputElement).value).toBe('bad');
+  const correctedId = `300010121${String((Number(serial) + 2) % 10000).padStart(4, '0')}0`;
+  fireEvent.change(correction.getByLabelText(ar.conscripts.correction.fields.national_id!), { target: { value: correctedId } });
+  fireEvent.click(correction.getByRole('button', { name: ar.conscripts.correction.save }));
+  const approve = await screen.findByRole('button', { name: ar.conscripts.report.approve(formatNumber(2)) }, { timeout: 45_000 });
+  const correctedReport = await (await request(`/api/v1/imports/${jobId}/report`)).json();
+  expect(correctedReport.summary.invalid_rows).toBe(0);
+  const correctedRow = correctedReport.valid.items.find((item: { corrected_data: unknown }) => item.corrected_data);
+  expect(correctedRow.raw_data.national_id).toBe('bad');
+  expect(correctedRow.corrected_data.national_id).toBe(correctedId);
   fireEvent.click(approve);
   fireEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: ar.conscripts.report.approveConfirm }));
   await screen.findByText(ar.conscripts.report.approvedTitle);

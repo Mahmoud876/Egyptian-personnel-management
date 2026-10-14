@@ -1,9 +1,9 @@
-import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { Schemas } from '../../shared/api/client';
 import { ar } from '../../shared/i18n/ar';
 import { makeMe, renderApp, stubFetch } from '../../test/render';
-import { mergeImportProgress } from './api';
+import { conscriptsKeys, mergeImportProgress } from './api';
 
 const OPERATOR = ['conscripts.view', 'conscripts.enter', 'conscripts.label.print'];
 const ADMIN = [...OPERATOR, 'conscripts.import.upload', 'conscripts.edit_locked'];
@@ -52,6 +52,7 @@ function importJob(overrides: Partial<Schemas['ImportOut']> = {}): Schemas['Impo
     checkpoint_row: 10,
     retry_count: 0,
     progress_version: 3,
+    validation_run: 0,
     last_error: null,
     created_at: '2026-10-14T08:45:00Z',
     approved_at: null,
@@ -167,6 +168,122 @@ describe('enlistment data entry', () => {
 });
 
 describe('import review', () => {
+  it('shows the failing field and original value, and submits only the administrator correction', async () => {
+    let job = importJob();
+    const record = { id: RECRUIT_ID, row_number: 4, validation_status: 'INVALID',
+      raw_data: { name: 'أحمد محمد حسن علي', national_id: '30001010100010', ps_name: '' },
+      corrected_data: null,
+      errors: [{ field_name: 'ps_name', error_code: 'FIELD_REQUIRED', error_message: 'البيان مطلوب أو يتجاوز الطول المسموح' }] };
+    const calls = stubFetch(({ method, path }) => {
+      if (path === `/api/v1/imports/${JOB_ID}`) return { status: 200, body: job };
+      if (path === `/api/v1/imports/${JOB_ID}/rows`) return { status: 200, body: { ...emptyPage, total: 1, items: [record] } };
+      if (path === `/api/v1/imports/${JOB_ID}/rows/${RECRUIT_ID}` && method === 'PATCH') {
+        job = importJob({ status: 'QUEUED', progress_version: 4, validation_run: 1 });
+        return { status: 202, body: job };
+      }
+      return undefined;
+    });
+    const app = renderApp(`/conscripts/imports/${JOB_ID}`, makeMe(ADMIN));
+    fireEvent.click(await screen.findByRole('button', { name: ar.conscripts.correction.view }));
+    const dialog = within(await screen.findByRole('dialog'));
+    const field = dialog.getByLabelText(ar.conscripts.correction.fields.ps_name!) as HTMLInputElement;
+    expect(field.value).toBe('');
+    expect(field.getAttribute('aria-invalid')).toBe('true');
+    fireEvent.change(field, { target: { value: 'قسم أول' } });
+    fireEvent.click(dialog.getByRole('button', { name: ar.conscripts.correction.save }));
+    await waitFor(() => expect(calls).toContainEqual({ method: 'PATCH',
+      path: `/api/v1/imports/${JOB_ID}/rows/${RECRUIT_ID}`, body: { version: 3, changes: { ps_name: 'قسم أول' } } }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(await screen.findByText(ar.conscripts.correction.provisionalResults)).toBeTruthy();
+    expect(within(screen.getByRole('table')).getByText(record.raw_data.name)).toBeTruthy();
+    // Keep the selected invalid tab even though the new validation counters reset to zero.
+    expect(screen.getByRole('tab', { name: ar.conscripts.rows.invalidLabel }).getAttribute('aria-selected')).toBe('true');
+    fireEvent.click(screen.getByRole('button', { name: ar.conscripts.correction.view }));
+    expect(within(await screen.findByRole('dialog')).queryByRole('button', { name: ar.conscripts.correction.save })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: ar.common.close }));
+    job = importJob({ validation_run: 1, progress_version: 10 });
+    await act(async () => { app.queryClient.setQueryData(conscriptsKeys.import(JOB_ID), job); });
+    await waitFor(() => expect(screen.queryByText(ar.conscripts.correction.provisionalResults)).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('progressbar', { name: ar.conscripts.correction.refreshingRows })).toBeNull());
+    fireEvent.click(screen.getByRole('button', { name: ar.conscripts.correction.view }));
+    expect(within(await screen.findByRole('dialog')).getByRole('button', { name: ar.conscripts.correction.save })).toBeTruthy();
+  });
+
+  it.each(['QUEUED', 'PARSING', 'VALIDATING', 'FAILED'])('allows row inspection after refreshing during revalidation: %s', async (status) => {
+    stubFetch(({ path }) => {
+      if (path === `/api/v1/imports/${JOB_ID}`) return { status: 200, body: importJob({
+        status, validation_run: 1, valid_rows: 0, invalid_rows: 0, processed_rows: 0,
+      }) };
+      if (path === `/api/v1/imports/${JOB_ID}/rows`) return { status: 200, body: { ...emptyPage, total: 1, items: [{
+        id: RECRUIT_ID, row_number: 1, validation_status: 'INVALID', raw_data: { national_id: 'bad' }, errors: [],
+      }] } };
+      return undefined;
+    });
+    renderApp(`/conscripts/imports/${JOB_ID}`, makeMe(ADMIN));
+    expect(await screen.findByText(ar.conscripts.correction.provisionalResults)).toBeTruthy();
+    fireEvent.click(await screen.findByRole('button', { name: ar.conscripts.correction.view }));
+    const dialog = within(await screen.findByRole('dialog'));
+    expect((dialog.getByLabelText(ar.conscripts.correction.fields.national_id!) as HTMLInputElement).readOnly).toBe(true);
+    expect(dialog.queryByRole('button', { name: ar.conscripts.correction.save })).toBeNull();
+    fireEvent.click(dialog.getByRole('button', { name: ar.common.close }));
+    fireEvent.click(screen.getByRole('tab', { name: ar.conscripts.rows.validLabel }));
+    await waitFor(() => expect(requestedUrls().some((url) => url.searchParams.get('status') === 'VALID')).toBe(true));
+    expect(screen.queryByRole('button', { name: ar.conscripts.report.exportRejected })).toBeNull();
+    expect(screen.queryByRole('button', { name: ar.conscripts.report.approve('0') })).toBeNull();
+  });
+
+  it('retains the table during a slow results refresh without allowing stale edits', async () => {
+    let job = importJob({ status: 'VALIDATING', validation_run: 1 });
+    let name = 'الاسم السابق';
+    stubFetch(({ path }) => {
+      if (path === `/api/v1/imports/${JOB_ID}`) return { status: 200, body: job };
+      if (path.endsWith('/rows')) return { status: 200, body: { ...emptyPage, total: 1, items: [{
+        id: RECRUIT_ID, row_number: 1, validation_status: 'INVALID', raw_data: { name }, errors: [],
+      }] } };
+      return undefined;
+    });
+    const app = renderApp(`/conscripts/imports/${JOB_ID}`, makeMe(ADMIN));
+    await screen.findByText(name);
+    const respond = globalThis.fetch;
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => { release = resolve; });
+    vi.stubGlobal('fetch', vi.fn(async (input: Request) => {
+      if (new URL(input.url).pathname.endsWith('/rows')) await gate;
+      return respond(input);
+    }));
+    job = importJob({ validation_run: 1, progress_version: 8 });
+    await act(async () => { app.queryClient.setQueryData(conscriptsKeys.import(JOB_ID), job); });
+    expect(within(screen.getByRole('table')).getByText(name)).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: ar.conscripts.correction.view }));
+    const dialog = within(await screen.findByRole('dialog'));
+    expect(dialog.queryByRole('button', { name: ar.conscripts.correction.save })).toBeNull();
+    name = 'الاسم بعد التصحيح';
+    await act(async () => { release(); });
+    await waitFor(() => expect(within(screen.getByRole('table', { hidden: true })).getByText(name)).toBeTruthy());
+    // An already-open detail snapshot must be reopened before it can be edited.
+    expect(dialog.queryByRole('button', { name: ar.conscripts.correction.save })).toBeNull();
+    fireEvent.click(dialog.getByRole('button', { name: ar.common.close }));
+    fireEvent.click(screen.getByRole('button', { name: ar.conscripts.correction.view }));
+    const fresh = within(await screen.findByRole('dialog'));
+    expect((fresh.getByLabelText(ar.conscripts.correction.fields.name!) as HTMLInputElement).value).toBe(name);
+    expect(fresh.getByRole('button', { name: ar.conscripts.correction.save })).toBeTruthy();
+  });
+
+  it.each(['APPROVED', 'CANCELLED'])('keeps source details read-only after %s', async (status) => {
+    stubFetch(({ path }) => {
+      if (path === `/api/v1/imports/${JOB_ID}`) return { status: 200, body: importJob({ status }) };
+      if (path === `/api/v1/imports/${JOB_ID}/rows`) return { status: 200, body: { ...emptyPage, total: 1, items: [{
+        id: RECRUIT_ID, row_number: 1, validation_status: 'INVALID', raw_data: { national_id: 'bad' }, errors: [],
+      }] } };
+      return undefined;
+    });
+    renderApp(`/conscripts/imports/${JOB_ID}`, makeMe(ADMIN));
+    fireEvent.click(await screen.findByRole('button', { name: ar.conscripts.correction.view }));
+    const dialog = within(await screen.findByRole('dialog'));
+    expect((dialog.getByLabelText(ar.conscripts.correction.fields.national_id!) as HTMLInputElement).readOnly).toBe(true);
+    expect(dialog.queryByRole('button', { name: ar.conscripts.correction.save })).toBeNull();
+  });
+
   it('asks for confirmation before cancelling an import', async () => {
     const calls = stubFetch(({ method, path }) => {
       if (path === `/api/v1/imports/${JOB_ID}` && method === 'GET') return { status: 200, body: importJob() };

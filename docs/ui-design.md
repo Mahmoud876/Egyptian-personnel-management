@@ -31,7 +31,7 @@ The frontend follows the Stitch design in `stitch_egyptian_personnel_management_
 | 7 login | `/login` | |
 | 9 dashboard | `/` | Database totals, including status-filtered counts across all imports. History and counters refresh every 10 seconds. |
 | 11 upload | `/conscripts/imports` | Upload form and history |
-| 5 review modal | `/conscripts/imports/:id` | Live progress over SSE, valid/rejected rows, approve, cancel, export rejected rows |
+| 5 review modal | `/conscripts/imports/:id` | Live progress, valid/rejected rows, field-specific errors, full row inspection, administrator corrections and revalidation before approval, cancel, export rejected rows |
 | 10 search | `/conscripts/search` | Criteria in the URL; the top-bar search lands here |
 | 3 enlistment entry | `/conscripts/entry`, `/conscripts/entry/:id` | Initial date suggestions from the backend; both dates editable. Changing start preserves end (FR-18); save validates the qualification duration (FR-20). |
 | 1 label printing | `/conscripts/labels`, `/conscripts/labels/:id` | Preview drawn locally; printing uses the backend's label page, which is audited |

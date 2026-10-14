@@ -52,3 +52,10 @@ export function localDayToIso(day: string, nextDay = false): string {
   const [year, month, date] = day.split('-').map(Number);
   return new Date(year ?? 1970, (month ?? 1) - 1, (date ?? 1) + (nextDay ? 1 : 0)).toISOString();
 }
+
+/** Local date/time from a datetime-local input -> UTC instant, preserving the chosen time. */
+export function localDateTimeToIso(value: string): string | undefined {
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(value)) return undefined;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date.toISOString();
+}

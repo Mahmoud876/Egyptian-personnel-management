@@ -131,6 +131,8 @@ If PowerShell refuses to run scripts: `Set-ExecutionPolicy -Scope CurrentUser Re
 scripts\test.ps1
 ```
 
+Synthetic import files with answer keys (1,000 and 10,000 records, 20% deliberately invalid across every validation rule) are in [test-data/](test-data/README.md) for manual and load testing of the upload and review screens.
+
 Backend tests run against their own database (`personnel_test`), rebuilt from `backend/sql` on every run; the development database is never touched. They cover queue delivery and failure recovery, checkpoint resume, concurrent completion, approval conflicts, Access export and readback, protected downloads, and a live end-to-end run of the React screens against a real API and worker. Frontend tests cover routing and permission guards, the conscript screens and the enlistment date rules.
 
 ## Project structure

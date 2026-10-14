@@ -103,13 +103,19 @@ export function useImportProgress(id: string, active: boolean) {
   }, [id, active, queryClient]);
 }
 
-export function useImportRowsQuery(id: string, status: RowStatus, page: number, pageSize: number, enabled: boolean) {
+export function useImportRowsQuery(id: string, status: RowStatus, page: number, pageSize: number, enabled: boolean, version?: number) {
   const query = { status, page: page + 1, page_size: pageSize };
   return useQuery({
-    queryKey: conscriptsKeys.rows(id, query),
+    queryKey: conscriptsKeys.rows(id, { ...query, version }),
     queryFn: () =>
       unwrap(api.GET('/api/v1/imports/{job_id}/rows', { params: { path: { job_id: id }, query } })),
-    placeholderData: keepPreviousData,
+    // Retain only this exact file/tab/page while its validation revision refreshes.
+    // Consumers must keep placeholder rows read-only until the new response arrives.
+    placeholderData: (previous, previousQuery) => {
+      const old = previousQuery?.queryKey[4] as typeof query | undefined;
+      return previousQuery?.queryKey[3] === id && old?.status === status
+        && old.page === query.page && old.page_size === pageSize ? previous : undefined;
+    },
     enabled,
   });
 }
@@ -160,6 +166,32 @@ export function useCancelImport(id: string) {
   return useMutation({
     mutationFn: () => unwrap(api.POST('/api/v1/imports/{job_id}/cancel', { params: { path: { job_id: id } } })),
     onSettled: invalidate,
+  });
+}
+
+export function useCorrectImportRow(id: string, recordId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: Schemas['CorrectImportRecord']) => unwrap(api.PATCH('/api/v1/imports/{job_id}/rows/{record_id}', {
+      params: { path: { job_id: id, record_id: recordId } }, body,
+    })),
+    onSuccess: (job) => {
+      queryClient.setQueryData(conscriptsKeys.import(id), job);
+      void queryClient.invalidateQueries({ queryKey: conscriptsKeys.imports });
+    },
+  });
+}
+
+export function useRevalidateImport(id: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (version: number) => unwrap(api.POST('/api/v1/imports/{job_id}/revalidate', {
+      params: { path: { job_id: id } }, body: { version },
+    })),
+    onSuccess: (job) => {
+      queryClient.setQueryData(conscriptsKeys.import(id), job);
+      void queryClient.invalidateQueries({ queryKey: conscriptsKeys.imports });
+    },
   });
 }
 

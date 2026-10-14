@@ -1,0 +1,42 @@
+{
+    "actions":  {
+                    "login":  "تسجيل دخول",
+                    "login_failed":  "محاولة دخول فاشلة",
+                    "logout":  "تسجيل خروج",
+                    "denied":  "محاولة مرفوضة",
+                    "create":  "إضافة",
+                    "update":  "تعديل",
+                    "delete":  "حذف",
+                    "update_permissions":  "تعديل الصلاحيات",
+                    "change_password":  "تغيير كلمة المرور",
+                    "reset_password":  "إعادة تعيين كلمة المرور",
+                    "reset_admin":  "إعادة تعيين المدير",
+                    "upload":  "رفع ملف",
+                    "validation_complete":  "اكتمال الفحص",
+                    "import_row_corrected":  "تصحيح سجل مستورد",
+                    "revalidation_requested":  "طلب إعادة فحص الملف",
+                    "job_failed":  "فشل المعالجة",
+                    "approve":  "اعتماد ملف",
+                    "cancel":  "إلغاء ملف",
+                    "complete":  "استكمال بيانات",
+                    "label":  "طباعة ملصق",
+                    "export_requested":  "طلب تصدير",
+                    "export_complete":  "اكتمال التصدير",
+                    "document_upload":  "إرفاق مستند"
+                },
+    "entities":  {
+                     "app_user":  "مستخدم",
+                     "permission_template":  "قالب صلاحيات",
+                     "route":  "مسار",
+                     "governorate":  "محافظة",
+                     "police_station":  "قسم شرطة",
+                     "qualification":  "مؤهل",
+                     "batch_schedule":  "موعد دفعة",
+                     "work_entity":  "جهة عمل",
+                     "action_type":  "نوع إجراء",
+                     "import_job":  "ملف مستورد",
+                     "import_record":  "سجل بالملف المستورد",
+                     "export_job":  "ملف تصدير",
+                     "recruit":  "سجل مجند"
+                 }
+}

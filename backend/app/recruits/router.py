@@ -29,7 +29,7 @@ from .jobs import snapshot, IMPORT_TERMINAL
 from .models import ImportJob, ExportJob, Recruit, RecruitDocument, OfficialGovernorate
 from .schemas import (ImportOut, ExportOut, ExportRequest, RecruitOut, CompleteProfile,
                       EditProfile, DocumentOut, ImportRecordOut, ImportReportOut, ApprovalOut,
-                      ImportStatus, OfficialGovernorateOut)
+                      ImportStatus, OfficialGovernorateOut, CorrectImportRecord, RevalidateImport)
 
 router = APIRouter(tags=["conscript PoC"])
 file_permission = require_permission("file:insert")
@@ -98,6 +98,18 @@ def approve(job_id: UUID, request: Request, actor: CurrentUser = Depends(file_pe
     return service.approve(db, job_id, actor, client_ip(request))
 
 
+@router.patch("/imports/{job_id}/rows/{record_id}", response_model=ImportOut, status_code=202)
+def correct_row(job_id: UUID, record_id: UUID, body: CorrectImportRecord, request: Request,
+                actor: CurrentUser = Depends(file_permission), db: Session = Depends(get_db)):
+    return service.revalidate(db, job_id, body, actor, client_ip(request), record_id)
+
+
+@router.post("/imports/{job_id}/revalidate", response_model=ImportOut, status_code=202)
+def revalidate_import(job_id: UUID, body: RevalidateImport, request: Request,
+                      actor: CurrentUser = Depends(file_permission), db: Session = Depends(get_db)):
+    return service.revalidate(db, job_id, body, actor, client_ip(request))
+
+
 @router.post("/imports/{job_id}/cancel", response_model=ImportOut)
 def cancel(job_id: UUID, request: Request, actor: CurrentUser = Depends(file_permission), db: Session = Depends(get_db)):
     return service.cancel(db, job_id, actor, client_ip(request))
@@ -142,7 +154,7 @@ def events(job_id: UUID, request: Request, _: CurrentUser = Depends(file_permiss
 @router.post("/imports/{job_id}/exports", response_model=ExportOut, status_code=202)
 def create_export(job_id: UUID, body: ExportRequest, request: Request,
                   actor: CurrentUser = Depends(file_permission), db: Session = Depends(get_db)):
-    job = service.get(db, ImportJob, job_id)
+    job = service.get(db, ImportJob, job_id, lock=True)
     if job.status not in {"READY_FOR_REVIEW", "APPROVED", "CANCELLED"}:
         raise AppError(409, "نتائج الفحص غير جاهزة", "report_unavailable")
     export = ExportJob(import_job_id=job.id, export_format=body.format, requested_by_user_id=actor.id)

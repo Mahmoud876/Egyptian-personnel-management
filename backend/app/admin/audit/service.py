@@ -1,15 +1,22 @@
 import json
 from datetime import UTC, datetime
 from typing import Any
+from pathlib import Path
 
-from sqlalchemy import select, or_, cast, String
+from sqlalchemy import select, or_, and_, cast, String
 from sqlalchemy.orm import Session
 
 from app.core.models import AppUser, AuditLog
 from app.core.queries import PageParams, paginate, like_contains
 from app.core.schemas import Page
+from app.core.errors import AppError
+from app.recruits.models import Recruit, ImportRecord, ExportJob
+from app.recruits.validation import normalize_name
 
 from .schemas import AuditEntry, AuditFacets, AuditUser
+
+# Search aliases mirror the Arabic display catalog; a regression test checks parity.
+LABELS = json.loads(Path(__file__).with_name("labels.json").read_text(encoding="utf-8"))
 
 
 def _naive_utc(value: datetime) -> datetime:
@@ -33,17 +40,33 @@ def search(
     date_to: datetime | None = None,
     q: str | None = None,
 ) -> Page[AuditEntry]:
+    if date_from is not None and date_to is not None and _naive_utc(date_from) >= _naive_utc(date_to):
+        raise AppError(422, "يجب أن يكون وقت النهاية بعد وقت البداية", "invalid_audit_range")
     statement = (
         select(AuditLog, AppUser.username, AppUser.full_name)
         .outerjoin(AppUser, AppUser.id == AuditLog.user_id)
         .order_by(AuditLog.id.desc())
     )
-    if q:
+    if q and q.strip():
         pattern = like_contains(q.strip())
+        term = normalize_name(q.strip()).casefold()
+        actions = [code for code, label in LABELS["actions"].items() if term in normalize_name(label).casefold()]
+        entities = [code for code, label in LABELS["entities"].items() if term in normalize_name(label).casefold()]
+        recruits = or_(Recruit.national_id.like(pattern), Recruit.barcode.like(pattern),
+            Recruit.police_number.like(pattern), Recruit.normalized_name.like(like_contains(normalize_name(q.strip()))))
+        staged = or_(ImportRecord.national_id_raw.like(pattern), ImportRecord.corrected_data_json.like(pattern))
+        import_ids = select(Recruit.import_job_id).where(recruits).union(
+            select(ImportRecord.import_job_id).where(staged))
         statement = statement.where(or_(AppUser.username.like(pattern), AppUser.full_name.like(pattern),
             cast(AuditLog.user_id, String).like(pattern), AuditLog.action.like(pattern),
             AuditLog.entity.like(pattern), AuditLog.entity_id.like(pattern),
-            AuditLog.old_values.like(pattern), AuditLog.new_values.like(pattern)))
+            AuditLog.old_values.like(pattern), AuditLog.new_values.like(pattern), AuditLog.ip.like(pattern),
+            AuditLog.permission_code.like(pattern), AuditLog.action.in_(actions), AuditLog.entity.in_(entities),
+            and_(AuditLog.entity == "recruit", AuditLog.entity_id.in_(select(cast(Recruit.id, String(36))).where(recruits))),
+            and_(AuditLog.entity == "import_record", AuditLog.entity_id.in_(select(cast(ImportRecord.id, String(36))).where(staged))),
+            and_(AuditLog.entity == "import_job", AuditLog.entity_id.in_(select(cast(import_ids.subquery().c.import_job_id, String(36))))),
+            and_(AuditLog.entity == "export_job", AuditLog.entity_id.in_(select(cast(ExportJob.id, String(36)))
+                .where(ExportJob.import_job_id.in_(import_ids))))))
     if user_id is not None:
         statement = statement.where(AuditLog.user_id == user_id)
     if action:

@@ -13,7 +13,7 @@ from app.core.security import utcnow
 from .jobs import locked, publish
 from .models import ImportJob, ImportRecord, ImportRecordError, Recruit, ExportJob
 from .schemas import RecruitOut, ImportRecordOut, RecordErrorOut
-from .validation import add_months, initial_start, SERVICE_MONTHS, normalize_name
+from .validation import add_months, initial_start, SERVICE_MONTHS, normalize_name, readable_error
 
 
 def get(db, model, identity, lock=False):
@@ -31,7 +31,9 @@ def require_review(job):
 
 def report_rows(db, job_id, paging, status=None):
     job = get(db, ImportJob, job_id)
-    if job.status not in {"READY_FOR_REVIEW", "APPROVED", "CANCELLED"}:
+    # A revalidation retains the complete staging table. Keep it inspectable on refresh,
+    # including after a failed retry; classifications/errors remain provisional until ready.
+    if job.status not in {"READY_FOR_REVIEW", "APPROVED", "CANCELLED"} and not job.validation_run:
         raise AppError(409, "تقرير المراجعة غير متاح بعد", "report_unavailable")
     query = select(ImportRecord).where(ImportRecord.import_job_id == job_id).order_by(ImportRecord.row_number)
     if status:
@@ -39,12 +41,65 @@ def report_rows(db, job_id, paging, status=None):
     page = paginate(db, query, paging, lambda row: row[0])
     ids = [r.id for r in page.items]
     errors = {}
+    values = {r.id: json.loads(r.corrected_data_json or r.raw_data_json) for r in page.items}
     if ids:
         for error in db.scalars(select(ImportRecordError).where(ImportRecordError.import_row_id.in_(ids)).order_by(ImportRecordError.error_code)):
-            errors.setdefault(error.import_row_id, []).append(RecordErrorOut.model_validate(error))
+            errors.setdefault(error.import_row_id, []).append(RecordErrorOut(**readable_error(
+                error.error_code, error.field_name, error.error_message, values[error.import_row_id])))
     return {"total": page.total, "page": page.page, "page_size": page.page_size,
             "items": [ImportRecordOut(id=r.id, row_number=r.row_number, validation_status=r.validation_status,
-                        raw_data=json.loads(r.raw_data_json), errors=errors.get(r.id, [])) for r in page.items]}
+                        raw_data=json.loads(r.raw_data_json),
+                        corrected_data=json.loads(r.corrected_data_json) if r.corrected_data_json else None,
+                        errors=errors.get(r.id, [])) for r in page.items]}
+
+
+def revalidate(db, job_id, body, actor, ip, record_id=None):
+    """Freeze review, save a correction separately from the original, and queue a full-file validation.
+
+    Job locking serializes correction, approval, cancellation and export creation. The whole file
+    must be checked again because changing one ID can change another row's duplicate status.
+    """
+    try:
+        job = get(db, ImportJob, job_id, lock=True)
+        if not (job.status == "READY_FOR_REVIEW" or
+                (record_id is None and job.status == "FAILED" and job.validation_run > 0)):
+            require_review(job)
+        if job.progress_version != body.version:
+            raise AppError(409, "تغيرت نتائج الملف؛ أعد تحميل التقرير قبل التصحيح", "review_conflict")
+        if db.scalar(select(ExportJob.id).where(ExportJob.import_job_id == job.id,
+                     ExportJob.status.in_(["QUEUED", "PROCESSING"]))):
+            raise AppError(409, "انتظر اكتمال تصدير التقرير قبل إعادة الفحص", "export_in_progress")
+        if record_id is not None:
+            record = get(db, ImportRecord, record_id)
+            if record.import_job_id != job.id:
+                raise AppError(404, "السجل غير موجود في هذا الملف", "not_found")
+            before = json.loads(record.corrected_data_json or record.raw_data_json)
+            after = {**before, **body.changes}
+            record.corrected_data_json = json.dumps(after, ensure_ascii=False)
+            audit.write(db, action="import_row_corrected", user_id=actor.id, ip=ip,
+                        entity="import_record", entity_id=str(record.id),
+                        old_values={"import_job_id": str(job.id), "row_number": record.row_number, "data": before},
+                        new_values={"import_job_id": str(job.id), "row_number": record.row_number, "data": after})
+        old = {"status": job.status, "valid_rows": job.valid_rows, "invalid_rows": job.invalid_rows,
+               "validation_run": job.validation_run}
+        job.validation_run += 1
+        job.status = "QUEUED"
+        job.processed_rows = job.valid_rows = job.invalid_rows = job.checkpoint_row = 0
+        job.retry_count = 0
+        job.rq_job_id = None
+        job.last_error = None
+        job.completed_at = None
+        job.heartbeat_at = utcnow()
+        job.progress_version += 1
+        audit.write(db, action="revalidation_requested", user_id=actor.id, ip=ip, entity="import_job",
+                    entity_id=str(job.id), old_values=old,
+                    new_values={"status": job.status, "validation_run": job.validation_run})
+        db.commit()
+        publish(job)
+        return job
+    except Exception:
+        db.rollback()
+        raise
 
 
 def approve(db, job_id, actor, ip):

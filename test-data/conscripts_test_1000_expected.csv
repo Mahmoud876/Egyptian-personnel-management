@@ -1,0 +1,1001 @@
+﻿id,national_id,name,expected_status,expected_errors,case
+1,30301120105137,معاذ شعبان مازن سالم,INVALID,FIELD_REQUIRED,"required field empty (name, police station, governorate name or qualification name)"
+2,30412011506275,أنس عبد العزيز يوسف الدسوقي,VALID,,valid
+3,30603282155232,شنودة مينا إسحق إبراهيم,VALID,,valid
+4,30611151413439,عبد المنعم كريم رمضان المصري,INVALID,BIRTH_DATE,birth_date column empty or not YYYY-MM-DD
+5,30512311266392,عادل سعيد عبد العزيز عثمان,VALID,,valid
+6,29610072788499,جرجس ماجد مرقص المصري,VALID,,valid
+7,29802192573871,محمود سامح ياسر فرج,VALID,,valid
+8,30704152132958,وليد زياد رضا منصور,VALID,,valid
+9,29607091235536,ماجد عبد الله أنس حجازي,INVALID,FIELD_REQUIRED,"required field empty (name, police station, governorate name or qualification name)"
+10,30710311565717,عادل جرجس يوحنا القاضي,VALID,,valid
+11,30610192172056,عبد العزيز صبري عبد الله عيسى,VALID,,valid
+12,29612022357678,منصور أنس إسلام إبراهيم,VALID,,valid
+13,30701112419477,معاذ نادر إبراهيم سالم,VALID,,valid
+14,30707061814553,عبد المنعم باسم عادل رزق,VALID,,valid
+15,30804212401495,عبد العزيز سيد رضا حجازي,VALID,,valid
+16,30801032188696,إسلام محمد ماجد القاضي,INVALID,GOV_MISMATCH,gov_id differs from the governorate in the national ID
+17,29611032571513,عصام طارق سامح عبد الله,VALID,,valid
+18,29708200109937,حسين سيد إسلام إبراهيم,VALID,,valid
+19,30301232394419,رضا عصام أنس القاضي,INVALID,BIRTH_DATE,birth_date column empty or not YYYY-MM-DD
+20,30511141488555,سمير جرجس أندرو فهمي,VALID,,valid
+21,29604142544174,عمر أحمد جمال حجازي,VALID,,valid
+22,30207211638056,كيرلس بيشوي أندرو رزق,INVALID,BIRTH_MISMATCH,birth_date column differs from the date in the national ID
+23,2971227262637,عبد الله عبد الرحمن حسين عطية,INVALID,ID_LENGTH,national ID is 13 or 15 digits
+24,30404031632591,عادل عبد المنعم أيمن المصري,INVALID,DUPLICATE_FILE,national ID repeated in the file (different name)
+25,29803172542325,مينا بيتر بيشوي حسنين,INVALID,GENDER,13th digit is even (female national ID)
+26,29902102980879,بيتر جرجس سمير البدري,VALID,,valid
+27,29709261542297,ناصر أحمد هاني منصور,VALID,,valid
+28,30307071877175,زياد عبد الحميد طارق البدري,INVALID,GOV_MISMATCH,gov_id differs from the governorate in the national ID
+29,30004022652119,سعيد إبراهيم عمرو عبد الله,VALID,,valid
+30,30103021604556,طارق محمود حمزة البدري,VALID,,valid
+31,30810060273153,عزيز عادل أندرو الدسوقي,VALID,,valid
+32,29603062106091,رضا رمضان عبد العزيز منصور,VALID,,valid
+33,30511051521757,حسن فارس حمزة عبد الله,INVALID,FIELD_REQUIRED,"required field empty (name, police station, governorate name or qualification name)"
+34,35708050130158,عادل محمد عبد الله القاضي,INVALID,ID_BIRTH_DATE,birth date inside the national ID is impossible or in the future
+35,29712312694295,جمال ناصر تامر خليل,VALID,,valid
+36,29901231457822,شادي معاذ عبد الفتاح عبد الله,INVALID,GENDER,13th digit is even (female national ID)
+37,30005303637319,تامر حسن عبد الحميد فرج,INVALID,GOV_MISMATCH;GOV_UNKNOWN,governorate code not in the official list
+38,29804241454274,محمود هشام يوسف فهمي,VALID,,valid
+39,29807091468110,عزيز مينا فادي منصور,INVALID,BIRTH_MISMATCH,birth_date column differs from the date in the national ID
+40,29903161310536,مينا نبيل رامي عبد الله,VALID,,valid
+41,30004292970056,أدهم معاذ صبري المصري,VALID,,valid
+42,30607231380750,علي جمال زياد عبد الله,INVALID,QUALIFICATION,"qualification ID unknown, empty or not a number"
+43,29708051720331,شريف مازن صلاح فرج,VALID,,valid
+44,30104302572357,أسامة رضا شريف النجار,VALID,,valid
+45,29812041855565,فتحي يوسف مازن منصور,INVALID,GENDER,13th digit is even (female national ID)
+46,29706313453651,محمد صلاح شعبان عبد الله,INVALID,ID_BIRTH_DATE,birth date inside the national ID is impossible or in the future
+47,29706232588615,علي طارق سعيد عطية,VALID,,valid
+48,30611141595530,معاذ وليد عصام الشريف,VALID,,valid
+49,29707072113030,عبد الفتاح سليمان تامر النجار,INVALID,BIRTH_DATE,birth_date column empty or not YYYY-MM-DD
+50,30513150135116,مازن حسن زياد عيسى,INVALID,ID_BIRTH_DATE,birth date inside the national ID is impossible or in the future
+51,29909171020739,يوسف طارق رمضان عيسى,INVALID,GOV_MISMATCH;GOV_UNKNOWN,governorate code not in the official list
+52,29904262125930,نبيل أندرو شنودة عبد الله,VALID,,valid
+53,30310200243516,فتحي جمال ناصر فرج,VALID,,valid
+54,30807022108810,شريف محمد ياسر الصاوي,VALID,,valid
+55,30512032837936,حنا شنودة كيرلس منصور,VALID,,valid
+56,30710153278433,فارس ممدوح صبري فرج,INVALID,BIRTH_DATE,birth_date column empty or not YYYY-MM-DD
+57,29602102955271,وليد صبري يوسف رزق,VALID,,valid
+58,30307162165839,سالم هشام شريف الجمال,VALID,,valid
+59,30701121909238,عزيز يوحنا سمير فهمي,VALID,,valid
+60,29712281632895,مينا أندرو مايكل شحاتة,INVALID,QUALIFICATION,"qualification ID unknown, empty or not a number"
+61,29706021105033,عبد الرحمن صلاح عمر النجار,INVALID,QUALIFICATION,"qualification ID unknown, empty or not a number"
+62,29601091663734,باسم ممدوح ياسر البدري,VALID,,valid
+63,30706021128132,عبد المنعم صلاح هشام خليل,VALID,,valid
+64,29806221520372,علي جمال وليد إبراهيم,INVALID,GOV_MISMATCH,gov_id differs from the governorate in the national ID
+65,30311301397598,عمرو أيمن حسين القاضي,VALID,,valid
+66,30411282782752,عمرو يوسف محمود الجمال,VALID,,valid
+67,29703012375593,سعيد ماجد مصطفى عطية,VALID,,valid
+68,30507270269078,بولس ماجد إسحق رزق,VALID,,valid
+69,30110030104257,حسن إسلام فارس السعيد,VALID,,valid
+70,30702222594093,مُحَمَّد عبـــد الرَّحمن شعبان النجار,VALID,,valid: Arabic diacritics/tatweel in the name
+71,29610251957892,جمال إسلام محمود رزق,INVALID,DUPLICATE_FILE,national ID repeated in the file (same record sent twice)
+72,30609210191234,سليمان حمزة عمرو عطية,INVALID,QUALIFICATION,"qualification ID unknown, empty or not a number"
+73,30505292317338,خالد إسلام زياد زكي,VALID,,valid
+74,30006091547770,عبد الرحمن سالم شادي فهمي,VALID,,valid
+75,30306101613956,شعبان عصام وليد إبراهيم,VALID,,valid
+76,29611282471319,فارس مصطفى ياسر عثمان,VALID,,valid
+77,29608181652056,هشام سامح مازن عطية,VALID,,valid
+78,29807250161939,,INVALID,FIELD_REQUIRED,"required field empty (name, police station, governorate name or qualification name)"
+79,29610012901235,هاني منصور عبد الله المصري,VALID,,valid
+80,30701122173352,طارق سعيد صلاح إبراهيم,INVALID,QUALIFICATION,"qualification ID unknown, empty or not a number"
+81,302093014414,سيد أنس رضا القاضي,INVALID,BIRTH_DATE;ID_LENGTH,12-digit national ID and a DD/MM/YYYY birth date
+82,30610162336091,مرقص عزيز جرجس السعيد,INVALID,DUPLICATE_FILE,national ID repeated in the file (different name)
+83,30405023344794,عصام سليمان تامر إبراهيم,INVALID,GOV_MISMATCH,gov_id differs from the governorate in the national ID
+84,30401111275693,صبري جمال ماجد فهمي,VALID,,valid
+85,29903121503757,مازن عادل وليد البنا,VALID,,valid
+86,30303152148435,إبراهيم خالد شادي النجار,VALID,,valid
+87,29711241270215,عصام إبراهيم عبد الرحمن زكي,VALID,,valid
+88,30711211325879,شريف هشام حسين الشناوي,VALID,,valid
+89,30503310178939,أدهم علي وليد الجمال,INVALID,BIRTH_MISMATCH,birth_date column differs from the date in the national ID
+90,29803252284273,عبد المنعم محمود أدهم القاضي,VALID,,valid
+91,29810151592515,حسين وليد حسن عبد الله,VALID,,valid
+92,30610180202314,شريف ياسر خالد إبراهيم,VALID,,valid
+93,30202030220736,سليمان إسلام إسماعيل المصري,VALID,,valid
+94,30008132557118,أحمد عبد الفتاح رمضان سالم,VALID,,valid
+95,29908180321771,ياسر نادر باسم الصاوي,VALID,,valid
+96,30311091849157,ماجد إسحق مرقص عطية,VALID,,valid
+97,30701090153619,خالد رضا مازن السعيد,VALID,,valid
+98,29604151234536,إبراهيم هاني سامح إبراهيم,VALID,,valid
+99,30406201518571,سعيد عبد العزيز منصور القاضي,VALID,,valid
+100,29809250271374,سعيد حمزة سليمان عبد الله,VALID,,valid
+101,30412311287456,بيشوي حنا عزيز الدسوقي,VALID,,valid
+102,29807200463816,سالم صلاح سليمان الجمال,INVALID,FIELD_TOO_LONG,"field longer than allowed (police station code over 20, name over 200 characters)"
+103,29807180170331,ياسر يوسف أيمن القاضي,VALID,,valid
+104,30204201248775,أنس حسين صلاح الشريف,INVALID,GOV_MISMATCH,gov_id differs from the governorate in the national ID
+105,30108073184973,فارس معاذ ناصر فهمي,INVALID,BIRTH_DATE,birth_date column empty or not YYYY-MM-DD
+106,29808233265219,عبد المنعم تامر فتحي الفقي,VALID,,valid
+107,29808152285753,ممدوح تامر ياسر خليل,VALID,,valid
+108,29904190120475,عبد الرحمن منصور رمضان إبراهيم,VALID,,valid
+109,29709162419558,حسن ناصر إسماعيل المصري,VALID,,valid
+110,30302101321891,علي ماجد محمد يونس,VALID,,valid
+111,30203232731757,أيمن رضا عبد الفتاح البنا,VALID,,valid
+112,30311042188636,عبد العزيز خالد عادل السعيد,VALID,,valid
+113,30212182845858,هاني مصطفى أنس شحاتة,VALID,,valid
+114,10107231761177,سيد جمال شادي البدري,INVALID,ID_BIRTH_DATE,birth date inside the national ID is impossible or in the future
+115,30002292126856,سالم سامح خالد موسى,VALID,,valid: born on 29 February (leap year)
+116,٣٠٢١١٣٠١٧٨٨٠٧٦,سامح وليد صلاح يونس,INVALID,ID_DIGITS,"national ID contains letters, symbols or Arabic-Indic digits"
+117,30703170386915,سليمان معاذ هاني لطفي,VALID,,valid
+118,29904282341047,حمزة مصطفى إسماعيل زكي,INVALID,GENDER,13th digit is even (female national ID)
+119,30807240186111,حمزة إبراهيم أسامة عبد الله,VALID,,valid
+120,30610021362797,سيد سامح ممدوح السعيد,VALID,,valid
+121,30105102153534,أحمد شعبان سالم البدري,VALID,,valid
+122,29701103516674,فارس شريف أدهم البنا,VALID,,valid
+123,30806101780317,إبراهيم مازن فارس السعيد,INVALID,GOV_MISMATCH,gov_id differs from the governorate in the national ID
+124,30311270138815,نادر هاني عبد الفتاح الدسوقي,VALID,,valid
+125,30411081550654,عبد الرحمن شريف ياسر الجمال,VALID,,valid
+126,30211301425130,صبري عبد الحميد وليد زكي,VALID,,valid
+127,30107052637977,إسحق عزيز كيرلس لطفي,VALID,,valid
+128,30005292504550,سيد محمود سالم شحاتة,INVALID,DUPLICATE_FILE,national ID repeated in the file (different name)
+129,30608191492836,باسم سليمان طارق سالم,VALID,,valid
+130,29803301599975,عزيز مينا جرجس عطية,VALID,,valid
+131,29601292545974,حسين كريم وليد حجازي,VALID,,valid: oldest age band
+132,30101282417073,إسلام حسن باسم حسنين,VALID,,valid
+133,30703030156336,محمود سامح صبري موسى,VALID,,valid
+134,30809301306854,فتحي تامر أدهم خليل,VALID,,valid
+135,29710112638070,طارق كريم سامح البنا,VALID,,valid
+136,30709152293431,صبري أحمد طارق الفقي,VALID,,valid
+137,30111010118378,عبد الله إسماعيل عبد الفتاح الفقي,VALID,,valid
+138,29810161233639,خالد وليد إسماعيل عطية,INVALID,QUALIFICATION,"qualification ID unknown, empty or not a number"
+139,29902242324995,خالد حسن ماجد إبراهيم,VALID,,valid
+140,29806262177035,عمرو محمد كريم لطفي,VALID,,valid
+141,30309110124199,بولس مايكل سمير الشناوي,VALID,,valid
+142,29803170102033,طارق رمضان هشام الدسوقي,VALID,,valid
+143,30304180162052,عبد الله ياسر جمال زكي,VALID,,valid
+144,30003161684131,ياسر معاذ إبراهيم حسنين,VALID,,valid
+145,29911122131456,صبري عادل عمرو حجازي,VALID,,valid
+146,29609202656719,سعيد أنس أدهم الدسوقي,VALID,,valid
+147,3050719013805,علي فارس أدهم حجازي,INVALID,ID_LENGTH,national ID is 13 or 15 digits
+148,29802092419919,علي منصور وليد سالم,VALID,,valid
+149,30301291590575,ماجد فارس محمد الجمال,VALID,,valid
+150,30206242381291,منصور مصطفى عبد الله الصاوي,INVALID,FIELD_REQUIRED,"required field empty (name, police station, governorate name or qualification name)"
+151,29710031565214,ناصر عادل محمود الشريف,VALID,,valid
+152,29606121877159,فارس أدهم إبراهيم إبراهيم,INVALID,DUPLICATE_FILE,national ID repeated in the file (same record sent twice)
+153,30408080162832,سيد ممدوح باسم القاضي,VALID,,valid
+154,29906201543155,شريف عمرو طارق البدري,VALID,,valid
+155,29910052101939,بيشوي رامي بولس القاضي,INVALID,FIELD_REQUIRED,"required field empty (name, police station, governorate name or qualification name)"
+156,30110282689374,حمزة زياد سعيد البدري,INVALID,BIRTH_MISMATCH,birth_date column differs from the date in the national ID
+157,29911292135175,أدهم طارق عمرو فرج,VALID,,valid
+158,30303291827939,شريف إبراهيم وليد سالم,VALID,,valid
+159,30212242473971,,INVALID,FIELD_REQUIRED,"required field empty (name, police station, governorate name or qualification name)"
+160,30402111611058,عبد الحميد إسلام رمضان عطية,VALID,,valid
+161,30706170255397,سالم أيمن ناصر الدسوقي,VALID,,valid
+162,30605101838950,أدهم هاني أنس عطية,VALID,,valid
+163,30006180406352,عزيز ماجد فادي حجازي,VALID,,valid
+164,30001051741278,زياد رمضان محمد الجمال,VALID,,valid
+165,30212151831997,سيد فارس يوسف حجازي,VALID,,valid
+166,29807081773638,ماجد مصطفى عادل خليل,VALID,,valid
+167,30006011335151,شعبان عمرو معاذ الجمال,VALID,,valid
+168,29811041667852,صبري نادر عبد المنعم عيسى,VALID,,valid
+169,29812313405972,مصطفى خالد أنس موسى,VALID,,valid
+170,30306212200957,كريم باسم صبري عثمان,VALID,,valid
+171,30206102181592,زياد نادر سيد رزق,VALID,,valid
+172,30606092441976,هاني إسماعيل سيد القاضي,VALID,,valid
+173,30402181738496,مصطفى زياد ياسر خليل,VALID,,valid
+174,10203012494794,محمود سالم إبراهيم منصور,INVALID,ID_BIRTH_DATE,birth date inside the national ID is impossible or in the future
+175,302102718920,سعيد إسلام أيمن عبد الله,INVALID,BIRTH_DATE;ID_LENGTH,12-digit national ID and a DD/MM/YYYY birth date
+176,29601252914017,وليد حسين سيد عيسى,VALID,,valid
+177,30602041398875,حنا أندرو كيرلس عطية,VALID,,valid
+178,30001242245632,عمرو ممدوح حسن عيسى,VALID,,valid
+179,30804291563591,مازن شعبان عبد الله عطية,VALID,,valid
+180,30106091883053,سيد إبراهيم ياسر فهمي,VALID,,valid
+181,29604152148232,رمضان سليمان رضا خليل,VALID,,valid
+182,30103090264311,صلاح جمال حسن شحاتة,VALID,,valid
+183,30403242515174,سليمان حسين مازن الشناوي,VALID,,valid
+184,30705052396038,حسين سامح شريف الشريف,VALID,,valid
+185,30007211508974,حمزة عصام عبد العزيز النجار,VALID,,valid
+186,30801301580376,جرجس بولس فادي سالم,VALID,,valid
+187,30311112343192,أسامة ممدوح حمزة البنا,VALID,,valid
+188,30103031227310,شعبان سعيد شادي البدري,VALID,,valid
+189,29602201127174,عبد العزيز منصور شعبان سالم,VALID,,valid
+190,30301122465634,أيمن رمضان هشام موسى,VALID,,valid
+191,30606122183858,شريف إسماعيل وليد الفقي,VALID,,valid
+192,29601191201313,سليمان علي ممدوح رزق,VALID,,valid
+193,29604082112376,سيد وليد زياد يونس,VALID,,valid
+194,29710251867895,عبد الحميد إسماعيل فارس النجار,INVALID,QUALIFICATION,"qualification ID unknown, empty or not a number"
+195,29704282511899,رضا وليد عبد الحميد فهمي,INVALID,QUALIFICATION,"qualification ID unknown, empty or not a number"
+196,30411162183637,أيمن معاذ عبد الله فهمي,VALID,,valid
+197,30807271333350,عبد العزيز عادل عبد الله القاضي,VALID,,valid
+198,29601012301033,ماجد أنس أحمد سالم,VALID,,valid
+199,29903221822653,فتحي شريف سامح فهمي,VALID,,valid
+200,30803172111231,معاذ طارق وليد النجار,VALID,,valid
+201,30706152130719,مصطفى فارس معاذ القاضي,VALID,,valid
+202,30108161817775,فتحي أدهم حمزة البنا,VALID,,valid
+203,30713162674534,إسلام أحمد كريم سالم,INVALID,ID_BIRTH_DATE,birth date inside the national ID is impossible or in the future
+204,30709041695374,طارق أحمد هشام عبد الله,VALID,,valid
+205,30009031390576,ياسر صلاح فارس موسى,VALID,,valid
+206,30303060168278,مصطفى عبد الحميد سالم البنا,VALID,,valid
+207,30110151536357,عمر عادل عبد الحميد الصاوي,VALID,,valid
+208,30808200133174,حمزة حسن ممدوح عطية,INVALID,QUALIFICATION,"qualification ID unknown, empty or not a number"
+209,30512282396354,ماجد إبراهيم أسامة حسنين,VALID,,valid
+210,30206182291955,أحمد عادل شعبان حجازي,VALID,,valid
+211,29606092166752,إسماعيل نادر علي عيسى,VALID,,valid
+212,30401013446090,بولس بيتر سمير الدسوقي,VALID,,valid
+213,30809110248854,كريم يوسف علي الشناوي,INVALID,GOV_MISMATCH,gov_id differs from the governorate in the national ID
+214,30305201629571,سليمان شريف حسن عبد الله,VALID,,valid
+215,29909011660795,ياسر إبراهيم شعبان لطفي,VALID,,valid
+216,30501290172675,   ,INVALID,FIELD_REQUIRED,"required field empty (name, police station, governorate name or qualification name)"
+217,29O01303433012,عبد الفتاح شريف عصام فهمي,INVALID,ID_DIGITS,"national ID contains letters, symbols or Arabic-Indic digits"
+218,30701220163032,رمضان إبراهيم عمر زكي,VALID,,valid
+219,30801262402779,محمود أسامة نادر فهمي,VALID,,valid
+220,30408200146713,إسماعيل حسن سليمان سالم,VALID,,valid
+221,29803301477638,عبد الفتاح علي باسم القاضي,VALID,,valid
+222,30004022367254,شادي تامر مازن الشناوي,VALID,,valid
+223,30603143241692,عبد الرحمن رمضان خالد رزق,VALID,,valid
+224,2991230150559,صلاح ياسر هشام القاضي,INVALID,ID_LENGTH,national ID is 13 or 15 digits
+225,30601101453518,وليد عبد الله إبراهيم حسنين,VALID,,valid
+226,29605162551499,ماجد سليمان يوسف زكي,VALID,,valid
+227,30604231792479,نادر عبد الرحمن ماجد يونس,VALID,,valid
+228,29905092753852,ياسر عصام إسلام فرج,VALID,,valid
+229,30507111471890,يوسف ممدوح رمضان النجار,VALID,,valid
+230,30412192646277,علي كريم أحمد الشناوي,VALID,,valid
+231,30411291606411,عصام صلاح إسماعيل موسى,VALID,,valid
+232,30302141256554,ماجد عبد الحميد أحمد حجازي,VALID,,valid
+233,30503271432778,ياسر عبد الله إبراهيم الجمال,VALID,,valid
+234,29903231843411,حنا فادي إسحق لطفي,VALID,,valid
+235,30404031632591,يوسف إسلام رضا الدسوقي,INVALID,DUPLICATE_FILE,national ID repeated in the file (different name)
+236,30402230137361,جمال ممدوح باسم القاضي,INVALID,GENDER,13th digit is even (female national ID)
+237,30212192975896,منصور فتحي عبد الفتاح خليل,VALID,,valid
+238,30402201442379,عبد الرحمن وليد تامر عطية,VALID,,valid
+239,30005292504550,صبري سليمان حسين إبراهيم,INVALID,DUPLICATE_FILE,national ID repeated in the file (different name)
+240,29608269977890,محمد ياسر إسلام حجازي,INVALID,GOV_MISMATCH;GOV_UNKNOWN,governorate code not in the official list
+241,30501312762090,سعيد عمر عبد الرحمن عيسى,VALID,,valid
+242,30501302121135,عبد المنعم صبري صلاح سالم,VALID,,valid
+243,29904102474277,عادل فارس معاذ الشريف,VALID,,valid
+244,30405292637478,محمود حسن محمد يونس,VALID,,valid
+245,30305052689538,طارق أنس عبد الحميد عبد الله,VALID,,valid
+246,3031030152019,محمود نادر عبد الله النجار,INVALID,ID_LENGTH,national ID is 13 or 15 digits
+247,29807021392816,عادل حمزة ناصر خليل,VALID,,valid
+248,29607272444311,إسماعيل أيمن عبد العزيز فرج,VALID,,valid
+249,30112023380559,صبري صلاح ناصر البنا,VALID,,valid
+250,30707222726917,حسين رضا عمر عبد الله,VALID,,valid
+251,10309071384351,أسامة هاني مصطفى الدسوقي,INVALID,ID_BIRTH_DATE,birth date inside the national ID is impossible or in the future
+252,30211051848318,صبري تامر مصطفى سالم,VALID,,valid
+253,30105261705936,يوسف عبد المنعم خالد عطية,VALID,,valid
+254,30011290466691,مايكل شنودة مينا لطفي,INVALID,QUALIFICATION,"qualification ID unknown, empty or not a number"
+255,29910051886698,أنس وليد مصطفى الجمال,VALID,,valid
+256,30801281543139,حسن نادر يوسف موسى,INVALID,QUALIFICATION,"qualification ID unknown, empty or not a number"
+257,30509261417192,حسن ناصر عبد الله الفقي,VALID,,valid
+258,29604262719314,شريف سيد علي زكي,VALID,,valid
+259,30509032979898,أنس سامح رضا عثمان,VALID,,valid
+260,30211121778114,حسين كريم سليمان الجمال,VALID,,valid
+261,30001240139036,عادل عمر مصطفى يونس,VALID,,valid
+262,29610271669039,أدهم هشام رمضان منصور,VALID,,valid
+263,30305161227212,إسماعيل أحمد عبد المنعم الجمال,VALID,,valid
+264,30206212605059,أسامة سليمان مازن الدسوقي,VALID,,valid
+265,29902032331195,ممدوح عمر مصطفى خليل,VALID,,valid
+266,30312265037988,عبد الرحمن محمود أدهم الدسوقي,INVALID,FIELD_REQUIRED;GENDER;GOV_MISMATCH;GOV_UNKNOWN,"unknown governorate, female ID and missing police station"
+267,,,INVALID,FIELD_REQUIRED;ID_DIGITS;ID_LENGTH,"national ID missing or text, and empty name"
+268,29904282148577,شريف عبد المنعم إسماعيل الفقي,VALID,,valid
+269,29911271553414,رضا إسلام سامح موسى,VALID,,valid
+270,30103281889754,هشام سليمان باسم الدسوقي,VALID,,valid
+271,30004231152337,ممدوح رمضان عبد العزيز الجمال,VALID,,valid
+272,30305041885319,,INVALID,FIELD_REQUIRED,"required field empty (name, police station, governorate name or qualification name)"
+273,29701033252096,أدهم ياسر عبد الله حجازي,INVALID,DUPLICATE_FILE,national ID repeated in the file (different name)
+274,30310241336290,زياد مازن باسم القاضي,VALID,,valid
+275,30602252367417,صبري وليد حسين الشناوي,INVALID,DUPLICATE_FILE,national ID repeated in the file (same record sent twice)
+276,29810131395534,مازن باسم حسين حجازي,VALID,,valid
+277,30106090211679,عادل خالد منصور عثمان,VALID,,valid
+278,29810062425955,شريف حسن يوسف زكي,VALID,,valid
+279,305051103219765,إسماعيل سعيد خالد منصور,INVALID,ID_LENGTH,national ID is 13 or 15 digits
+280,30401170139331,ياسر مازن منصور النجار,VALID,,valid
+281,30209070433150,علي حسين سليمان المصري,VALID,,valid
+282,30711270148717,حسين إسلام طارق عطية,VALID,,valid
+283,29604221253853,أدهم ياسر أيمن المصري,VALID,,valid
+284,30410122171397,حسن علي عمرو سالم,VALID,,valid
+285,30602092779739,حمزة صبري ماجد عثمان,VALID,,valid
+286,30410282039731,علي باسم هشام عيسى,INVALID,GOV_MISMATCH;GOV_UNKNOWN,governorate code not in the official list
+287,30209102960372,صلاح إبراهيم خالد الجمال,VALID,,valid
+288,30710211660455,شادي عبد المنعم إسماعيل الشريف,VALID,,valid
+289,298042922674330,أيمن عصام عمر حسنين,INVALID,ID_LENGTH,national ID is 13 or 15 digits
+290,29712102348698,هشام عبد الرحمن كريم المصري,VALID,,valid
+291,30601252685092,إسماعيل هاني عبد الرحمن الجمال,VALID,,valid
+292,30602170285739,فتحي عمرو شعبان عيسى,VALID,,valid
+293,29710212197856,صلاح مازن فتحي عبد الله,VALID,,valid
+294,29910280197897,ياسر عمرو أنس الصاوي,VALID,,valid
+295,29907290182854,عبد الفتاح سالم أدهم البدري,VALID,,valid
+296,30702042331955,سليمان سعيد هشام البدري,INVALID,QUALIFICATION,"qualification ID unknown, empty or not a number"
+297,30409030145676,عمر صبري سعيد السعيد,VALID,,valid
+298,30504032851270,سيد أحمد عبد الرحمن حجازي,VALID,,valid
+299,29802022715075,عبد الله حمزة أدهم الصاوي,VALID,,valid
+300,30510202756356,محمود ناصر تامر حجازي,VALID,,valid
+301,29708101313817,أنس مصطفى تامر البدري,VALID,,valid
+302,29707210224972,كيرلس نبيل سمير الصاوي,VALID,,valid
+303,29708062136390,كريم سعيد سيد حجازي,VALID,,valid
+304,30302261445499,عصام وليد ياسر زكي,INVALID,BIRTH_MISMATCH,birth_date column differs from the date in the national ID
+305,30309090143157,عبد الحميد عبد العزيز أسامة عبد الله,INVALID,BIRTH_DATE,birth_date column empty or not YYYY-MM-DD
+306,30606211236712,هشام تامر طارق لطفي,VALID,,valid
+307,30703242549296,رمضان أدهم مصطفى لطفي,VALID,,valid
+308,30704271231454,علي أنس وليد المصري,VALID,,valid
+309,29702202634736,سليمان كريم رمضان عيسى,VALID,,valid
+310,29606270111239,صبري سيد محمد عطية,VALID,,valid
+311,30808220103658,سالم حسن إبراهيم السعيد,VALID,,valid
+312,29603282269057,محمود عمرو علي القاضي,VALID,,valid
+313,29909233374032,طارق صلاح عبد العزيز الشريف,VALID,,valid
+314,30612062559292,حسين هاني عادل شحاتة,INVALID,FIELD_REQUIRED,"required field empty (name, police station, governorate name or qualification name)"
+315,30710253535330,محمد إبراهيم ممدوح خليل,VALID,,valid
+316,29911212568632,شنودة نبيل بولس موسى,VALID,,valid
+317,29703301786015,هاني معاذ مصطفى الفقي,VALID,,valid
+318,30206071219611,عبد الرحمن فارس باسم الشناوي,VALID,,valid
+319,30103200212414,حمزة صلاح عبد الرحمن زكي,INVALID,FIELD_REQUIRED,"required field empty (name, police station, governorate name or qualification name)"
+320,30709302723257,باسم سالم كريم رزق,VALID,,valid
+321,30006232643455,عبد العزيز أيمن وليد حجازي,VALID,,valid
+322,29808041325656,مازن محمد يوسف الدسوقي,VALID,,valid
+323,29601150262454,محمود محمد شريف عطية,VALID,,valid: oldest age band
+324,30405091220332,ياسر حمزة أنس لطفي,VALID,,valid
+325,29712111634299,باسم سليمان محمود السعيد,VALID,,valid
+326,29811091485757,تامر منصور خالد عثمان,VALID,,valid
+327,30111132144223,جمال عصام أيمن عبد الله,INVALID,GENDER,13th digit is even (female national ID)
+328,30012293186110,ياسر نادر سعيد الصاوي,VALID,,valid
+329,30006291410218,شريف سليمان محمود المصري,VALID,,valid
+330,30512142279135,ماجد رمضان خالد عطية,INVALID,DUPLICATE_FILE,national ID repeated in the file (different name)
+331,30301011848691,إسلام هاني سالم شحاتة,VALID,,valid
+332,30507021143955,محمد حمزة عبد المنعم النجار,VALID,,valid
+333,30503131674414,زياد يوسف رمضان الفقي,VALID,,valid
+334,30704251211094,سامح عبد الله صلاح الشريف,VALID,,valid
+335,29602290155715,أحمد فتحي منصور المصري,VALID,,valid: born on 29 February (leap year)
+336,29605110118831,جمال عبد الرحمن وليد حجازي,VALID,,valid
+337,30102182869174,إسماعيل أيمن تامر السعيد,VALID,,valid
+338,30710162102215,كريم عبد الله جمال يونس,INVALID,QUALIFICATION,"qualification ID unknown, empty or not a number"
+339,30012302882490,سامح جمال صلاح عيسى,VALID,,valid
+340,30012251413651,سيد منصور حمزة عطية,VALID,,valid
+341,29712121935337,عمرو محمد تامر فهمي,VALID,,valid
+342,29607031669239,عبد الرحمن عبد الله شادي المصري,VALID,,valid
+343,30210270158531,فارس رمضان عبد الله زكي,VALID,,valid
+344,30603162312674,صبري حمزة تامر الدسوقي,VALID,,valid
+345,30509172565290,سليمان عبد الرحمن عادل الشناوي,VALID,,valid
+346,30209191439317,فادي شنودة بيشوي عيسى,VALID,,valid
+347,30112272139735,فارس محمود سعيد موسى,VALID,,valid
+348,30305021948493,عصام طارق صبري الشريف,VALID,,valid
+349,30310012449239,سليمان هاني ياسر يونس,VALID,,valid
+350,30710310143390,عبد الله سامح عبد الفتاح لطفي,VALID,,valid
+351,30705211264172,هاني ممدوح حسن النجار,VALID,,valid
+352,30605230417538,خالد هشام عادل حجازي,VALID,,valid
+353,29703021729475,ماجد صلاح أسامة عطية,INVALID,QUALIFICATION,"qualification ID unknown, empty or not a number"
+354,29709222474538,باسم وليد عبد الرحمن حجازي,VALID,,valid
+355,30212200301296,ماجد عصام عمرو فرج,VALID,,valid
+356,29711232784370,نادر شريف كريم عطية,VALID,,valid
+357,30104151241590,إبراهيم أسامة عادل عثمان,VALID,,valid
+358,30403142652695,هشام عمر ياسر حسنين,VALID,,valid
+359,29705190457514,محمود أيمن مازن النجار,VALID,,valid
+360,29903232564818,يوسف رضا عادل عبد الله,VALID,,valid
+361,29909101207233,منصور وليد مصطفى لطفي,INVALID,FIELD_REQUIRED,"required field empty (name, police station, governorate name or qualification name)"
+362,29601042283790,عمرو عصام كريم فرج,VALID,,valid
+363,30805223438652,صبري زياد عمر الفقي,VALID,,valid
+364,298051818660129,هاني شادي هشام حسنين,INVALID,ID_LENGTH,national ID is 13 or 15 digits
+365,29712271358716,فارس هشام مازن البنا,VALID,,valid
+366,30306042169571,نبيل ماجد مرقص الدسوقي,VALID,,valid
+367,301103121265171,عبد العزيز جمال محمود عثمان,INVALID,ID_LENGTH,national ID is 13 or 15 digits
+368,19610192650292,شريف حمزة كريم خليل,INVALID,ID_BIRTH_DATE,birth date inside the national ID is impossible or in the future
+369,298081113989,مازن أسامة صبري منصور,INVALID,BIRTH_DATE;ID_LENGTH,12-digit national ID and a DD/MM/YYYY birth date
+370,30301242336850,معاذ سعيد أسامة فرج,VALID,,valid
+371,29605022415979,عمرو إسلام أيمن حسنين,VALID,,valid
+372,29601102173331,أيمن أدهم باسم الجمال,VALID,,valid
+373,30605092884655,تامر كريم عبد الله شحاتة,VALID,,valid
+374,30808283153813,حمزة نادر مازن الصاوي,VALID,,valid
+375,30707101530076,شريف خالد عبد الرحمن النجار,VALID,,valid
+376,30510082448478,كيرلس مينا فادي شحاتة,VALID,,valid
+377,30203032150533,عبد الله ناصر إسلام السعيد,VALID,,valid
+378,29912011366470,زياد صلاح سامح الشناوي,VALID,,valid
+379,29710160128492,فادي أندرو ماجد شحاتة,VALID,,valid
+380,30110312956074,ممدوح سعيد محمود البدري,VALID,,valid
+381,30808092730314,سيد سالم عبد الرحمن لطفي,VALID,,valid
+382,29607030127198,عبد الله ناصر حسين القاضي,INVALID,BIRTH_MISMATCH,birth_date column differs from the date in the national ID
+383,30006290111518,وليد أيمن فتحي القاضي,VALID,,valid
+384,30612222630525,ياسر إبراهيم وليد الجمال,INVALID,GENDER,13th digit is even (female national ID)
+385,29810211263013,ماجد عمر إبراهيم لطفي,VALID,,valid
+386,29804301850638,خالد سامح سيد يونس,VALID,,valid
+387,30508092107473,ماجد حسن مازن الفقي,VALID,,valid
+388,30301081337979,طارق إبراهيم صلاح شحاتة,VALID,,valid
+389,30801032319150,طارق باسم فتحي الدسوقي,VALID,,valid
+390,29901032605854,محمد زياد صبري لطفي,VALID,,valid
+391,29603141348097,منصور صلاح يوسف حسنين,VALID,,valid
+392,30506080107036,محمد مازن أسامة البدري,VALID,,valid
+393,29604112323174,هشام صبري سيد الصاوي,VALID,,valid
+394,29808293315474,سعيد محمد يوسف البدري,VALID,,valid
+395,301092/2120071,منصور عبد العزيز فارس عثمان,INVALID,ID_DIGITS,"national ID contains letters, symbols or Arabic-Indic digits"
+396,29807161738697,أسامة عبد الله منصور الفقي,VALID,,valid
+397,29910142711873,شريف سالم نادر المصري,VALID,,valid
+398,30703150206339,تامر باسم ممدوح فهمي,VALID,,valid
+399,29711112716274,شريف سامح ممدوح المصري,VALID,,valid
+400,29611101250515,سيد علي حسين عثمان,VALID,,valid
+401,30210210125796,أنس زياد كريم عثمان,VALID,,valid
+402,30108241233330,تامر رمضان منصور عيسى,VALID,,valid
+403,30112292152558,هشام حسين عبد العزيز زكي,VALID,,valid
+404,30703212656859,عبد العزيز عبد الحميد علي النجار,VALID,,valid
+405,30304011555057,مازن منصور حسين الشناوي,VALID,,valid
+406,29801232161712,عبد المنعم عصام شادي فرج,VALID,,valid
+407,3O002101434053,بولس مينا كيرلس إبراهيم,INVALID,ID_DIGITS,"national ID contains letters, symbols or Arabic-Indic digits"
+408,30109251651975,ياسر سيد أحمد خليل,VALID,,valid
+409, 30610162336091 ,عادل محمد حسن سالم,INVALID,DUPLICATE_FILE,national ID repeated in the file (different name)
+410,30808172171254,مازن سامح زياد البدري,VALID,,valid
+411,30301311796779,أسامة سليمان شعبان النجار,VALID,,valid
+412,30706110305197,صلاح عبد العزيز إبراهيم عطية,INVALID,GOV_MISMATCH,gov_id differs from the governorate in the national ID
+413,30806230199799,زياد هاني معاذ خليل,VALID,,valid
+414,30208281826436,علي حسين حمزة موسى,VALID,,valid
+415,30508270274295,معاذ باسم عبد الفتاح الشناوي,VALID,,valid
+416,30303260321393,محمد سيد رمضان منصور,VALID,,valid
+417,30802151146577,عمر أيمن صبري القاضي,VALID,,valid
+418,30305303275573,نادر أسامة ناصر الدسوقي,VALID,,valid
+419,29811201485934,صبري عبد العزيز عادل القاضي,VALID,,valid
+420,30609120186496,أدهم حسين عبد المنعم سالم,VALID,,valid
+421,30207221283173,شادي صلاح تامر الفقي,VALID,,valid
+422,30801060343359,هشام رضا نادر عثمان,VALID,,valid
+423,30307302147231,مصطفى شعبان أسامة موسى,VALID,,valid
+424,29604200175571,عمرو طارق فتحي يونس,VALID,,valid
+425,30405160181116,مصطفى علي سعيد منصور,VALID,,valid
+426,30/08231251797,فارس حسن هاني القاضي,INVALID,ID_DIGITS,"national ID contains letters, symbols or Arabic-Indic digits"
+427,30109101838731,أحمد عبد العزيز عصام الجمال,VALID,,valid
+428,2970327O530875,أحمد أيمن عبد الحميد المصري,INVALID,ID_DIGITS,"national ID contains letters, symbols or Arabic-Indic digits"
+429,30503093568093,نادر طارق هشام يونس,VALID,,valid
+430,30205283499074,زياد تامر طارق المصري,VALID,,valid
+431,30105131441671,هشام سليمان نادر الشناوي,VALID,,valid
+432,30202142222472,سامح سالم سليمان إبراهيم,VALID,,valid
+433,30601122258892,مينا بيشوي بيتر الفقي,VALID,,valid
+434,30806111338537,أدهم أحمد خالد عثمان,VALID,,valid
+435,307042418023758,عبد المنعم مازن فارس الشريف,INVALID,ID_LENGTH,national ID is 13 or 15 digits
+436,30603121557073,عبد الرحمن ماجد محمود إبراهيم,VALID,,valid
+437,29709181864699,,INVALID,FIELD_REQUIRED,"required field empty (name, police station, governorate name or qualification name)"
+438,30205081381114,باسم هشام وليد حسنين,VALID,,valid
+439,30306152141618,سامح ماجد أحمد إبراهيم,VALID,,valid
+440,30208122470212,طارق محمد ممدوح الشريف,VALID,,valid
+441,30112071689834,عمرو خالد شريف النجار,VALID,,valid
+442,29908042937233,مُحَمَّد عبـــد الرَّحمن رضا رزق,VALID,,valid: Arabic diacritics/tatweel in the name
+443,29609110210975,طارق إسماعيل كريم خليل,VALID,,valid
+444,30511250111013,أسامة كريم ياسر النجار,VALID,,valid
+445,30611281461373,يوسف عبد الرحمن صلاح فرج,VALID,,valid
+446,30802062194951,عمر محمد سيد الدسوقي,VALID,,valid
+447,30807292325355,نبيل شنودة ماجد عثمان,VALID,,valid
+448,29809182834058,عزيز مينا فادي الصاوي,VALID,,valid
+449,30104090174770,سيد سليمان فتحي سالم,INVALID,GOV_MISMATCH,gov_id differs from the governorate in the national ID
+450,30107071398175,ممدوح سعيد سامح عطية,VALID,,valid
+451,29608271366371,ياسر محمود مازن النجار,VALID,,valid
+452,29711302670599,علي ناصر ممدوح إبراهيم,VALID,,valid
+453,29609022637199,مصطفى محمد أدهم رزق,VALID,,valid
+454,29702251891853,إبراهيم صبري مازن الجمال,VALID,,valid
+455,30102050250835,شنودة سمير نبيل رزق,VALID,,valid
+456,29809111750173,رضا أحمد أسامة القاضي,VALID,,valid
+457,29705072126555,رضا تامر نادر الفقي,VALID,,valid
+458,29703212350891,بولس سمير أندرو شحاتة,VALID,,valid
+459,30306251321592,معاذ منصور عمرو شحاتة,VALID,,valid
+460,30605181401615,ماجد عادل حنا الشناوي,VALID,,valid
+461,29607180181555,أندرو سمير بولس خليل,VALID,,valid
+462,29608101346078,أسامة أدهم عمر السعيد,VALID,,valid
+463,  30704141672095 , سليمان جمال فارس شحاتة  ,VALID,,valid: spaces around national ID and name (trimmed)
+464,29912242204192,زياد تامر طارق يونس,VALID,,valid
+465,30610092224177,سليمان عبد الرحمن عادل إبراهيم,VALID,,valid
+466,30303072136018,عبد العزيز أسامة ممدوح السعيد,VALID,,valid
+467,30710021299436,عبد المنعم أيمن عصام شحاتة,VALID,,valid
+468,  30705151215737 , شعبان ناصر رضا المصري  ,VALID,,valid: spaces around national ID and name (trimmed)
+469,30101122431813,سليمان أدهم باسم الشريف,VALID,,valid
+470,30410122268887,حسين عصام يوسف سالم,INVALID,GENDER,13th digit is even (female national ID)
+471,29711182592539,محمد باسم عادل الجمال,VALID,,valid
+472,30706160629692,عبد الله محمد زياد فرج,INVALID,GOV_MISMATCH;GOV_UNKNOWN,governorate code not in the official list
+473,29612012379150,فارس كريم حسين الصاوي,VALID,,valid
+474,30204181809336,منصور علي سيد البدري,INVALID,BIRTH_MISMATCH,birth_date column differs from the date in the national ID
+475,30212111487135,عبد الرحمن طارق رمضان إبراهيم,VALID,,valid
+476,29906282987172,هشام أنس شعبان البدري,VALID,,valid
+477,30304041828298,عادل عزيز مايكل الصاوي,VALID,,valid
+478,30209200314136,ماجد زياد فارس الفقي,VALID,,valid
+479,29701182996410,عادل أحمد عبد الرحمن خليل,VALID,,valid
+480,29808312278955,رمضان مصطفى باسم الدسوقي,INVALID,QUALIFICATION,"qualification ID unknown, empty or not a number"
+481,30804103481796,ناصر خالد منصور عبد الله,INVALID,BIRTH_DATE,birth_date column empty or not YYYY-MM-DD
+482,29609201776900,عبد الفتاح مصطفى شريف زكي,INVALID,GENDER,13th digit is even (female national ID)
+483,29804181779216,هاني عادل وليد الدسوقي,VALID,,valid
+484,30005101255232,عبد الرحمن عبد الفتاح عبد الله رزق,VALID,,valid
+485,29602011655570,ماجد عبد المنعم عبد الحميد القاضي,VALID,,valid
+486,30708051693870,عبد الله فارس إبراهيم البنا,VALID,,valid
+487,30109072412975,إسلام حسن رمضان عبد الله,VALID,,valid
+488,30801011286298,فادي نبيل مايكل الدسوقي,VALID,,valid
+489,30204251577813,شريف أيمن ماجد عطية,INVALID,GOV_MISMATCH,gov_id differs from the governorate in the national ID
+490,30606052491058,منصور إسلام شعبان إبراهيم,VALID,,valid
+491,30409191742632,عبد الحميد ناصر كريم عثمان,VALID,,valid
+492,29909182629437,عبد الرحمن رضا عصام الصاوي,VALID,,valid
+493,30009101194815,أحمد عمرو حسن حسنين,VALID,,valid
+494,30112252439813,عبد الفتاح ياسر سامح المصري,VALID,,valid
+495,30403090177778,شنودة مايكل بيتر فرج,VALID,,valid
+496,30701292113636,هاني إبراهيم صلاح عبد الله,VALID,,valid
+497,٣٠٨٠٩٠٤٠١٢٢١٧٠,إبراهيم وليد فارس رزق,INVALID,ID_DIGITS,"national ID contains letters, symbols or Arabic-Indic digits"
+498,29607161336452,مازن إبراهيم عادل القاضي,VALID,,valid
+499,29709082348154,إبراهيم أحمد عمرو الدسوقي,VALID,,valid
+500,30604262166653,سعيد معاذ محمد البنا,VALID,,valid
+501,30803110196597,مصطفى شريف عمر حجازي,VALID,,valid
+502,30005103375651,سمير عزيز كيرلس الشريف,INVALID,BIRTH_MISMATCH,birth_date column differs from the date in the national ID
+503,30605020490711,أسامة رمضان سالم الدسوقي,VALID,,valid
+504,30405290181237,عبد العزيز معاذ عبد الله شحاتة,VALID,,valid
+505,30602252367417,صبري وليد حسين الشناوي,INVALID,DUPLICATE_FILE,national ID repeated in the file (same record sent twice)
+506,29901152889573,خالد زياد أنس لطفي,VALID,,valid
+507,30510101246151,رضا فتحي هاني يونس,VALID,,valid
+508,30612252177116,عصام أيمن وليد عبد الله,VALID,,valid
+509,30507260158015,ماجد إسحق يوحنا عطية,VALID,,valid
+510,30801291952610,فتحي إبراهيم شادي البدري,VALID,,valid
+511,30504031840330,سيد طارق وليد إبراهيم,VALID,,valid
+512,30608212162077,عادل عبد الرحمن صلاح شحاتة,VALID,,valid
+513,30312121891388,سعيد محمد هشام الجمال,INVALID,GENDER,13th digit is even (female national ID)
+514,30203081968539,عبد العزيز هاني أسامة عثمان,VALID,,valid
+515,30312032380058,هاني حمزة سالم البنا,VALID,,valid
+516,30808312401871,ممدوح خالد محمد سالم,VALID,,valid
+517,30805062421499,هاني سامح سالم لطفي,VALID,,valid
+518,30404051212292,شادي صبري ناصر المصري,VALID,,valid
+519,30805161487371,عادل معاذ ماجد البنا,VALID,,valid
+520,30612282626977,يوسف زياد هشام عيسى,VALID,,valid
+521,30404192314013,سعيد مصطفى جمال لطفي,INVALID,DUPLICATE_FILE,national ID repeated in the file (same record sent twice)
+522,30502112187410,صبري عادل صلاح عبد الله,VALID,,valid
+523,30112112504416,شريف سيد أسامة منصور,VALID,,valid
+524,29809021239793,عبد المنعم باسم عبد الرحمن النجار,VALID,,valid
+525,30508153440773,نادر عمرو شادي عبد الله,VALID,,valid
+526,30104141600777,مازن عصام نادر حجازي,VALID,,valid
+527,٣٠٢٠٩٢٥٣٢٩١٤٥٥,حمزة عبد الحميد عمرو حسنين,INVALID,ID_DIGITS,"national ID contains letters, symbols or Arabic-Indic digits"
+528,29602090135313,محمود رمضان ناصر عطية,VALID,,valid
+529,29602051154113,جمال صلاح فتحي الشناوي,VALID,,valid
+530,29912050194330,أنس أسامة عادل الشريف,VALID,,valid
+531,30306040102737,عبد العزيز شريف جمال الجمال,VALID,,valid
+532,30201051797855,أيمن حمزة علي الدسوقي,VALID,,valid
+533,30710240182895,شنودة أندرو عادل الدسوقي,VALID,,valid
+534,30801210186218,حسن أيمن فتحي الدسوقي,VALID,,valid
+535,30701192103838,إسماعيل عمر سالم يونس,VALID,,valid
+536,301072201093586,أدهم عبد الفتاح شريف الصاوي,INVALID,ID_LENGTH,national ID is 13 or 15 digits
+537,30712262936832,أيمن علي عادل القاضي,VALID,,valid
+538,30307190176475,عبد الرحمن حسين حسن الصاوي,VALID,,valid
+539,30410242617878,سالم كريم عمر موسى,VALID,,valid
+540,30711092173032,صبري نادر جمال فهمي,VALID,,valid
+541,29711020385879,إسماعيل علي إبراهيم حجازي,VALID,,valid
+542,30206112618033,ناصر ماجد ممدوح موسى,VALID,,valid
+543,  29904202103051 , سيد عبد الله سامح موسى  ,VALID,,valid: spaces around national ID and name (trimmed)
+544,30208032220338,ناصر نادر أحمد سالم,VALID,,valid
+545,30411211559434,فارس عصام عبد المنعم السعيد,VALID,,valid
+546,29608252182815,هاني هشام أسامة الصاوي,VALID,,valid
+547,30404231431051,خالد مازن هاني فرج,VALID,,valid
+548,30701121783885,زياد أيمن يوسف يونس,INVALID,GENDER,13th digit is even (female national ID)
+549,30405181809635,أندرو مايكل كيرلس حسنين,VALID,,valid
+550,30307112485115,مصطفى سعيد هاني عيسى,VALID,,valid
+551,30502051544550,هاني فارس شريف القاضي,VALID,,valid
+552,30805261536478,عبد الفتاح عصام عبد الرحمن سالم,VALID,,valid
+553,30602AB1581115,,INVALID,FIELD_REQUIRED;ID_DIGITS;QUALIFICATION,"letters in national ID, empty name, unknown qualification"
+554,30708041840092,سليمان إبراهيم سالم القاضي,VALID,,valid
+555,30802232877739,إسحق بولس بيتر الدسوقي,VALID,,valid
+556,30302222205574,طارق شريف معاذ البدري,VALID,,valid
+557,29605AB2119353,,INVALID,FIELD_REQUIRED;ID_DIGITS;QUALIFICATION,"letters in national ID, empty name, unknown qualification"
+558,29810242505558,إسماعيل رمضان منصور حسنين,VALID,,valid
+559,30109200210095,إسلام شعبان باسم القاضي,VALID,,valid
+560,30704310279191,حسن ممدوح ماجد سالم,INVALID,ID_BIRTH_DATE,birth date inside the national ID is impossible or in the future
+561,30801150179255,إسماعيل ياسر عبد الرحمن زكي,VALID,,valid
+562,29711270149637,أسامة صلاح أيمن الشناوي,VALID,,valid
+563,30805281152032,أسامة شعبان عبد الله عطية,VALID,,valid
+564,30509271573633,عبد الحميد رمضان عصام المصري,VALID,,valid
+565,29909090304216,باسم عبد العزيز شريف المصري,VALID,,valid
+566,30410152402095,عبد الفتاح طارق نادر عبد الله,VALID,,valid
+567,30408051345290,ياسر جمال إبراهيم زكي,INVALID,GOV_MISMATCH,gov_id differs from the governorate in the national ID
+568,29710032730896,سالم ماجد عمر فهمي,VALID,,valid
+569,29810133300472,أنس تامر سيد رزق,VALID,,valid
+570,29710112502711,إسحق مينا بولس لطفي,VALID,,valid
+571,301121715254555,أحمد أدهم شعبان حجازي,INVALID,ID_LENGTH,national ID is 13 or 15 digits
+572,30602011250115,محمود هاني باسم البنا,VALID,,valid
+573,29910050010530,عبد الفتاح عبد العزيز أسامة إبراهيم,INVALID,GOV_MISMATCH;GOV_UNKNOWN,governorate code not in the official list
+574,29611151374870,علي صلاح يوسف فرج,VALID,,valid
+575,29707021298657,شعبان عبد الحميد ممدوح المصري,VALID,,valid
+576,30103221685772,حمزة منصور فارس فهمي,VALID,,valid
+577,30704141696937,نادر شادي ممدوح الصاوي,INVALID,BIRTH_MISMATCH,birth_date column differs from the date in the national ID
+578,30704292439539,جرجس بولس مايكل حسنين,VALID,,valid
+579,29805181923896,أيمن معاذ نادر فهمي,VALID,,valid
+580,30112221455098,عبد العزيز حمزة عبد الله رزق,VALID,,valid
+581,30105030432532,إبراهيم سعيد عبد الفتاح القاضي,VALID,,valid
+582,30510010127050,عبد العزيز وليد طارق فهمي,INVALID,BIRTH_MISMATCH,birth_date column differs from the date in the national ID
+583,30705261842010,سليمان جمال عبد الفتاح شحاتة,VALID,,valid
+584,30212102494895,حسن عبد الرحمن فتحي موسى,VALID,,valid
+585,30411112255172,فتحي سالم عمرو حسنين,VALID,,valid
+586,29902120129848,يوسف حسين سيد موسى,INVALID,BIRTH_MISMATCH;GENDER;GOV_MISMATCH,"female ID, governorate and birth date both disagree with the ID"
+587,29804201743236,محمد صبري مازن السعيد,VALID,,valid
+588,29609301706772,إسلام أسامة سامح الشريف,VALID,,valid
+589,30306071257156,حمزة سامح هاني فهمي,VALID,,valid
+590,30305202601276,عمر عبد العزيز رمضان يونس,INVALID,FIELD_REQUIRED,"required field empty (name, police station, governorate name or qualification name)"
+591,30001131728258,فتحي نادر معاذ سالم,VALID,,valid
+592,30707082571137,باسم مصطفى ناصر الشريف,VALID,,valid
+593,29610041695737,منصور إسلام عمرو إبراهيم,VALID,,valid
+594,29809023111603,أدهم عمرو عبد الفتاح يونس,INVALID,GENDER,13th digit is even (female national ID)
+595,30002173161556,عبد الرحمن يوسف شادي البنا,INVALID,BIRTH_MISMATCH,birth_date column differs from the date in the national ID
+596,30104011342257,منصور سامح عصام الجمال,VALID,,valid
+597,10004232263639,عبد الله وليد رضا يونس,INVALID,ID_BIRTH_DATE,birth date inside the national ID is impossible or in the future
+598,30009012424412,سمير نبيل جرجس عطية,VALID,,valid
+599,30304091825950,زياد فتحي محمود النجار,INVALID,DUPLICATE_FILE,national ID repeated in the file (same record sent twice)
+600,30008272993916,ماجد إسلام رضا عطية,VALID,,valid
+601,29710032384430,معاذ أدهم رضا الشناوي,VALID,,valid
+602,30102112777218,محمد عادل مصطفى منصور,VALID,,valid
+603,30101081378936,شعبان عصام عبد الله يونس,VALID,,valid
+604,30308110222594,عمرو عبد الرحمن طارق السعيد,INVALID,FIELD_REQUIRED,"required field empty (name, police station, governorate name or qualification name)"
+605,30011281588459,صلاح حسن عبد الفتاح لطفي,VALID,,valid
+606,30010012155717,شريف عبد الفتاح حمزة رزق,VALID,,valid
+607,30304091825950,زياد فتحي محمود النجار,INVALID,DUPLICATE_FILE,national ID repeated in the file (same record sent twice)
+608,30606130278671,علي عصام أحمد زكي,VALID,,valid
+609,29608080161955,عمرو سامح فتحي البدري,VALID,,valid
+610,30707171408599,عبد الحميد عصام شادي منصور,VALID,,valid
+611,30702060237674,مصطفى ممدوح شادي الصاوي,VALID,,valid
+612,30506191543695,,INVALID,FIELD_REQUIRED,"required field empty (name, police station, governorate name or qualification name)"
+613,30309112858857,ناصر خالد أسامة الصاوي,VALID,,valid
+614,30302171987015,عادل مازن ياسر القاضي,VALID,,valid
+615,30709061398612,طارق باسم معاذ الصاوي,VALID,,valid
+616,30805200339635,إسماعيل شادي كريم فهمي,VALID,,valid
+617,29806302943095,عبد الحميد رضا ماجد الشريف,VALID,,valid
+618,29806061897572,إسماعيل ماجد رضا لطفي,VALID,,valid
+619,30401242559656,هاني سليمان خالد الشريف,VALID,,valid
+620,30605091774674,رمضان محمد ماجد عطية,VALID,,valid
+621,29910032465734,باسم مصطفى صلاح موسى,VALID,,valid
+622,3060820243905,رمضان فارس معاذ حسنين,INVALID,ID_LENGTH,national ID is 13 or 15 digits
+623,29810153111999,مصطفى عبد الله ياسر السعيد,VALID,,valid
+624,29911061695238,زياد سيد شريف القاضي,VALID,,valid
+625,29911042607391,نادر جمال عبد العزيز الدسوقي,VALID,,valid
+626,29603092172299,سليمان صلاح عصام لطفي,VALID,,valid
+627,29912121840574,سامح عبد العزيز هاني فهمي,VALID,,valid
+628,30501081709273,شعبان باسم مصطفى عيسى,VALID,,valid
+629,30110170237675,عبد الفتاح باسم هشام القاضي,VALID,,valid
+630,29806221297890,أيمن عبد الله إبراهيم الشناوي,VALID,,valid
+631,29610161437770,ياسر علي مازن فرج,VALID,,valid
+632,30106151271330,شريف إبراهيم يوسف عبد الله,VALID,,valid
+633,29604262211738,إسماعيل صبري فارس الشريف,VALID,,valid
+634,29709281268676,إبراهيم مازن ناصر عطية,VALID,,valid
+635,30103310311399,محمد زياد أدهم خليل,VALID,,valid
+636,30712211125990,هشام عبد الله ناصر عيسى,VALID,,valid
+637,30601100147654,يوسف ماجد عبد المنعم البدري,VALID,,valid
+638,30606110162456,رضا فتحي سامح الشريف,VALID,,valid
+639,29809221630494,حسن عبد الله أدهم الدسوقي,VALID,,valid
+640,29911092240371,عبد الرحمن مازن سعيد الشناوي,VALID,,valid
+641,30001312310716,إسماعيل ممدوح إسلام حجازي,VALID,,valid
+642,30701254028617,فتحي ممدوح عبد المنعم خليل,INVALID,GOV_MISMATCH;GOV_UNKNOWN,governorate code not in the official list
+643,30110100407433,عبد المنعم صبري هاني حجازي,INVALID,GOV_MISMATCH,gov_id differs from the governorate in the national ID
+644,30802290102952,سمير مايكل إسحق إبراهيم,VALID,,valid: born on 29 February (leap year)
+645,30709268814232,عبد الله عبد الحميد عادل عطية,VALID,,valid: governorate 88 (born outside Egypt)
+646,29710181867356,حسن تامر صبري سالم,VALID,,valid
+647,29704AB2339597,,INVALID,FIELD_REQUIRED;ID_DIGITS;QUALIFICATION,"letters in national ID, empty name, unknown qualification"
+648,29902260352691,عادل أدهم سالم إبراهيم,VALID,,valid
+649,30211281812510,سعيد علي شعبان حجازي,VALID,,valid
+650,30310072731252,هاني رضا شعبان الدسوقي,INVALID,GOV_MISMATCH,gov_id differs from the governorate in the national ID
+651,29608262120218,عزيز بيتر بيشوي موسى,VALID,,valid
+652,29810211598630,نادر سامح مازن فهمي,VALID,,valid
+653,29803182905259,سالم حسن عصام فرج,VALID,,valid
+654,30507021645558,وليد جمال منصور إبراهيم,VALID,,valid
+655,30101102730857,حسين شادي أنس رزق,VALID,,valid
+656,30007141849954,إسحق ماجد سمير إبراهيم,VALID,,valid
+657,30502250194595,عمر عادل إسماعيل إبراهيم,VALID,,valid
+658,29711280163750,عبد العزيز أيمن جمال الفقي,VALID,,valid
+659,30005170392839,محمود معاذ عبد الرحمن السعيد,VALID,,valid
+660,30603222153295,معاذ باسم سليمان حجازي,VALID,,valid
+661,30404242358192,حمزة سالم سليمان الجمال,VALID,,valid
+662,30805310281554,عبد الله إسلام عبد الفتاح خليل,INVALID,QUALIFICATION,"qualification ID unknown, empty or not a number"
+663,30211042524259,علي رضا أنس منصور,INVALID,BIRTH_DATE,birth_date column empty or not YYYY-MM-DD
+664,30402030144817,ناصر عبد الفتاح عادل الدسوقي,VALID,,valid
+665,30507211354677,سليمان ياسر شعبان حسنين,VALID,,valid
+666,30210232174599,مازن عبد الحميد أدهم عبد الله,INVALID,BIRTH_MISMATCH,birth_date column differs from the date in the national ID
+667,29812191580754,رامي نبيل ماجد عطية,VALID,,valid
+668,30604022360299,عمرو رضا شعبان البنا,VALID,,valid
+669,30511282794978,خالد محمود صلاح عيسى,VALID,,valid
+670,30005242665638,صبري مازن عبد المنعم الشناوي,VALID,,valid
+671,  29810021311855 , عبد الفتاح مازن فتحي الشناوي  ,VALID,,valid: spaces around national ID and name (trimmed)
+672,30804042137875,عبد الحميد يوسف مصطفى فرج,VALID,,valid
+673,30711051759458,ياسر عمر سليمان رزق,VALID,,valid
+674,29703142321719,حسين ناصر فتحي فرج,VALID,,valid
+675,30310013197450,ماجد رامي مايكل إبراهيم,VALID,,valid
+676,29703291443730,شعبان ناصر شريف البدري,VALID,,valid
+677,29808130178797,محمود شادي إسلام يونس,INVALID,FIELD_TOO_LONG,"field longer than allowed (police station code over 20, name over 200 characters)"
+678,29710152391875,عبد الرحمن سالم ممدوح لطفي عبد الرحمن سالم ممدوح لطفي عبد الرحمن سالم ممدوح لطفي عبد الرحمن سالم ممدوح لطفي عبد الرحمن سالم ممدوح لطفي عبد الرحمن سالم ممدوح لطفي عبد الرحمن سالم ممدوح لطفي عبد الرحمن سالم ممدوح لطفي عبد الرحمن سالم ممدوح لطفي عبد الرحمن سالم ممدوح لطفي عبد الرحمن سالم ممدوح لطفي عبد الرحمن سالم ممدوح لطفي الطويل جداً,INVALID,FIELD_TOO_LONG,"field longer than allowed (police station code over 20, name over 200 characters)"
+679,30103081348694,أحمد أيمن فتحي السعيد,VALID,,valid
+680,29610252779299,مصطفى مازن نادر سالم,VALID,,valid
+681,30006301695839,هشام منصور معاذ الفقي,INVALID,GOV_MISMATCH,gov_id differs from the governorate in the national ID
+682,29812091629937,طارق شعبان سعيد البدري,VALID,,valid
+683,29802052511152,منصور معاذ إسلام حسنين,VALID,,valid
+684,29910131337496,معاذ رضا عبد الله الشريف,VALID,,valid
+685,30610030157232,جمال حمزة أحمد المصري,VALID,,valid
+686,30212130115830,أسامة كريم طارق فهمي,INVALID,BIRTH_MISMATCH,birth_date column differs from the date in the national ID
+687,30003172215934,رضا مازن سيد زكي,VALID,,valid
+688,29807141585730,أيمن أنس صبري البنا,VALID,,valid
+689,30705042182519,أحمد أنس سيد عطية,VALID,,valid
+690,30106080265396,عمرو عبد العزيز ماجد الدسوقي,VALID,,valid
+691,30105312330838,أحمد عبد الرحمن رضا شحاتة,INVALID,BIRTH_MISMATCH,birth_date column differs from the date in the national ID
+692,30605032145676,أحمد يوسف باسم السعيد,VALID,,valid
+693,30001171252247,عبد الفتاح كريم عبد الله فرج,INVALID,GENDER,13th digit is even (female national ID)
+694,30511151347991,جمال أسامة شريف عطية,VALID,,valid
+695,29603232145819,مايكل عزيز مرقص سالم,VALID,,valid
+696,30309102225833,عمر ياسر عبد الرحمن شحاتة,VALID,,valid
+697,29811292572539,أيمن ماجد معاذ النجار,INVALID,BIRTH_DATE,birth_date column empty or not YYYY-MM-DD
+698,30703161521734,رضا صلاح فارس إبراهيم,VALID,,valid
+699,30509012473771,حمزة طارق عبد المنعم الجمال,VALID,,valid
+700,30504280219711,محمد فتحي أسامة زكي,VALID,,valid
+701,29803240123591,رمضان عبد الرحمن محمد الشناوي,VALID,,valid
+702,30301052244835,ماجد فادي مينا الشريف,VALID,,valid
+703,30408221705234,حسن أيمن عبد الحميد عطية,VALID,,valid
+704,29602282730597,عبد المنعم حمزة تامر الشريف,VALID,,valid
+705,29701182441139,إبراهيم سالم جمال الفقي,VALID,,valid
+706,30206132620338,عبد الرحمن هاني ناصر البنا عبد الرحمن هاني ناصر البنا عبد الرحمن هاني ناصر البنا عبد الرحمن هاني ناصر البنا عبد الرحمن هاني ناصر البنا عبد الرحمن هاني ناصر البنا عبد الرحمن هاني ناصر البنا عبد الرحمن هاني ناصر البنا عبد الرحمن هاني ناصر البنا عبد الرحمن هاني ناصر البنا عبد الرحمن هاني ناصر البنا عبد الرحمن هاني ناصر البنا الطويل جداً,INVALID,FIELD_TOO_LONG,"field longer than allowed (police station code over 20, name over 200 characters)"
+707,30311060186171,مازن محمد ممدوح الشريف,VALID,,valid
+708,29909272623615,   ,INVALID,FIELD_REQUIRED,"required field empty (name, police station, governorate name or qualification name)"
+709,30401023174499,سامح ياسر عمر الشناوي,VALID,,valid
+710,29911262120336,ممدوح علي أدهم الصاوي,VALID,,valid
+711,30708222455352,إسماعيل إسلام فارس عبد الله,INVALID,BIRTH_DATE,birth_date column empty or not YYYY-MM-DD
+712,30501182129934,شريف حمزة جمال الصاوي,VALID,,valid
+713,29712150119555,معاذ زياد باسم لطفي,VALID,,valid
+714,29601071147992,فادي سمير مايكل زكي,VALID,,valid: oldest age band
+715,29606121877159,فارس أدهم إبراهيم إبراهيم,INVALID,DUPLICATE_FILE,national ID repeated in the file (same record sent twice)
+716,29602030186457,عبد الرحمن شريف أسامة السعيد,VALID,,valid
+717,29810050102639,سيد حسن وليد عيسى,INVALID,BIRTH_DATE,birth_date column empty or not YYYY-MM-DD
+718,30710171616677,صبري هشام سليمان البدري,VALID,,valid
+719,29706011894657,شادي إسلام ماجد المصري,VALID,,valid
+720,29610251957892,جمال إسلام محمود رزق,INVALID,DUPLICATE_FILE,national ID repeated in the file (same record sent twice)
+721,30006262242433,أنس مصطفى عادل إبراهيم,VALID,,valid
+722,30704092144555,مايكل نبيل عزيز منصور,VALID,,valid
+723,30610222401850,سليمان إبراهيم حمزة موسى,VALID,,valid
+724,2991009138167,تامر رمضان عبد العزيز يونس,INVALID,ID_LENGTH,national ID is 13 or 15 digits
+725,29610140254230,عبد الرحمن سيد حسين عبد الله,VALID,,valid
+726,30305012691992,عمر هاني منصور منصور,VALID,,valid
+727,29709302157492,سيد هشام ياسر الصاوي,VALID,,valid
+728,29707313340775,هاني شادي مازن الصاوي,VALID,,valid
+729,  30107151634217 , رضا حسن ماجد حسنين  ,VALID,,valid: spaces around national ID and name (trimmed)
+730,30403242522056,عبد الفتاح شريف عبد المنعم الدسوقي,VALID,,valid
+731,30609262167330,عبد الرحمن ممدوح وليد البدري,VALID,,valid
+732,30007010378878,رامي ماجد سمير حسنين,VALID,,valid
+733,30810090129979,أحمد حمزة فتحي رزق,INVALID,FIELD_REQUIRED,"required field empty (name, police station, governorate name or qualification name)"
+734,30604302418331,عمرو عبد الفتاح عبد الله يونس,VALID,,valid
+735,30604261271955,محمود فتحي أدهم فرج,VALID,,valid
+736,30702281373311,هاني شادي شعبان موسى,VALID,,valid
+737,29903291291713,سعيد حسن عبد الحميد زكي,VALID,,valid
+738,30106230333116,جمال عبد الله طارق النجار,VALID,,valid
+739,30506138870593,هشام تامر ممدوح الشريف,VALID,,valid: governorate 88 (born outside Egypt)
+740,30409222456371,شريف علي ممدوح البنا,VALID,,valid
+741,30510020237276,عبد المنعم سالم هاني شحاتة,VALID,,valid
+742,30707050137278,صبري محمود أسامة الشريف,VALID,,valid
+743,30507142167917,حسين عمر يوسف عثمان,VALID,,valid
+744,30602211522759,صلاح سليمان ياسر حجازي,VALID,,valid
+745,29610071283732,مازن محمود حسين السعيد,VALID,,valid
+746,30702222952/73,ناصر محمد عبد المنعم منصور,INVALID,ID_DIGITS,"national ID contains letters, symbols or Arabic-Indic digits"
+747,30802132170736,فادي عادل نبيل الشناوي,VALID,,valid
+748,30402181476974,ناصر عبد الفتاح حسين شحاتة,VALID,,valid
+749,30110252647044,أندرو عادل مينا الشريف,INVALID,GENDER,13th digit is even (female national ID)
+750,30602221867315,عصام سالم عبد الفتاح خليل,VALID,,valid
+751,29904081342673,صبري حسن ياسر الصاوي,VALID,,valid
+752,30212171329615,صلاح مازن حمزة النجار,VALID,,valid
+753,29905211447817,أيمن يوسف نادر فهمي,VALID,,valid
+754,29709041673334,ناصر زياد سيد سالم,VALID,,valid
+755,30011260127850,عبد الرحمن عادل رضا يونس,VALID,,valid
+756,30306221352759,صلاح منصور إبراهيم الشناوي,VALID,,valid
+757,30006272582398,باسم عبد المنعم سالم عبد الله,VALID,,valid
+758,29610013568419,منصور شريف فتحي عطية,VALID,,valid
+759,30008300164571,طارق ناصر رضا النجار,VALID,,valid
+760,30104082780791,صبري عمر عادل زكي,VALID,,valid
+761,30712292912718,نادر ماجد وليد شحاتة,VALID,,valid
+762,30507142689475,هاني محمود إسماعيل الفقي,VALID,,valid
+763,29705082674830,إسلام ممدوح نادر خليل,INVALID,QUALIFICATION,"qualification ID unknown, empty or not a number"
+764,29809292719938,نبيل مايكل سمير عيسى,VALID,,valid
+765,30112111555659,إسماعيل نادر زياد البدري,VALID,,valid
+766,30612192112939,محمد سامح إسماعيل الدسوقي,VALID,,valid
+767,  30005302694699 , شريف عبد المنعم أحمد حسنين  ,VALID,,valid: spaces around national ID and name (trimmed)
+768,30504262149032,حمزة صلاح رمضان الشريف,VALID,,valid
+769,30509111128080,مصطفى عبد المنعم منصور الصاوي,INVALID,GENDER,13th digit is even (female national ID)
+770,30303227711796,محمد ماجد ناصر شحاتة,INVALID,GOV_MISMATCH;GOV_UNKNOWN,governorate code not in the official list
+771,29912162784831,جمال كريم ماجد حجازي,VALID,,valid
+772,30111032436290,سعيد أنس عبد الله البنا,VALID,,valid
+773,29909290292939,هاني سعيد وليد موسى,VALID,,valid
+774,29903302237351,نادر طارق خالد عبد الله,VALID,,valid
+775,29804102595098,عادل سيد عبد الله السعيد,VALID,,valid
+776,30309031228896,حمزة زياد فتحي سالم,VALID,,valid
+777,29808042947338,شادي معاذ صلاح البدري,VALID,,valid
+778,29811070125675,بولس عزيز رامي شحاتة,VALID,,valid
+779,29701010241632,رضا سامح أيمن حجازي,VALID,,valid
+780,30412092207897,فارس عمر صلاح رزق,VALID,,valid
+781,30001032139675,عبد العزيز محمود عبد الحميد الفقي,VALID,,valid
+782,30510222251378,هاني عمرو صلاح الجمال,VALID,,valid
+783,30609282490879,عبد الله فتحي أيمن فهمي,VALID,,valid
+784,30301310121516,شنودة أندرو كيرلس البنا,VALID,,valid
+785,30009031225859,سامح سليمان عبد الله عيسى,VALID,,valid
+786,30104052599196,حسين نادر وليد السعيد,VALID,,valid
+787,30403152203442,عمر جمال زياد عبد الله,INVALID,BIRTH_MISMATCH;GENDER;GOV_MISMATCH,"female ID, governorate and birth date both disagree with the ID"
+788,30301312192585,عمرو إبراهيم شعبان شحاتة,INVALID,GENDER,13th digit is even (female national ID)
+789,30412250125055,عمرو شريف أسامة القاضي,VALID,,valid
+790,29902100258819,أحمد جمال شعبان حسنين,VALID,,valid
+791,29903170105830,سيد فتحي أنس البدري,VALID,,valid
+792,30512232796174,رامي فادي شنودة يونس,VALID,,valid
+793,30706241319215,إسماعيل تامر طارق المصري,VALID,,valid
+794,30706061318794,ممدوح أسامة سالم الجمال,VALID,,valid
+795,29808261495219,أيمن شريف هشام رزق,VALID,,valid
+796,30512142279135,عادل باسم عصام حسنين,INVALID,DUPLICATE_FILE,national ID repeated in the file (different name)
+797,29811023126950,أسامة محمد خالد القاضي,INVALID,BIRTH_DATE,birth_date column empty or not YYYY-MM-DD
+798,30808032147232,ياسر مازن شعبان موسى,VALID,,valid
+799,30809120138135,محمد حمزة عبد المنعم إبراهيم,VALID,,valid
+800,29809072831770,علي فتحي هشام يونس,VALID,,valid
+801,30504141322172,باسم عبد الرحمن وليد المصري,VALID,,valid
+802,29604312214735,فتحي عصام مازن عيسى,INVALID,ID_BIRTH_DATE,birth date inside the national ID is impossible or in the future
+803,29810231644175,عبد الحميد شادي حمزة حجازي,VALID,,valid
+804,30411202373495,كريم سامح أنس عطية,VALID,,valid
+805,29606130468415,هاني باسم مصطفى فرج,VALID,,valid
+806,30411260113314,شريف ماجد عبد الفتاح السعيد,INVALID,GOV_MISMATCH,gov_id differs from the governorate in the national ID
+807,29604050219357,أسامة كريم مازن الصاوي,VALID,,valid
+808,29905182713632,علي كريم خالد الفقي,VALID,,valid
+809,30005072262892,مُحَمَّد عبـــد الرَّحمن هشام عيسى,VALID,,valid: Arabic diacritics/tatweel in the name
+810,30407200159238,أندرو جرجس مايكل خليل,VALID,,valid
+811,30412142302339,فارس نادر عمر الصاوي,VALID,,valid
+812,30308242130952,مصطفى صبري كريم القاضي,VALID,,valid
+813,30002172176090,صلاح منصور محمود سالم,VALID,,valid
+814,30307082204039,سعيد عبد الحميد صبري عيسى,VALID,,valid
+815,30501131598715,عبد الحميد أدهم ممدوح سالم,VALID,,valid
+816,30001162453297,هاني فتحي حسين البدري,VALID,,valid
+817,30104142169714,هشام محمود شادي سالم,VALID,,valid
+818,29911071678210,شنودة رامي مايكل رزق,VALID,,valid
+819,30601152113053,شادي مازن عادل الدسوقي,VALID,,valid
+820,296011613102528,ممدوح مازن إسماعيل حسنين,INVALID,ID_LENGTH,national ID is 13 or 15 digits
+821,30707071342670,هشام سليمان زياد يونس,VALID,,valid
+822,30002050157075,عبد الفتاح شادي مازن حجازي,VALID,,valid
+823,30612242584590,سامح عمرو جمال عطية,VALID,,valid
+824,30001290298433,عصام هاني عمرو لطفي,VALID,,valid
+825,30803250179171,عمر عمرو عبد الله حجازي,VALID,,valid
+826,2960416013643,عبد المنعم عمرو شعبان خليل,INVALID,ID_LENGTH,national ID is 13 or 15 digits
+827,29605143384779,فارس عمر أحمد يونس,VALID,,valid
+828,30303221711812,عبد الرحمن رمضان تامر عثمان,VALID,,valid
+829,30007252732678,نبيل جرجس بيتر فرج,VALID,,valid
+830,30409111205516,ياسر عمر ممدوح موسى,VALID,,valid
+831,30704242703833,تامر أسامة أيمن فرج,VALID,,valid
+832,30602081427495,حسن ماجد عبد الرحمن سالم,VALID,,valid
+833,30711093230233,عبد العزيز علي ماجد فهمي,INVALID,QUALIFICATION,"qualification ID unknown, empty or not a number"
+834,29705041221237,صلاح ممدوح سامح الشناوي,VALID,,valid
+835,30702131588898,أدهم سيد شعبان لطفي,VALID,,valid
+836,29602272512943,إسماعيل عبد الحميد طارق الفقي,INVALID,BIRTH_MISMATCH;GENDER;GOV_MISMATCH,"female ID, governorate and birth date both disagree with the ID"
+837,30607252649672,عبد الله يوسف أحمد النجار,VALID,,valid
+838,30511151328234,كريم عبد العزيز فارس شحاتة,VALID,,valid
+839,30/07043451679,منصور حمزة إسلام خليل,INVALID,ID_DIGITS,"national ID contains letters, symbols or Arabic-Indic digits"
+840,30707240556295,حمزة سامح أدهم الشريف,INVALID,GOV_MISMATCH;GOV_UNKNOWN,governorate code not in the official list
+841,30302180185170,زياد حسين أسامة سالم,VALID,,valid
+842,29606023365110,رضا فتحي تامر عثمان,VALID,,valid
+843,30104302933458,نادر شعبان عصام الشريف,VALID,,valid
+844,30712292152173,عادل هاني منصور لطفي,VALID,,valid
+845,29807021303119,سيد أسامة ماجد الصاوي,VALID,,valid
+846,29712282320792,فارس حمزة سليمان منصور,VALID,,valid
+847,29605270147416,تامر باسم محمد الجمال,VALID,,valid
+848,30704012264657,شادي صلاح سليمان حسنين,VALID,,valid
+849,29609271952636,بيتر مينا أندرو خليل,VALID,,valid
+850,30005312894112,حمزة حسن عبد الرحمن موسى,VALID,,valid
+851,30203282921576,ممدوح صلاح عبد الرحمن لطفي,VALID,,valid
+852,30309102100213,شادي سيد هشام النجار,VALID,,valid
+853,29607251750477,سيد ممدوح فتحي إبراهيم,VALID,,valid
+854,30509112854851,إسماعيل كريم يوسف سالم,VALID,,valid
+855,301073/3150513,حسين سامح ممدوح فهمي,INVALID,ID_DIGITS,"national ID contains letters, symbols or Arabic-Indic digits"
+856,29601122183273,مينا بيتر رامي موسى,VALID,,valid: oldest age band
+857,29707270107072,مينا أندرو رامي البنا,VALID,,valid
+858,30213150214893,جمال عبد المنعم ممدوح البدري,INVALID,ID_BIRTH_DATE,birth date inside the national ID is impossible or in the future
+859,30204015031586,ممدوح صلاح يوسف الشريف,INVALID,FIELD_REQUIRED;GENDER;GOV_MISMATCH;GOV_UNKNOWN,"unknown governorate, female ID and missing police station"
+860,30710261109376,عبد الحميد إسلام عبد الفتاح حسنين,VALID,,valid
+861,29905272215977,مايكل بيشوي عزيز عيسى,INVALID,BIRTH_MISMATCH,birth_date column differs from the date in the national ID
+862,29907071565956,محمد زياد شريف النجار,VALID,,valid
+863,30402200187674,منصور عبد الفتاح جمال عيسى,VALID,,valid
+864,3040429022641,وليد فتحي عادل عيسى,INVALID,ID_LENGTH,national ID is 13 or 15 digits
+865,30408091832994,مصطفى عادل سامح الشناوي,VALID,,valid
+866,30311181129054,هاني منصور سيد فهمي,VALID,,valid
+867,30311081370517,رضا شادي عبد الحميد عيسى,VALID,,valid
+868,29903192486613,ناصر يوسف أيمن فرج,VALID,,valid
+869,29901251251553,مازن معاذ هشام سالم,VALID,,valid
+870,30711283186950,عبد الرحمن إبراهيم ماجد البدري,VALID,,valid
+871,30703071246933,ناصر مصطفى أسامة عثمان,VALID,,valid
+872,29609241362380,صلاح ممدوح يوسف فهمي,INVALID,GENDER,13th digit is even (female national ID)
+873,30001221232896,عبد الفتاح عبد المنعم أسامة يونس,VALID,,valid
+874,29605151632214,حمزة طارق ممدوح المصري,VALID,,valid
+875,29602221337573,فتحي نادر علي حسنين,VALID,,valid
+876,29902100388815,شريف أنس معاذ لطفي,VALID,,valid
+877,30807021816038,جرجس مرقص رامي فهمي,VALID,,valid
+878,30010212125156,كريم عبد الله عمرو يونس,VALID,,valid
+879,30402290174592,عمرو صلاح منصور لطفي,VALID,,valid: born on 29 February (leap year)
+880,29904212250099,وليد منصور تامر عبد الله,VALID,,valid
+881,29611230104676,حسن كريم عبد المنعم لطفي,VALID,,valid
+882,30301031274893,شادي خالد عبد الرحمن عبد الله,VALID,,valid
+883,30407012455394,فادي مايكل جرجس المصري,VALID,,valid
+884,30110061169273,صبري محمد طارق الشريف,VALID,,valid
+885,30207181189131,باسم ممدوح منصور رزق,VALID,,valid
+886,29905013216779,ممدوح سامح علي السعيد,VALID,,valid
+887,30111191848998,مازن عصام حسن يونس,VALID,,valid
+888,29601072142373,حسن مصطفى باسم القاضي,INVALID,BIRTH_DATE,birth_date column empty or not YYYY-MM-DD
+889,29906290211151,وليد إبراهيم عبد العزيز شحاتة,VALID,,valid
+890,30011241350637,خالد رمضان سيد فهمي,VALID,,valid
+891,30403271676538,مازن شعبان أحمد فرج,VALID,,valid
+892,29810181780935,معاذ عبد الحميد شادي شحاتة,VALID,,valid
+893,29802101324093,ياسر أيمن خالد الشناوي,VALID,,valid
+894,30306081654357,أحمد صبري هاني فرج,VALID,,valid
+895,29812132674372,أندرو سمير مرقص فهمي,VALID,,valid
+896,30508111227592,جرجس أندرو كيرلس عثمان,VALID,,valid
+897,29601070202692,علي طارق عبد العزيز عيسى,VALID,,valid
+898,30006/00193053,أسامة باسم فارس الصاوي,INVALID,ID_DIGITS,"national ID contains letters, symbols or Arabic-Indic digits"
+899,30013302175193,علي معاذ عبد الفتاح منصور,INVALID,ID_BIRTH_DATE,birth date inside the national ID is impossible or in the future
+900,29809060446097,حسن عمر نادر الشناوي,VALID,,valid
+901,30404192314013,سعيد مصطفى جمال لطفي,INVALID,DUPLICATE_FILE,national ID repeated in the file (same record sent twice)
+902,30805301472192,ممدوح معاذ حمزة الشناوي,VALID,,valid
+903,35709181999753,عبد الله إبراهيم علي البدري,INVALID,ID_BIRTH_DATE,birth date inside the national ID is impossible or in the future
+904,30606051758675,إسماعيل هاني ماجد لطفي,VALID,,valid
+905,30408241325732,فارس هاني نادر إبراهيم,VALID,,valid
+906,30707143502279,هشام كريم خالد النجار,VALID,,valid
+907,29712031367476,أنس عبد المنعم محمود رزق,VALID,,valid
+908,30402270136095,كريم وليد عصام الصاوي,VALID,,valid
+909,30704011290555,عمر شعبان شريف عثمان,VALID,,valid
+910,29604302181165,أيمن إسماعيل عمر إبراهيم,INVALID,GENDER,13th digit is even (female national ID)
+911,30503143115696,فارس إبراهيم باسم زكي,VALID,,valid
+912,30502012422553,أحمد فتحي رضا البدري,VALID,,valid
+913,307010601938901,نبيل كيرلس بولس رزق,INVALID,ID_LENGTH,national ID is 13 or 15 digits
+914,30204042109550,إسماعيل عبد الحميد سليمان القاضي,VALID,,valid
+915,29903261249891,حسين عبد الفتاح يوسف حجازي,VALID,,valid
+916,30708081768216,حسن محمود عبد الله خليل,VALID,,valid
+917,30507230258578,فارس أيمن هشام عيسى,VALID,,valid
+918,29911-71452617,هشام أسامة طارق عثمان,INVALID,ID_DIGITS,"national ID contains letters, symbols or Arabic-Indic digits"
+919,30204222146838,حسين ماجد إبراهيم الفقي,INVALID,BIRTH_DATE,birth_date column empty or not YYYY-MM-DD
+920,30411052110110,محمود هاني ياسر فهمي,VALID,,valid
+921,30412130210139,إبراهيم صلاح محمود عطية,VALID,,valid
+922,30209152336836,سمير بيشوي بولس الجمال,VALID,,valid
+923,30005111812256,زياد عبد المنعم رضا عبد الله,INVALID,BIRTH_MISMATCH,birth_date column differs from the date in the national ID
+924,29809250145999,نادر حسن طارق إبراهيم,VALID,,valid
+925,30803022197434,بيتر ماجد مايكل السعيد,VALID,,valid
+926,29602212951173,عبد الفتاح محمد ياسر سالم,VALID,,valid
+927,30306162136296,سيد ياسر حسن إبراهيم,VALID,,valid
+928,30106141232692,طارق فارس حسين الشريف,VALID,,valid
+929,30212292190932,ممدوح خالد زياد الشناوي,VALID,,valid
+930,30612132359835,سامح إسماعيل سيد شحاتة,VALID,,valid
+931,30802092392130,شادي حسن أيمن منصور,VALID,,valid
+932,30612272195076,يوسف حمزة عبد العزيز لطفي,VALID,,valid
+933,30312070235057,حمزة جمال هشام السعيد,VALID,,valid
+934,30402272303558,شادي حمزة صلاح الفقي,VALID,,valid
+935,30806201463751,حمزة وليد حسين المصري,VALID,,valid
+936,30003260185475,منصور هاني ناصر النجار,VALID,,valid
+937,30703013055095,محمود علي كريم الشناوي,INVALID,GOV_MISMATCH;GOV_UNKNOWN,governorate code not in the official list
+938,٣٠١١٢٠٦٠١٨٨١٧٨,عادل حنا مايكل البدري,INVALID,ID_DIGITS,"national ID contains letters, symbols or Arabic-Indic digits"
+939,30708082552330,مُحَمَّد عبـــد الرَّحمن مصطفى الدسوقي,VALID,,valid: Arabic diacritics/tatweel in the name
+940,29602041592416,نادر أيمن رمضان الجمال,VALID,,valid
+941,30201081685499,عبد الرحمن عبد العزيز عادل القاضي,VALID,,valid
+942,30611182133533,شريف علي رمضان عثمان,VALID,,valid
+943,30503052435091,نادر ماجد إبراهيم سالم,VALID,,valid
+944,30309251398576,هشام صلاح سليمان الجمال,VALID,,valid
+945,2960117022669,علي عبد الله فتحي فهمي,INVALID,ID_LENGTH,national ID is 13 or 15 digits
+946,30705042169535,رمضان أسامة سالم موسى,VALID,,valid
+947,29907190156519,هاني عادل وليد المصري,VALID,,valid
+948,29708061239535,عمرو نادر باسم الشريف,INVALID,GOV_MISMATCH,gov_id differs from the governorate in the national ID
+949,30511202480112,معاذ عبد الفتاح أسامة الصاوي,VALID,,valid
+950,29703310147070,أنس فتحي صلاح الدسوقي,VALID,,valid
+951,30410091130512,شادي رضا ناصر عطية,VALID,,valid
+952,3010O091390991,وليد ممدوح شادي عيسى,INVALID,ID_DIGITS,"national ID contains letters, symbols or Arabic-Indic digits"
+953,30606062612997,شعبان خالد جمال عيسى,VALID,,valid
+954,30210072412092,عادل فارس زياد الدسوقي,VALID,,valid
+955,29610092536056,عبد العزيز هشام عبد الحميد البنا,VALID,,valid
+956,30609173194373,عمر عبد المنعم عادل شحاتة,VALID,,valid
+957,30505022538577,بيشوي مرقص بيتر النجار,VALID,,valid
+958,30605112766332,هاني رضا إبراهيم موسى,VALID,,valid
+959,30801111819873,إسلام ناصر مصطفى خليل,INVALID,BIRTH_DATE,birth_date column empty or not YYYY-MM-DD
+960,30206102806011,أنس يوسف سيد عثمان,VALID,,valid
+961,29801282109995,علي سالم فتحي الدسوقي,VALID,,valid
+962,29601250266936,زياد طارق حمزة الصاوي,VALID,,valid
+963,30502091222372,رمضان ممدوح جمال النجار,VALID,,valid
+964,30201112491835,نادر سالم فتحي القاضي,VALID,,valid
+965,30702112744233,عمرو فتحي سامح حجازي,INVALID,BIRTH_MISMATCH,birth_date column differs from the date in the national ID
+966,30310271763836,عزيز أندرو جرجس موسى عزيز أندرو جرجس موسى عزيز أندرو جرجس موسى عزيز أندرو جرجس موسى عزيز أندرو جرجس موسى عزيز أندرو جرجس موسى عزيز أندرو جرجس موسى عزيز أندرو جرجس موسى عزيز أندرو جرجس موسى عزيز أندرو جرجس موسى عزيز أندرو جرجس موسى عزيز أندرو جرجس موسى الطويل جداً,INVALID,FIELD_TOO_LONG,"field longer than allowed (police station code over 20, name over 200 characters)"
+967,30303292632615,عبد الحميد أنس حمزة الجمال,VALID,,valid
+968,30201240188277,شعبان أنس زياد السعيد,VALID,,valid
+969,30807050104758,عمر حسين إسماعيل رزق,VALID,,valid
+970,29609160119237,سامح أسامة أدهم رزق,VALID,,valid
+971,35802021718958,إسلام زياد طارق شحاتة,INVALID,ID_BIRTH_DATE,birth date inside the national ID is impossible or in the future
+972,30611202790071,أندرو إسحق فادي السعيد,VALID,,valid
+973,30803180170310,مازن عادل ممدوح القاضي,VALID,,valid
+974,29812141438230,ماجد جمال عادل خليل,VALID,,valid
+975,30602022536392,ناصر شريف ممدوح موسى,VALID,,valid
+976,30101241377735,عمر محمد حمزة سالم,VALID,,valid
+977,30509010181210,رضا عادل عبد الحميد سالم,VALID,,valid
+978,29607242894299,عادل ناصر جمال شحاتة,VALID,,valid
+979,30711091312373,تامر ياسر عبد الله عيسى,VALID,,valid
+980,30804201822872,فارس حمزة علي الصاوي,INVALID,BIRTH_MISMATCH,birth_date column differs from the date in the national ID
+981,30304090123032,مايكل عزيز فادي الشناوي,VALID,,valid
+982,30306082548278,عادل مينا أندرو شحاتة,VALID,,valid
+983,30804231473054,شادي ممدوح صلاح الشناوي,VALID,,valid
+984,30606132938316,عبد الحميد عبد الفتاح فتحي حجازي,VALID,,valid
+985,30004232464997,ناصر مصطفى عبد العزيز النجار,VALID,,valid
+986,30004252993136,فارس طارق عبد الله النجار,VALID,,valid
+987,30605032445496,نادر عبد المنعم عبد الفتاح فهمي,VALID,,valid
+988,29809290217091,معاذ عبد العزيز سليمان إبراهيم,VALID,,valid
+989,29901281436255,وليد شريف مازن السعيد,VALID,,valid
+990,30809281786214,إسحق مرقص عزيز حجازي,VALID,,valid
+991,30703170102177,سيد باسم ماجد يونس,VALID,,valid
+992,29702211297792,حسين شادي أيمن فرج,INVALID,FIELD_REQUIRED,"required field empty (name, police station, governorate name or qualification name)"
+993,30708212420050,شنودة مرقص يوحنا الجمال,VALID,,valid
+994,30406161370871,سالم عبد الله أسامة شحاتة,VALID,,valid
+995,30212312854056,جمال تامر باسم إبراهيم,VALID,,valid
+996,29701033252096,هشام حسين هاني عثمان,INVALID,DUPLICATE_FILE,national ID repeated in the file (different name)
+997,30807262488774,ماجد زياد إبراهيم عثمان,VALID,,valid
+998,30403162152859,أحمد سليمان زياد رزق,VALID,,valid
+999,29604012661871,علي عبد العزيز عصام الدسوقي,INVALID,GOV_MISMATCH,gov_id differs from the governorate in the national ID
+1000,29908192227853,عبد الفتاح يوسف عمر موسى,VALID,,valid

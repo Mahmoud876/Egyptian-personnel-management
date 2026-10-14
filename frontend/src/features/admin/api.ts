@@ -102,9 +102,10 @@ export type AuditQuery = {
   page_size: number;
 };
 
-export function useAuditQuery(query: AuditQuery) {
+export function useAuditQuery(query: AuditQuery, enabled = true) {
   return useQuery({
     queryKey: adminKeys.audit(query),
+    enabled,
     queryFn: () => unwrap(api.GET('/api/v1/audit', { params: { query } })),
     placeholderData: keepPreviousData,
   });

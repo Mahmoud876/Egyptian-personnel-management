@@ -19,7 +19,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { ApiError } from '../../../shared/api/client';
 import { formatDateTime, formatDateTimeNumeric, formatNumber } from '../../../shared/format';
@@ -60,7 +60,9 @@ import {
   useImportProgress,
   useImportQuery,
   useImportRowsQuery,
+  useRevalidateImport,
 } from '../api';
+import { ImportRowDialog, importFieldLabel } from './ImportRowDialog';
 import { conscriptsPaths } from '../paths';
 import { batchLabel, importStatus } from '../rules';
 
@@ -70,7 +72,7 @@ const percent = (part: number, total: number) => (total > 0 ? Math.round((part /
 
 /** Raw values from the uploaded file, as text. */
 const raw = (record: ImportRecord, field: string) => {
-  const value = record.raw_data[field];
+  const value = (record.corrected_data ?? record.raw_data)[field];
   return value === null || value === undefined || value === '' ? ar.common.none : String(value);
 };
 
@@ -207,6 +209,7 @@ function Decision({ job }: { job: ImportJob }) {
   const notify = useNotify();
   const approve = useApproveImport(job.id);
   const cancel = useCancelImport(job.id);
+  const revalidate = useRevalidateImport(job.id);
   const [dialog, setDialog] = useState<'approve' | 'cancel' | null>(null);
 
   const close = () => {
@@ -249,11 +252,17 @@ function Decision({ job }: { job: ImportJob }) {
           {ar.conscripts.report.approve(formatNumber(job.valid_rows))}
         </Button>
         <ExportRejected job={job} />
+        <Button variant="outlined" disabled={revalidate.isPending}
+          title={ar.conscripts.correction.revalidateHint}
+          onClick={() => revalidate.mutate(job.progress_version)}>
+          {revalidate.isPending ? ar.conscripts.correction.revalidating : ar.conscripts.correction.revalidate}
+        </Button>
         <Box sx={{ flex: 1 }} />
         <Button variant="outlined" color="error" startIcon={<CancelIcon />} onClick={() => setDialog('cancel')}>
           {ar.conscripts.report.cancel}
         </Button>
       </Box>
+      {revalidate.isError && <ErrorAlert error={revalidate.error} />}
       <ConfirmDialog
         open={dialog === 'approve'}
         tone="primary"
@@ -305,7 +314,7 @@ function Decision({ job }: { job: ImportJob }) {
   );
 }
 
-function RowsTable({ status, records }: { status: RowStatus; records: ImportRecord[] }) {
+function RowsTable({ status, records, onInspect }: { status: RowStatus; records: ImportRecord[]; onInspect: (record: ImportRecord) => void }) {
   const invalid = status === 'INVALID';
   return (
     <TableContainer>
@@ -320,6 +329,7 @@ function RowsTable({ status, records }: { status: RowStatus; records: ImportReco
             {!invalid && <TableCell>{ar.conscripts.fields.policeStation}</TableCell>}
             {!invalid && <TableCell>{ar.conscripts.fields.qualification}</TableCell>}
             {invalid && <TableCell>{ar.conscripts.rows.reasons}</TableCell>}
+            <TableCell>{ar.common.actions}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -345,12 +355,16 @@ function RowsTable({ status, records }: { status: RowStatus; records: ImportReco
                   <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 0.5 }}>
                     {record.errors.map((error) => (
                       <StatusBadge key={`${error.error_code}-${error.field_name}`} tone="error" icon={<ErrorIcon />}>
-                        {error.error_message}
+                        {importFieldLabel(error.field_name)}: {error.error_message}
                       </StatusBadge>
                     ))}
                   </Box>
                 </TableCell>
               )}
+              <TableCell>
+                <Button size="small" onClick={() => onInspect(record)}>{ar.conscripts.correction.view}</Button>
+                {record.corrected_data && <StatusBadge tone="info">{ar.conscripts.correction.corrected}</StatusBadge>}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -360,13 +374,23 @@ function RowsTable({ status, records }: { status: RowStatus; records: ImportReco
 }
 
 function RowsSection({ job }: { job: ImportJob }) {
-  const [status, setStatus] = useState<RowStatus>(job.invalid_rows > 0 ? 'INVALID' : 'VALID');
+  const [selected, setSelected] = useState<{ record: ImportRecord; version: number } | null>(null);
+  const provisional = !hasReport(job.status);
+  const [status, setStatus] = useState<RowStatus>(provisional || job.invalid_rows > 0 ? 'INVALID' : 'VALID');
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(20);
-  const rows = useImportRowsQuery(job.id, status, page, pageSize, true);
+  const rows = useImportRowsQuery(job.id, status, page, pageSize, true, job.progress_version);
+  // A corrected row may leave the final page. Move to the last remaining page.
+  useEffect(() => {
+    if (rows.data && !rows.isPlaceholderData && !rows.isFetching) {
+      const last = Math.max(0, Math.ceil(rows.data.total / pageSize) - 1);
+      if (page > last) setPage(last);
+    }
+  }, [rows.data, rows.isPlaceholderData, rows.isFetching, page, pageSize]);
 
   return (
     <SectionCard flush>
+      {provisional && <Alert severity="info">{ar.conscripts.correction.provisionalResults}</Alert>}
       <Box sx={{ px: { xs: 1, md: 2 }, borderBottom: 1, borderColor: 'divider', display: 'flex', alignItems: 'center' }}>
         <Tabs
           value={status}
@@ -377,10 +401,11 @@ function RowsSection({ job }: { job: ImportJob }) {
           variant="scrollable"
           allowScrollButtonsMobile
         >
-          <Tab value="INVALID" label={ar.conscripts.rows.invalidTab(formatNumber(job.invalid_rows))} />
-          <Tab value="VALID" label={ar.conscripts.rows.validTab(formatNumber(job.valid_rows))} />
+          <Tab value="INVALID" label={provisional ? ar.conscripts.rows.invalidLabel : ar.conscripts.rows.invalidTab(formatNumber(job.invalid_rows))} />
+          <Tab value="VALID" label={provisional ? ar.conscripts.rows.validLabel : ar.conscripts.rows.validTab(formatNumber(job.valid_rows))} />
         </Tabs>
       </Box>
+      {rows.isFetching && rows.data && <LinearProgress aria-label={ar.conscripts.correction.refreshingRows} />}
       {rows.isError && (
         <Box sx={{ p: 2 }}>
           <ErrorAlert error={rows.error} onRetry={() => void rows.refetch()} />
@@ -391,9 +416,11 @@ function RowsSection({ job }: { job: ImportJob }) {
       ) : (
         rows.data && (
           <>
-            <RowsTable status={status} records={rows.data.items} />
+            <RowsTable status={status} records={rows.data.items}
+              onInspect={(record) => setSelected({ record, version: rows.isPlaceholderData ? -1 : job.progress_version })} />
             {rows.data.items.length === 0 && (
-              <EmptyState text={status === 'INVALID' ? ar.conscripts.rows.noInvalid : ar.conscripts.rows.noValid} />
+              <EmptyState text={provisional ? ar.conscripts.correction.noProvisionalRows
+                : status === 'INVALID' ? ar.conscripts.rows.noInvalid : ar.conscripts.rows.noValid} />
             )}
             <TablePager
               page={page}
@@ -417,12 +444,16 @@ function RowsSection({ job }: { job: ImportJob }) {
           </Typography>
         </Box>
       )}
+      {selected && <ImportRowDialog key={selected.record.id} job={job} record={selected.record}
+        allowEdit={!rows.isPlaceholderData && !rows.isFetching && !rows.isError && selected.version === job.progress_version}
+        onClose={() => setSelected(null)} />}
     </SectionCard>
   );
 }
 
 function Report({ id }: { id: string }) {
   const job = useImportQuery(id);
+  const retry = useRevalidateImport(id);
   const active = job.data ? isActiveImport(job.data.status) : false;
   useImportProgress(id, active);
 
@@ -465,15 +496,18 @@ function Report({ id }: { id: string }) {
           <Alert severity="error">
             <AlertTitle>{ar.conscripts.report.failedTitle}</AlertTitle>
             {data.last_error ?? ar.conscripts.report.failedBody}
+            {(data.validation_run ?? 0) > 0 && <Button disabled={retry.isPending}
+              onClick={() => retry.mutate(data.progress_version)}>{ar.conscripts.correction.revalidate}</Button>}
+            {retry.isError && <ErrorAlert error={retry.error} />}
           </Alert>
         )}
         {hasReport(data.status) && (
           <>
             <Summary job={data} />
             <Decision job={data} />
-            <RowsSection job={data} />
           </>
         )}
+        {(hasReport(data.status) || (data.validation_run ?? 0) > 0) && <RowsSection job={data} />}
       </Stack>
     </>
   );

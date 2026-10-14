@@ -73,6 +73,35 @@ def test_audit_facets(client: TestClient, make_user: Callable[..., UserInfo]) ->
     assert auditor.username in {u["username"] for u in facets["users"]}
 
 
+def test_audit_time_boundaries_offsets_and_invalid_ranges(client, make_user):
+    from app.core.db import get_sessionmaker
+    from app.core.models import AuditLog
+    auditor = make_user("audit.view")
+    login(client, auditor)
+    with get_sessionmaker()() as db:
+        for minute in [29, 30, 31]:
+            db.add(AuditLog(user_id=auditor.id, at=datetime(2026, 10, 15, 6, minute), action="time_probe"))
+        db.commit()
+    params = {"user_id": auditor.id, "action": "time_probe", "date_from": "2026-10-15T09:30:00+03:00",
+              "date_to": "2026-10-15T09:31:00+03:00"}
+    result = client.get("/api/v1/audit", params=params)
+    assert result.status_code == 200, result.text
+    assert result.json()["total"] == 1
+    assert "06:30:00" in result.json()["items"][0]["at"]
+    assert client.get("/api/v1/audit", params={**params, "date_to": params["date_from"]}).status_code == 422
+    assert client.get("/api/v1/audit", params={**params, "date_to": "2026-10-15T09:29:00+03:00"}).status_code == 422
+
+
+def test_audit_search_labels_match_the_frontend_catalog():
+    import re
+    from app.core.config import REPO_ROOT
+    from app.admin.audit.service import LABELS
+    source = (REPO_ROOT / "frontend/src/shared/i18n/ar.ts").read_text(encoding="utf-8").split("  audit: {", 1)[1]
+    for kind in ["actions", "entities"]:
+        block = re.search(rf"{kind}: \{{(.*?)\}} as Record<string, string>", source, re.S).group(1)
+        assert dict(re.findall(r"(\w+): '([^']*)'", block)) == LABELS[kind]
+
+
 def test_audit_log_needs_audit_view(client: TestClient, make_user: Callable[..., UserInfo]) -> None:
     login(client, make_user(role="data_entry_operator"))
 

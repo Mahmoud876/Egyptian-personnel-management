@@ -29,6 +29,7 @@ class ImportOut(BaseModel):
     checkpoint_row: int
     retry_count: int
     progress_version: int
+    validation_run: int = 0
     last_error: str | None
     created_at: UtcDatetime
     approved_at: UtcDatetime | None
@@ -101,7 +102,19 @@ class ImportRecordOut(BaseModel):
     row_number: int
     validation_status: str
     raw_data: dict
+    corrected_data: dict | None = None
     errors: list[RecordErrorOut]
+
+
+class RevalidateImport(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    version: int = Field(ge=0)
+
+
+class CorrectImportRecord(RevalidateImport):
+    changes: dict[Literal["id", "name", "national_id", "birth_date", "gov_name", "gov_id",
+                          "ps_name", "ps_id", "type_id", "type_name"],
+                  Annotated[str, StringConstraints(max_length=2000)]] = Field(min_length=1, max_length=10)
 
 
 class ImportReportOut(BaseModel):

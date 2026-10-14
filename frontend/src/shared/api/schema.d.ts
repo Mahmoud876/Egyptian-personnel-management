@@ -562,6 +562,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/imports/{job_id}/rows/{record_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Correct Row */
+        patch: operations["correct_row_api_v1_imports__job_id__rows__record_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/imports/{job_id}/revalidate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Revalidate Import */
+        post: operations["revalidate_import_api_v1_imports__job_id__revalidate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/imports/{job_id}/cancel": {
         parameters: {
             query?: never;
@@ -921,6 +955,15 @@ export interface components {
             /** Revision */
             revision?: number | null;
         };
+        /** CorrectImportRecord */
+        CorrectImportRecord: {
+            /** Version */
+            version: number;
+            /** Changes */
+            changes: {
+                [key: string]: string;
+            };
+        };
         /** DatabaseHealth */
         DatabaseHealth: {
             /** Reachable */
@@ -1077,6 +1120,11 @@ export interface components {
             retry_count: number;
             /** Progress Version */
             progress_version: number;
+            /**
+             * Validation Run
+             * @default 0
+             */
+            validation_run: number;
             /** Last Error */
             last_error: string | null;
             /**
@@ -1104,6 +1152,10 @@ export interface components {
             raw_data: {
                 [key: string]: unknown;
             };
+            /** Corrected Data */
+            corrected_data?: {
+                [key: string]: unknown;
+            } | null;
             /** Errors */
             errors: components["schemas"]["RecordErrorOut"][];
         };
@@ -1348,6 +1400,11 @@ export interface components {
             suggested_start_date?: string | null;
             /** Suggested End Date */
             suggested_end_date?: string | null;
+        };
+        /** RevalidateImport */
+        RevalidateImport: {
+            /** Version */
+            version: number;
         };
         /** UserCreate */
         UserCreate: {
@@ -2693,6 +2750,77 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ApprovalOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    correct_row_api_v1_imports__job_id__rows__record_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+                record_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CorrectImportRecord"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revalidate_import_api_v1_imports__job_id__revalidate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RevalidateImport"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportOut"];
                 };
             };
             /** @description Validation Error */
