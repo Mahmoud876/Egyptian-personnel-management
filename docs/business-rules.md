@@ -77,7 +77,25 @@ Stored as `qualification.service_months`.
 
 ### Search and labels
 - Search by national ID, police number + year, barcode, or name. Name search uses a normalised column: أ إ آ → ا, ة → ه, ى → ي, remove tatweel and diacritics.
-- Barcode: Code 128 of a value unique per conscript (`barcode` column, UQ). Label shows barcode, four-part name, police number and conscription year.
+- Label (spec): barcode, four-part name, police number and conscription year. See [Barcode](#barcode).
+
+### Barcode
+The spec says each conscript gets a barcode after data entry ("يلي تلك المرحلة تسجيل بيانات التجنيد لكل شخص، وانشاء الباركود الخاص بكل مجند") and lists what the label shows, but not what the barcode encodes. **Proposed (to confirm with the client):**
+
+| Item | Rule |
+| --- | --- |
+| Value | 12 digits: conscription year (4) + batch (1) + sequence (7), e.g. `202630001234` |
+| Sequence | `dbo.conscript_barcode_seq` (SQL Server `SEQUENCE`): unique under concurrency, never reused (`NO CYCLE`); gaps are harmless |
+| When | Assigned when data entry saves the record (status `registered`), in the same transaction: `app/modules/conscripts/barcode.py: assign_barcode()` |
+| Stability | Never changes once assigned (trigger `TR_conscript_barcode_immutable`). Correcting the police number, year or name later does not change it; reprints reuse it |
+| DB rules | `CK_conscript_barcode_format` (12 digits, year 2xxx, batch 1–4), `UQ_conscript_barcode`, `CK_conscript_registered` requires a barcode |
+| Symbology | Code 128, subset C (two digits per symbol, the most compact form) |
+| Print size | Narrowest bar 0.25 mm (2 dots on a 203 dpi label printer), 10-module quiet zone each side: ~30 mm wide, fits a 50 × 25 mm label. Digits printed under the bars |
+| Scanning | USB scanners act as keyboards (send the digits + Enter). Digits only, so it works with the Windows Arabic keyboard layout too |
+
+Why not the national ID or the police number: the national ID would put personal data on every label, and both can be corrected after printing, which would break printed labels.
+
+Open: the client's label printer model and label size (layout currently targets 50 × 25 mm).
 
 ## Civilian employees (outline, details come later)
 

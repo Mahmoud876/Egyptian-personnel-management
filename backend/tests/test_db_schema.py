@@ -249,13 +249,13 @@ def test_conscript_registered_requires_entered_data(db: Connection) -> None:
 
 def test_conscript_changes_are_kept_in_history(db: Connection) -> None:
     conscript_id = db.execute(_INSERT_CONSCRIPT, _conscript_params(_new_import_batch(db))).scalar_one()
-    db.execute(text("UPDATE dbo.conscript SET barcode = N'B1' WHERE id = :id"), {"id": conscript_id})
+    db.execute(text("UPDATE dbo.conscript SET police_no = N'777' WHERE id = :id"), {"id": conscript_id})
     # Read the history table directly: inside one transaction both versions share a timestamp, and
     # FOR SYSTEM_TIME ALL hides such zero-length versions.
     old_versions = db.execute(
-        text("SELECT barcode FROM dbo.conscript_history WHERE id = :id"), {"id": conscript_id}
+        text("SELECT police_no FROM dbo.conscript_history WHERE id = :id"), {"id": conscript_id}
     ).all()
-    assert [row.barcode for row in old_versions] == [None]
+    assert [row.police_no for row in old_versions] == [None]
 
 
 # --- least-privilege app login ------------------------------------------------

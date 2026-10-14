@@ -47,6 +47,7 @@ Transitive: httpcore2 (BSD-3-Clause), truststore (MIT), pluggy (MIT), iniconfig 
 | zod | 4.6.7 | MIT | Form validation schemas |
 | @hookform/resolvers | 5.9.1 | MIT | Connects zod to react-hook-form |
 | openapi-fetch | 0.17.0 | MIT | Typed API client over `schema.d.ts` (~6 kB) |
+| jsbarcode | 3.12.3 | MIT | Draws the conscript label's Code 128 barcode as SVG |
 
 Icons: a handful of Material Design icon paths (Apache-2.0) inlined in `src/shared/ui/icons.tsx`, instead of the large `@mui/icons-material` package.
 
