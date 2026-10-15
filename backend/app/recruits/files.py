@@ -4,6 +4,8 @@ import hashlib
 import os
 import subprocess
 import json
+from collections.abc import Iterable
+from contextlib import suppress
 from datetime import date, datetime
 from pathlib import Path
 from uuid import uuid4
@@ -155,26 +157,40 @@ def create_access(path: Path):
         raise RuntimeError("ACCESS_ENGINE_REQUIRED: install 64-bit ACE DAO or configure ACCESS_TEMPLATE")
 
 
-def write_export(path: Path, rows: list[dict]):
-    headers = list(FIELDS) + sorted({k for row in rows for k in row} - set(FIELDS) - {"rejection_reasons"}) + ["rejection_reasons"]
+def write_export(path: Path, headers: list[str], rows: Iterable[dict]):
+    written = 0
     if path.suffix == ".xlsx":
         from openpyxl import Workbook
         from openpyxl.cell import WriteOnlyCell
         book = Workbook(write_only=True)
         sheet = book.create_sheet("Rejected records")
-        sheet.append(headers)
-        for row in rows:
-            cells = []
-            for h in headers:
-                value = row.get(h)
-                if value is not None and len(str(value)) > 32767:
-                    raise ValueError("EXCEL_CELL_TOO_LONG: use ACCDB export to preserve the complete raw value")
-                cell = WriteOnlyCell(sheet, value=value)
-                if isinstance(value, str):
-                    cell.data_type = "s"  # Formula-like uploaded text must remain literal text.
-                cells.append(cell)
-            sheet.append(cells)
-        book.save(path)
+        try:
+            sheet.append(headers)
+            for row in rows:
+                cells = []
+                for h in headers:
+                    value = row.get(h)
+                    if value is not None and len(str(value)) > 32767:
+                        raise ValueError("EXCEL_CELL_TOO_LONG: use ACCDB export to preserve the complete raw value")
+                    cell = WriteOnlyCell(sheet, value=value)
+                    if isinstance(value, str):
+                        cell.data_type = "s"  # Formula-like uploaded text must remain literal text.
+                    cells.append(cell)
+                sheet.append(cells)
+                written += 1
+            book.save(path)
+        except BaseException:
+            # Write-only workbooks have no public abort API. Close the XML generator and
+            # remove this worksheet's temporary file using the pinned openpyxl writer.
+            with suppress(Exception):
+                sheet.close()
+            with suppress(Exception):
+                if sheet._writer is not None and Path(sheet._writer.out).exists():
+                    sheet._writer.cleanup()
+            raise
+        finally:
+            book.close()
+
     else:
         if len(headers) > 255 or any(len(h) > 64 or any(c in h for c in ".!`[]") for h in headers):
             raise ValueError("ACCESS_COLUMN_LIMIT: export as XLSX")
@@ -186,4 +202,6 @@ def write_export(path: Path, rows: list[dict]):
             for row in rows:
                 conn.execute(f"INSERT INTO [rejected_records] VALUES ({placeholders})",
                              [None if row.get(h) is None else str(row[h]) for h in headers])
+                written += 1
             conn.commit()
+    return written

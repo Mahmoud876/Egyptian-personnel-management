@@ -14,7 +14,7 @@ from rq import Queue
 from rq.job import Job
 from rq.exceptions import NoSuchJobError
 from rq.serializers import JSONSerializer
-from sqlalchemy import select, text, insert, update, delete, func
+from sqlalchemy import select, text, insert, update, delete, func, literal_column
 
 import app.models  # Register shared FK targets before worker queries.
 from app.admin.models import Qualification
@@ -26,14 +26,19 @@ from app.core.security import utcnow
 from app.core.models import AuditLog
 from .files import path_for, iter_records, write_export, new_key
 from .models import ImportJob, ImportRecord, ImportRecordError, Recruit, ExportJob
-from .validation import validate_row, readable_error, FIELD_LABELS
+from .validation import validate_row, readable_error, FIELD_LABELS, FIELDS
 
 logger = logging.getLogger(__name__)
 IMPORT_TERMINAL = {"READY_FOR_REVIEW", "APPROVED", "CANCELLED", "FAILED"}
 
 
-def queue():
-    return Queue(get_settings().queue_name, connection=get_redis(), serializer=JSONSerializer)
+def queue(kind="import"):
+    name = get_settings().queue_name
+    if kind == "export":
+        name += ":exports"
+    elif kind != "import":
+        raise ValueError("Unknown job kind")
+    return Queue(name, connection=get_redis(), serializer=JSONSerializer)
 
 
 def snapshot(job: ImportJob):
@@ -91,6 +96,7 @@ def _failure(model, job_id, exc):
             job.last_error = "الملف غير صالح أو تجاوز حدود المعالجة. راجع الأعمدة ونوع الملف."
         job.status = "FAILED" if job.retry_count >= get_settings().job_max_attempts or isinstance(exc, (ValueError, UnicodeError)) else "QUEUED"
         job.heartbeat_at = utcnow()
+        job.next_dispatch_check_at = utcnow() + timedelta(seconds=get_settings().recovery_interval_seconds)
         if model is ImportJob:
             job.progress_version += 1
         audit.write(db, action="job_failed" if job.status == "FAILED" else "job_retry",
@@ -129,6 +135,7 @@ def process_import(job_id: str):
                 job = db.scalar(locked(select(ImportJob).where(ImportJob.id == job_id), db))
                 if job is None or job.status in IMPORT_TERMINAL:
                     return
+                job.next_dispatch_check_at = utcnow() + timedelta(seconds=get_settings().recovery_interval_seconds)
                 job.retry_count += 1
                 job.status = "PARSING"
                 job.parsed_rows = 0
@@ -242,8 +249,73 @@ def process_import(job_id: str):
             raise
 
 
+def export_record_batches(db, import_job_id):
+    """Keyset pages of scalar values, without retaining ORM objects or full result sets."""
+    last = 0
+    while True:
+        records = db.execute(select(ImportRecord.id, ImportRecord.row_number,
+            ImportRecord.raw_data_json, ImportRecord.corrected_data_json).where(
+                ImportRecord.import_job_id == import_job_id,
+                ImportRecord.validation_status == "INVALID", ImportRecord.row_number > last)
+            .order_by(ImportRecord.row_number).limit(get_settings().export_batch_size)).all()
+        if not records:
+            return
+        last = records[-1].row_number
+        yield records
+
+
+def export_layout(db, import_job_id):
+    source_headers = set()
+    output_headers = set()
+    corrected = has_reasons = False
+    for records in export_record_batches(db, import_job_id):
+        for record in records:
+            original = json.loads(record.raw_data_json)
+            raw = json.loads(record.corrected_data_json) if record.corrected_data_json else original
+            source_headers.update(original)
+            output_headers.update(raw)
+            corrected |= bool(record.corrected_data_json)
+            has_reasons |= "rejection_reasons" in raw
+    reserved = source_headers | output_headers
+    reasons_column = "source_rejection_reasons"
+    while reasons_column in reserved:
+        reasons_column = "source_" + reasons_column
+    original_column = "original_uploaded_data"
+    while original_column in reserved or original_column == reasons_column:
+        original_column = "source_" + original_column
+    if has_reasons:
+        output_headers.add(reasons_column)
+    if corrected:
+        output_headers.add(original_column)
+    headers = list(FIELDS) + sorted(output_headers - set(FIELDS) - {"rejection_reasons"}) + ["rejection_reasons"]
+    return headers, reasons_column, original_column
+
+
+def export_rows(db, import_job_id, reasons_column, original_column):
+    for records in export_record_batches(db, import_job_id):
+        values = {r.id: json.loads(r.corrected_data_json or r.raw_data_json) for r in records}
+        errors = {}
+        error_rows = db.execute(select(ImportRecordError.import_row_id, ImportRecordError.error_code,
+            ImportRecordError.field_name, ImportRecordError.error_message).where(
+                ImportRecordError.import_row_id.in_(list(values)))
+            .order_by(ImportRecordError.field_name, ImportRecordError.error_code)).all()
+        for record_id, code, field, message in error_rows:
+            error = readable_error(code, field, message, values[record_id])
+            errors.setdefault(record_id, []).append(
+                f"{FIELD_LABELS.get(field, field)} ({field}): {error['error_message']}")
+        for record in records:
+            raw = values.pop(record.id)
+            if record.corrected_data_json:
+                raw[original_column] = record.raw_data_json
+            if "rejection_reasons" in raw:
+                raw[reasons_column] = raw.pop("rejection_reasons")
+            raw["rejection_reasons"] = " | ".join(errors.get(record.id, []))
+            yield raw
+
+
 def process_export(job_id: str):
     job_id = UUID(job_id)
+    started = monotonic()
     with worker_lock(f"poc-export-{job_id}", wait_ms=5000) as acquired:
         if not acquired:
             return
@@ -253,51 +325,26 @@ def process_export(job_id: str):
                 job = db.scalar(locked(select(ExportJob).where(ExportJob.id == job_id), db))
                 if job is None or job.status in {"COMPLETED", "FAILED"}:
                     return
+                job.next_dispatch_check_at = utcnow() + timedelta(seconds=get_settings().recovery_interval_seconds)
                 job.retry_count += 1
                 job.status = "PROCESSING"
                 job.heartbeat_at = utcnow()
                 db.commit()
-                rows = []
-                records = db.scalars(select(ImportRecord).where(ImportRecord.import_job_id == job.import_job_id,
-                            ImportRecord.validation_status == "INVALID").order_by(ImportRecord.row_number)).all()
-                error_rows = db.execute(select(ImportRecordError.import_row_id, ImportRecordError.error_code,
-                                              ImportRecordError.field_name, ImportRecordError.error_message)
-                    .join(ImportRecord, ImportRecord.id == ImportRecordError.import_row_id)
-                    .where(ImportRecord.import_job_id == job.import_job_id)
-                    .order_by(ImportRecordError.field_name, ImportRecordError.error_code)).all()
-                errors = {}
-                values = {record.id: json.loads(record.corrected_data_json or record.raw_data_json) for record in records}
-                for record_id, code, field, message in error_rows:
-                    if record_id in values:
-                        error = readable_error(code, field, message, values[record_id])
-                        errors.setdefault(record_id, []).append(f"{FIELD_LABELS.get(field, field)} ({field}): {error['error_message']}")
-                source_headers = {h for record in records for h in json.loads(record.raw_data_json)}
-                original_reasons = "source_rejection_reasons"
-                while original_reasons in source_headers:
-                    original_reasons = "source_" + original_reasons
-                original_column = "original_uploaded_data"
-                while original_column in source_headers or original_column == original_reasons:
-                    original_column = "source_" + original_column
-                for record in records:
-                    raw = json.loads(record.corrected_data_json or record.raw_data_json)
-                    if record.corrected_data_json:
-                        raw[original_column] = record.raw_data_json
-                    # Preserve even a source column called rejection_reasons.
-                    if "rejection_reasons" in raw:
-                        raw[original_reasons] = raw.pop("rejection_reasons")
-                    raw["rejection_reasons"] = " | ".join(errors.get(record.id, []))
-                    rows.append(raw)
+                headers, reasons_column, original_column = export_layout(db, job.import_job_id)
                 storage_key = new_key("exports", "." + job.export_format)
                 output = path_for(storage_key)
                 output.parent.mkdir(parents=True, exist_ok=True)
-                write_export(output, rows)
+                with closing(export_rows(db, job.import_job_id, reasons_column, original_column)) as rows:
+                    written = write_export(output, headers, rows)
                 job.storage_key = storage_key
                 job.status = "COMPLETED"
                 job.completed_at = utcnow()
                 job.last_error = None
                 audit.write(db, action="export_complete", user_id=job.requested_by_user_id,
-                            entity="export_job", entity_id=str(job.id), new_values={"format": job.export_format, "rows": len(rows)})
+                            entity="export_job", entity_id=str(job.id), new_values={"format": job.export_format, "rows": written})
                 db.commit()
+                logger.info("Export completed job=%s format=%s rows=%s duration_seconds=%.3f",
+                            job_id, job.export_format, written, monotonic() - started)
         except Exception as exc:
             if output:
                 output.unlink(missing_ok=True)
@@ -305,57 +352,120 @@ def process_export(job_id: str):
             raise
 
 
-def dispatch_pending():
-    """SQL jobs are the durable outbox; retry after enqueue failure or abandoned RQ executions.
+JOB_TYPES = {
+    "import": (ImportJob, process_import, ("QUEUED", "PARSING", "VALIDATING")),
+    "export": (ExportJob, process_export, ("QUEUED", "PROCESSING")),
+}
 
-    Call repeatedly from the worker supervisor. A committed upload never depends on a single
-    successful enqueue. RQ state and SQL application locks prevent overlapping attempts.
-    """
-    for model, function, terminal in ((ImportJob, process_import, IMPORT_TERMINAL),
-                                      (ExportJob, process_export, {"COMPLETED", "FAILED"})):
+
+def active_jobs(model, statuses):
+    # Fixed SQL literals let SQL Server use the matching filtered index with prepared queries.
+    return model.status.in_([literal_column("'" + status + "'") for status in statuses])
+
+
+def dispatch_one(kind: str, job_id: str, validation_run: int | None = None):
+    """Deliver/reconcile one durable job; the same lock protects workers and all delivery paths."""
+    model, function, statuses = JOB_TYPES[kind]
+    job_id = UUID(str(job_id))
+    settings = get_settings()
+    with worker_lock(f"poc-{kind}-{job_id}") as acquired:
+        if not acquired:
+            return
         with get_sessionmaker()() as db:
-            ids = list(db.scalars(select(model.id).where(model.status.not_in(terminal))))
-        for job_id in ids:
-            kind = "import" if model is ImportJob else "export"
-            with worker_lock(f"poc-{kind}-{job_id}") as acquired:
-                if not acquired:
-                    continue
-                with get_sessionmaker()() as db:
-                    item = db.get(model, job_id)
-                    if item.status in terminal:
-                        continue
-                    if item.rq_job_id:
-                        try:
-                            rq_job = Job.fetch(item.rq_job_id, connection=get_redis(), serializer=JSONSerializer)
-                            state = rq_job.get_status(refresh=True)
-                            if state in {"queued", "deferred", "scheduled"}:
-                                continue
-                            if state == "started":
-                                last_seen = item.heartbeat_at or item.created_at
-                                if utcnow() - last_seen < timedelta(seconds=get_settings().job_timeout_seconds + 60):
-                                    continue
-                                # We hold the SQL worker lock: a stale RQ owner cannot still be writing.
-                            attempt = int(item.rq_job_id.rsplit("-", 1)[-1])
-                            if attempt > item.retry_count:
-                                # Also bound failures that happen before the job function starts.
-                                item.retry_count = attempt
-                        except NoSuchJobError:
-                            pass
-                    if item.retry_count >= get_settings().job_max_attempts:
-                        item.status = "FAILED"
-                        item.last_error = "تجاوزت العملية عدد محاولات المعالجة المسموح"
-                        if model is ImportJob:
-                            item.progress_version += 1
+            item = db.get(model, job_id)
+            if item is None or item.status not in statuses:
+                return
+            if kind == "import" and validation_run is not None and item.validation_run != validation_run:
+                return
+            item.next_dispatch_check_at = utcnow() + timedelta(seconds=settings.recovery_interval_seconds)
+            db.commit()  # A failed Redis call must not leave this candidate at the head of a scan.
+            if item.rq_job_id:
+                try:
+                    rq_job = Job.fetch(item.rq_job_id, connection=get_redis(), serializer=JSONSerializer)
+                    state = rq_job.get_status(refresh=True)
+                    if state in {"queued", "deferred", "scheduled"}:
+                        item.dispatched_at = item.dispatched_at or utcnow()
+                        item.next_dispatch_check_at = utcnow() + timedelta(seconds=settings.queued_recheck_seconds)
                         db.commit()
-                        if model is ImportJob:
-                            publish(item)
+                        return
+                    if state == "started":
+                        last_seen = item.heartbeat_at or item.created_at
+                        if utcnow() - last_seen < timedelta(seconds=settings.job_timeout_seconds + 60):
+                            return
+                    attempt = int(item.rq_job_id.rsplit("-", 1)[-1])
+                    if attempt > item.retry_count:
+                        item.retry_count = attempt
+                except NoSuchJobError:
+                    pass
+            if item.retry_count >= settings.job_max_attempts:
+                item.status = "FAILED"
+                item.last_error = "تجاوزت العملية عدد محاولات المعالجة المسموح"
+                if kind == "import":
+                    item.progress_version += 1
+                db.commit()
+                if kind == "import":
+                    publish(item)
+                return
+            generation = f"-r{item.validation_run}" if kind == "import" and item.validation_run else ""
+            identity = f"{model.__tablename__}-{item.id}{generation}-{item.retry_count + 1}"
+            item.rq_job_id = identity
+            item.dispatched_at = None
+            db.commit()  # Retry this identity if enqueue succeeds but its acknowledgment is lost.
+            q = queue(kind)
+            if not q.fetch_job(identity):
+                q.enqueue(function, str(item.id), job_id=identity,
+                          job_timeout=settings.job_timeout_seconds, result_ttl=86400, failure_ttl=86400)
+            item.dispatched_at = utcnow()
+            item.next_dispatch_check_at = utcnow() + timedelta(seconds=settings.queued_recheck_seconds)
+            db.commit()
+
+
+def deliver_after_commit(kind: str, job_id: str, validation_run: int | None = None):
+    """Best effort response background task; SQL recovery owns delivery after interruption/outage."""
+    try:
+        dispatch_one(kind, job_id, validation_run)
+    except Exception:
+        logger.exception("Immediate delivery unavailable kind=%s job=%s; SQL recovery will retry", kind, job_id)
+
+
+def dispatch_pending(stop=None):
+    """Drain bounded, alternating pages of due candidates, without rescanning completed history."""
+    settings = get_settings()
+    scan_at = utcnow()
+    started = monotonic()
+    checked = 0
+    try:
+        while stop is None or not stop.is_set():
+            found = False
+            for kind, (model, _, statuses) in JOB_TYPES.items():
+                with get_sessionmaker()() as db:
+                    candidates = db.execute(select(model.id, model.next_dispatch_check_at).where(
+                        active_jobs(model, statuses), model.next_dispatch_check_at <= scan_at)
+                        .order_by(model.next_dispatch_check_at, model.created_at, model.id)
+                        .limit(settings.dispatch_batch_size)).all()
+                found |= bool(candidates)
+                for job_id, due_at in candidates:
+                    if stop is not None and stop.is_set():
+                        return
+                    # Claim only the scheduling field, then release row locks before the application lock.
+                    # Advancing even busy candidates ensures fair pages under concurrent delivery/execution.
+                    with get_sessionmaker()() as db:
+                        result = db.execute(update(model).where(model.id == job_id,
+                            model.next_dispatch_check_at == due_at, active_jobs(model, statuses)).values(
+                                next_dispatch_check_at=utcnow() + timedelta(seconds=settings.recovery_interval_seconds)))
+                        claimed = result.rowcount == 1
+                        db.commit()
+                    if not claimed:
                         continue
-                    generation = f"-r{item.validation_run}" if model is ImportJob and item.validation_run else ""
-                    identity = f"{model.__tablename__}-{item.id}{generation}-{item.retry_count + 1}"
-                    item.rq_job_id = identity
-                    db.commit()  # Enqueue may fail; the next dispatcher tick retries this same identity.
-                    q = queue()
-                    if not q.fetch_job(identity):
-                        q.enqueue(function, str(item.id), job_id=identity,
-                                  job_timeout=get_settings().job_timeout_seconds,
-                                  result_ttl=86400, failure_ttl=86400)
+                    checked += 1
+                    try:
+                        dispatch_one(kind, str(job_id))
+                    except RedisError:
+                        logger.warning("Recovery paused: Redis unavailable; remaining jobs stay due")
+                        return
+                    except Exception:
+                        logger.exception("Recovery candidate failed kind=%s job=%s", kind, job_id)
+            if not found:
+                return
+    finally:
+        logger.info("Recovery scan candidates=%s duration_seconds=%.3f", checked, monotonic() - started)

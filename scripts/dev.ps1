@@ -33,7 +33,7 @@ npm.cmd run dev
 "@
 }
 
-# A dedicated supervised worker is required for import/export jobs.
+# The supervisor runs separate import/export workers and one recovery dispatcher.
 Start-InNewWindow -Title "personnel worker" -Command @"
 Remove-Item Env:PYTHONHOME -ErrorAction SilentlyContinue
 Set-Location -LiteralPath '$BackendDir'

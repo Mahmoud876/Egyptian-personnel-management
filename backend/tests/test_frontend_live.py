@@ -41,7 +41,7 @@ def test_react_workflow_with_real_backend(make_user, tmp_path):
     try:
         commands = [
             ([sys.executable, "-m", "uvicorn", "app.main:create_app", "--factory", "--host", "127.0.0.1", "--port", str(api_port)], root / "backend"),
-            ([sys.executable, "-m", "app.cli.worker"], root / "backend"),
+            ([sys.executable, "-m", "app.cli.worker_supervisor"], root / "backend"),
             ([node, "node_modules/vite/bin/vite.js", "--host", "127.0.0.1", "--port", str(web_port)], frontend),
         ]
         for index, (command, cwd) in enumerate(commands):

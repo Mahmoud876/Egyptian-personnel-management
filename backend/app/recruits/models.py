@@ -44,6 +44,8 @@ class ImportJob(Timestamped, Base):
     progress_version: Mapped[int] = mapped_column(BigInteger, default=0)
     validation_run: Mapped[int] = mapped_column(Integer, default=0, server_default=text("0"))
     rq_job_id: Mapped[str | None] = mapped_column(Unicode(100))
+    dispatched_at: Mapped[datetime | None] = mapped_column(DATETIME2(3))
+    next_dispatch_check_at: Mapped[datetime] = mapped_column(DATETIME2(3), default=utcnow, server_default=text("SYSUTCDATETIME()"))
     last_error: Mapped[str | None] = mapped_column(Unicode(1000))
     started_at: Mapped[datetime | None] = mapped_column(DATETIME2(3))
     heartbeat_at: Mapped[datetime | None] = mapped_column(DATETIME2(3))
@@ -52,6 +54,10 @@ class ImportJob(Timestamped, Base):
     cancelled_at: Mapped[datetime | None] = mapped_column(DATETIME2(3))
     duplicate_policy: Mapped[str] = mapped_column(Unicode(20), default="reject_all")
     __table_args__ = (
+        Index("IX_import_dispatch_due", "next_dispatch_check_at", "created_at", "id",
+              mssql_include=["status"],
+              mssql_where=text("status IN ('QUEUED','PARSING','VALIDATING')"),
+              sqlite_where=text("status IN ('QUEUED','PARSING','VALIDATING')")),
         CheckConstraint("batch_number BETWEEN 1 AND 4", name="CK_poc_import_batch"),
         CheckConstraint("enlistment_year BETWEEN 2000 AND 2100", name="CK_poc_import_year"),
         CheckConstraint("status IN ('QUEUED','PARSING','VALIDATING','READY_FOR_REVIEW','APPROVED','CANCELLED','FAILED')", name="CK_poc_import_status"),
@@ -134,11 +140,16 @@ class ExportJob(Timestamped, Base):
     status: Mapped[str] = mapped_column(Unicode(20), default="QUEUED")
     storage_key: Mapped[str | None] = mapped_column(Unicode(500))
     rq_job_id: Mapped[str | None] = mapped_column(Unicode(100))
+    dispatched_at: Mapped[datetime | None] = mapped_column(DATETIME2(3))
+    next_dispatch_check_at: Mapped[datetime] = mapped_column(DATETIME2(3), default=utcnow, server_default=text("SYSUTCDATETIME()"))
     retry_count: Mapped[int] = mapped_column(Integer, default=0)
     last_error: Mapped[str | None] = mapped_column(Unicode(1000))
     heartbeat_at: Mapped[datetime | None] = mapped_column(DATETIME2(3))
     completed_at: Mapped[datetime | None] = mapped_column(DATETIME2(3))
     __table_args__ = (
+        Index("IX_export_dispatch_due", "next_dispatch_check_at", "created_at", "id",
+              mssql_include=["status"], mssql_where=text("status IN ('QUEUED','PROCESSING')"),
+              sqlite_where=text("status IN ('QUEUED','PROCESSING')")),
         CheckConstraint("export_format IN ('xlsx','accdb')", name="CK_poc_export_format"),
         CheckConstraint("status IN ('QUEUED','PROCESSING','COMPLETED','FAILED')", name="CK_poc_export_status"),
     )

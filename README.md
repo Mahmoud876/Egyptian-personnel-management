@@ -45,7 +45,7 @@ flowchart LR
     W --- F
 ```
 
-An import moves through `QUEUED → PARSING → VALIDATING → READY_FOR_REVIEW → APPROVED | CANCELLED` (or `FAILED`). The worker commits staged records, errors and a checkpoint every 250 rows, so a restart resumes where it stopped. The browser follows progress over server-sent events, with polling as a fallback. Approval inserts only valid rows, in one transaction, and rechecks the database for duplicates first.
+An import moves through `QUEUED → PARSING → VALIDATING → READY_FOR_REVIEW → APPROVED | CANCELLED` (or `FAILED`). The worker commits staged records, errors and a checkpoint every 250 rows, so a restart resumes where it stopped. New requests attempt RQ delivery immediately after SQL commit; a separate dispatcher recovers missed deliveries. Imports and exports have independent workers (one each by default). Rejected-row exports read and write in 500-row batches. The browser follows progress over server-sent events, with polling as a fallback. Approval inserts only valid rows, in one transaction, and rechecks the database for duplicates first.
 
 Qualification determines the mandatory service period:
 
@@ -95,7 +95,7 @@ winget install Python.Python.3.12 OpenJS.NodeJS.LTS Microsoft.msodbcsql.18 Docke
 scripts\dev.ps1
 ```
 
-On first run this creates `.env` from `.env.example` with generated database passwords and free ports, creates `backend\.venv`, and installs the backend and frontend dependencies. It then starts SQL Server and Redis in Docker, applies `backend\sql\*.sql` (creating or updating the `personnel` database), and starts the API (uvicorn with reload), the supervised RQ worker and the frontend (Vite) as background processes. Logs and process IDs go to `storage\logs`.
+On first run this creates `.env` from `.env.example` with generated database passwords and free ports, creates `backend\.venv`, and installs the backend and frontend dependencies. It then starts SQL Server and Redis in Docker, applies `backend\sql\*.sql` (creating or updating the `personnel` database), and starts the API (uvicorn with reload), the supervised import/export workers, recovery dispatcher and the frontend (Vite) as background processes. Logs and process IDs go to `storage\logs`.
 
 - App: `http://localhost:<WEB_PORT>` (default 5173)
 - Health: `http://localhost:<API_PORT>/api/v1/health`
@@ -145,7 +145,7 @@ backend/
     auth/            login, logout, current user, change password
     admin/           users and roles, audit log, lookups
     recruits/        conscript imports, validation, jobs, profiles, labels, documents
-    cli/             db_init, create_admin, worker, worker_supervisor
+    cli/             db_init, create_admin, worker, dispatcher, worker_supervisor
   sql/               numbered, idempotent T-SQL scripts (source of truth for the schema)
   tests/
 frontend/

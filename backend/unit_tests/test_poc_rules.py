@@ -73,7 +73,7 @@ def test_csv_and_xlsx_preserve_raw_values(tmp_path):
 
 def test_export_formula_text_is_not_executable(tmp_path):
     path = tmp_path / "rejected.xlsx"
-    write_export(path, [{**valid_row(name="=HYPERLINK(\"https://invalid\")"), "rejection_reasons": "سبب الرفض"}])
+    write_export(path, list(FIELDS) + ["rejection_reasons"], [{**valid_row(name="=HYPERLINK(\"https://invalid\")"), "rejection_reasons": "سبب الرفض"}])
     book = load_workbook(path)
     assert book.active["B2"].data_type == "s"
     assert book.active["B2"].value.startswith("=HYPERLINK")
@@ -119,3 +119,16 @@ def test_redis_sessions_are_hashed_expire_and_logout(monkeypatch):
     security.delete_session(db, token)
     assert security.resolve_session(db, token) is None
     assert security.resolve_session(db, "é" * 64) is None
+
+
+def test_failed_streaming_export_closes_worksheet_temporary_file(tmp_path):
+    from openpyxl.worksheet._writer import ALL_TEMP_FILES
+    before = set(ALL_TEMP_FILES)
+
+    def interrupted():
+        yield valid_row()
+        raise RuntimeError("synthetic streaming interruption")
+
+    with pytest.raises(RuntimeError, match="synthetic streaming interruption"):
+        write_export(tmp_path / "failed.xlsx", list(FIELDS), interrupted())
+    assert set(ALL_TEMP_FILES) == before

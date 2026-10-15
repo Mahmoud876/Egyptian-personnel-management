@@ -4,7 +4,7 @@ from io import BytesIO
 from typing import Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, Form, File, UploadFile, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, Form, File, UploadFile, Request
 from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -24,7 +24,7 @@ from app.core.security import resolve_session
 from app.core.schemas import Page
 from . import service
 from .files import save_upload, path_for, IMPORT_EXTENSIONS
-from .jobs import snapshot, IMPORT_TERMINAL
+from .jobs import snapshot, IMPORT_TERMINAL, deliver_after_commit
 from .models import ImportJob, ExportJob, Recruit, RecruitDocument, OfficialGovernorate
 from .schemas import (ImportOut, ExportOut, ExportRequest, RecruitOut, CompleteProfile,
                       EditProfile, DocumentOut, ImportRecordOut, ImportReportOut, ApprovalOut,
@@ -35,7 +35,7 @@ file_permission = require_permission("file:insert")
 
 
 @router.post("/imports", response_model=ImportOut, status_code=202)
-async def upload_import(request: Request, file: UploadFile = File(...),
+async def upload_import(request: Request, background_tasks: BackgroundTasks, file: UploadFile = File(...),
                         batch_number: int = Form(..., ge=1, le=4),
                         enlistment_year: int = Form(..., ge=2000, le=2100),
                         actor: CurrentUser = Depends(file_permission), db: Session = Depends(get_db)):
@@ -53,7 +53,7 @@ async def upload_import(request: Request, file: UploadFile = File(...),
         db.rollback()
         path_for(storage_key).unlink(missing_ok=True)
         raise
-    # SQL QUEUED state is the durable enqueue request. Dispatcher retries delivery independently.
+    background_tasks.add_task(deliver_after_commit, "import", str(job.id), job.validation_run)
     return job
 
 
@@ -98,15 +98,19 @@ def approve(job_id: UUID, request: Request, actor: CurrentUser = Depends(file_pe
 
 
 @router.patch("/imports/{job_id}/rows/{record_id}", response_model=ImportOut, status_code=202)
-def correct_row(job_id: UUID, record_id: UUID, body: CorrectImportRecord, request: Request,
+def correct_row(job_id: UUID, record_id: UUID, body: CorrectImportRecord, request: Request, background_tasks: BackgroundTasks,
                 actor: CurrentUser = Depends(file_permission), db: Session = Depends(get_db)):
-    return service.revalidate(db, job_id, body, actor, client_ip(request), record_id)
+    job = service.revalidate(db, job_id, body, actor, client_ip(request), record_id)
+    background_tasks.add_task(deliver_after_commit, "import", str(job.id), job.validation_run)
+    return job
 
 
 @router.post("/imports/{job_id}/revalidate", response_model=ImportOut, status_code=202)
-def revalidate_import(job_id: UUID, body: RevalidateImport, request: Request,
+def revalidate_import(job_id: UUID, body: RevalidateImport, request: Request, background_tasks: BackgroundTasks,
                       actor: CurrentUser = Depends(file_permission), db: Session = Depends(get_db)):
-    return service.revalidate(db, job_id, body, actor, client_ip(request))
+    job = service.revalidate(db, job_id, body, actor, client_ip(request))
+    background_tasks.add_task(deliver_after_commit, "import", str(job.id), job.validation_run)
+    return job
 
 
 @router.post("/imports/{job_id}/cancel", response_model=ImportOut)
@@ -151,7 +155,7 @@ def events(job_id: UUID, request: Request, _: CurrentUser = Depends(file_permiss
 
 
 @router.post("/imports/{job_id}/exports", response_model=ExportOut, status_code=202)
-def create_export(job_id: UUID, body: ExportRequest, request: Request,
+def create_export(job_id: UUID, body: ExportRequest, request: Request, background_tasks: BackgroundTasks,
                   actor: CurrentUser = Depends(file_permission), db: Session = Depends(get_db)):
     job = service.get(db, ImportJob, job_id, lock=True)
     if job.status not in {"READY_FOR_REVIEW", "APPROVED", "CANCELLED"}:
@@ -162,6 +166,7 @@ def create_export(job_id: UUID, body: ExportRequest, request: Request,
     audit.write(db, action="export_requested", user_id=actor.id, ip=client_ip(request), entity="export_job",
                 entity_id=str(export.id), new_values={"import_job_id": str(job_id), "format": body.format})
     db.commit()
+    background_tasks.add_task(deliver_after_commit, "export", str(export.id))
     return export
 
 

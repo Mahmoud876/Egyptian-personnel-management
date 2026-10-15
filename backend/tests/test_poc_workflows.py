@@ -2,7 +2,7 @@
 import csv
 import json
 from concurrent.futures import ThreadPoolExecutor
-from datetime import date
+from datetime import date, timedelta
 from io import StringIO, BytesIO
 from itertools import count
 from uuid import UUID, uuid4
@@ -14,7 +14,7 @@ from sqlalchemy import select, text
 from app.core.config import get_settings
 from app.core.db import get_sessionmaker
 from app.core.models import AppUser, AuditLog
-from app.core.security import hash_password
+from app.core.security import hash_password, utcnow
 from app.core.redis_client import get_redis
 from app.main import create_app
 from app.recruits.jobs import process_import, process_export, dispatch_pending, queue
@@ -537,16 +537,23 @@ def test_dispatch_recovers_enqueue_outage_and_bounds_prestart_failures(actors, m
     from redis.exceptions import ConnectionError
     from rq.job import Job, JobStatus
     admin, _ = actors
-    job = upload(admin, [row()])
     real_queue = jobs.queue
-    def unavailable():
+    def unavailable(kind="import"):
         raise ConnectionError("simulated queue outage")
     monkeypatch.setattr(jobs, "queue", unavailable)
-    with pytest.raises(ConnectionError):
-        dispatch_pending()
+    job = upload(admin, [row()])  # Accepted even though immediate delivery fails.
+
+    def make_due():
+        with get_sessionmaker()() as db:
+            db.get(ImportJob, UUID(job)).next_dispatch_check_at = utcnow() - timedelta(seconds=1)
+            db.commit()
+
+    make_due()
+    dispatch_pending()  # A Redis outage pauses the scan without losing accepted work.
     assert admin.get(f"/api/v1/imports/{job}").json()["status"] == "QUEUED"
     monkeypatch.setattr(jobs, "queue", real_queue)
     for attempt in range(1, get_settings().job_max_attempts + 1):
+        make_due()
         dispatch_pending()
         with get_sessionmaker()() as db:
             item = db.get(ImportJob, UUID(job))
@@ -554,6 +561,7 @@ def test_dispatch_recovers_enqueue_outage_and_bounds_prestart_failures(actors, m
             rq_job = Job.fetch(item.rq_job_id, connection=get_redis())
             queue().remove(rq_job.id)
             rq_job.set_status(JobStatus.FAILED)
+    make_due()
     dispatch_pending()
     state = admin.get(f"/api/v1/imports/{job}").json()
     assert state["status"] == "FAILED"
@@ -610,16 +618,17 @@ def test_accdb_export_preserves_arabic(actors, monkeypatch):
 
 
 @pytest.mark.skipif(__import__('os').name != 'nt', reason="Native Windows worker regression")
-def test_supervised_windows_worker_recovers_and_processes_import_and_export(actors, tmp_path):
+def test_supervised_windows_worker_recovers_and_processes_import_and_export(actors, tmp_path, monkeypatch):
     import os
     import subprocess
     import sys
     import time
     from app.core.config import REPO_ROOT
     admin, _ = actors
-    job = upload(admin, [row(nid="bad")])
     settings = get_settings()
-    env = dict(os.environ, DB_NAME=settings.db_name, QUEUE_NAME='poc-spawn-' + uuid4().hex,
+    monkeypatch.setattr(settings, "queue_name", "poc-spawn-" + uuid4().hex)
+    job = upload(admin, [row(nid="bad")])
+    env = dict(os.environ, DB_NAME=settings.db_name, QUEUE_NAME=settings.queue_name,
                REDIS_PREFIX=settings.redis_prefix, STORAGE_ROOT=str(settings.storage_root),
                RECOVERY_INTERVAL_SECONDS='1')
     log_path = tmp_path / 'worker.log'
@@ -648,6 +657,9 @@ def test_supervised_windows_worker_recovers_and_processes_import_and_export(acto
             os.kill(running[0].pid, signal.SIGTERM)
             export = admin.post(f'/api/v1/imports/{job}/exports', json={'format': 'xlsx'}).json()['id']
             wait_for(f'/api/v1/exports/{export}', 'COMPLETED')
+            deadline = time.monotonic() + 10
+            while 'generation=2' not in log_path.read_text(encoding='utf-8') and time.monotonic() < deadline:
+                time.sleep(.1)
             assert 'generation=2' in log_path.read_text(encoding='utf-8')
             assert admin.get(f'/api/v1/exports/{export}/download').content.startswith(b'PK')
             staged = admin.get(f'/api/v1/imports/{job}/report').json()['invalid']['items'][0]

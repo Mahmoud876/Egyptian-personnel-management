@@ -139,3 +139,47 @@ def test_duplicate_supervisor_is_rejected_and_lock_is_reusable(tmp_path):
                 pytest.fail("duplicate acquired the supervisor lock")
     with single_supervisor(path):
         pass
+
+
+def test_service_commands_split_workers_and_one_dispatcher():
+    from types import SimpleNamespace
+    from app.cli.worker_supervisor import service_commands
+    commands = service_commands(SimpleNamespace(import_workers=2, export_workers=1))
+    assert [name for name, _ in commands] == ["dispatcher", "import-1", "import-2", "export-1"]
+    assert sum("app.cli.dispatcher" in command for _, command in commands) == 1
+    assert commands[-1][1][-3:] == ["--role", "export", "--supervised"]
+
+
+def test_service_group_restarts_one_child_without_restarting_the_other(tmp_path):
+    from app.cli.worker_supervisor import supervise_services
+    journals = [tmp_path / "import-starts", tmp_path / "export-starts"]
+    commands = []
+    for index, journal in enumerate(journals):
+        code = f"""
+import os, sys, time
+from pathlib import Path
+assert sys.stdin.readline() == 'start\\n'
+path = Path({str(journal)!r})
+with path.open('a') as out:
+    out.write(str(os.getpid()) + '\\n')
+time.sleep(120)
+"""
+        commands.append((f"role-{index}", [sys.executable, "-c", code]))
+    stop = threading.Event()
+    thread = threading.Thread(target=supervise_services, args=(commands, stop))
+    thread.start()
+    try:
+        wait_until(lambda: all(p.exists() and p.read_text().strip() for p in journals))
+        first = int(journals[0].read_text().strip())
+        other = int(journals[1].read_text().strip())
+        os.kill(first, signal.SIGTERM)
+        wait_until(lambda: len(journals[0].read_text().splitlines()) == 2)
+        assert journals[1].read_text().splitlines() == [str(other)]
+        assert alive(other)
+    finally:
+        stop.set()
+        thread.join(timeout=20)
+    assert not thread.is_alive()
+    for journal in journals:
+        for pid in journal.read_text().splitlines():
+            wait_until(lambda pid=int(pid): not alive(pid))

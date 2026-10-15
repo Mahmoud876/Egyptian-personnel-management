@@ -1,4 +1,4 @@
-"""Restart the RQ worker after exit; stop this supervisor to intentionally stop work."""
+"""Supervise independent import workers, export workers and one SQL recovery dispatcher."""
 from contextlib import contextmanager
 import hashlib
 import logging
@@ -42,7 +42,7 @@ def single_supervisor(path: Path):
                 fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
 
 
-def supervise(command, stop, *, initial_delay=2.0, max_delay=30.0, stable_seconds=60.0):
+def supervise(command, stop, *, initial_delay=2.0, max_delay=30.0, stable_seconds=60.0, label="worker"):
     delay = initial_delay
     generation = 0
     while not stop.is_set():
@@ -53,13 +53,13 @@ def supervise(command, stop, *, initial_delay=2.0, max_delay=30.0, stable_second
         try:
             tree = ProcessTree()
             process = start_worker(command, tree)
-            log.info("Started worker pid=%s generation=%s", process.pid, generation)
+            log.info("Started %s pid=%s generation=%s", label, process.pid, generation)
             while process.poll() is None and not stop.wait(0.25):
                 pass
             if not stop.is_set():
-                log.warning("Worker pid=%s exited code=%s", process.pid, process.poll())
+                log.warning("%s pid=%s exited code=%s", label, process.pid, process.poll())
         except OSError:
-            log.exception("Unable to start worker")
+            log.exception("Unable to start %s", label)
         finally:
             if tree is not None:
                 tree.close(process)
@@ -67,11 +67,47 @@ def supervise(command, stop, *, initial_delay=2.0, max_delay=30.0, stable_second
             break
         if time.monotonic() - started >= stable_seconds:
             delay = initial_delay
-        log.warning("Restarting worker in %.1f seconds", delay)
+        log.warning("Restarting %s in %.1f seconds", label, delay)
         if stop.wait(delay):
             break
         delay = min(max_delay, delay * 2)
-    log.info("Supervisor stopped; worker tree stopped without restart")
+    log.info("Supervisor stopped; %s tree stopped without restart", label)
+
+
+def service_commands(settings):
+    commands = [("dispatcher", [sys.executable, "-m", "app.cli.dispatcher", "--supervised"])]
+    for role, count in (("import", settings.import_workers), ("export", settings.export_workers)):
+        for number in range(count):
+            commands.append((f"{role}-{number + 1}",
+                [sys.executable, "-m", "app.cli.worker", "--role", role, "--supervised"]))
+    return commands
+
+
+def supervise_services(commands, stop):
+    failures = []
+    def run(label, command):
+        try:
+            supervise(command, stop, label=label)
+        except Exception:
+            log.exception("Service supervision failed role=%s; stopping service group", label)
+            failures.append(label)
+        finally:
+            stop.set()
+
+    threads = []
+    try:
+        for label, command in commands:
+            thread = threading.Thread(target=run, args=(label, command), name=label)
+            thread.start()
+            threads.append(thread)
+        while not stop.wait(0.25):
+            pass
+    finally:
+        stop.set()
+        for thread in threads:
+            thread.join()
+    if failures:
+        raise RuntimeError("Service supervision failed: " + ", ".join(failures))
 
 
 def main():
@@ -87,7 +123,7 @@ def main():
         signal.signal(signal.SIGBREAK, lambda *_: stop.set())
     try:
         with single_supervisor(settings.storage_root / "logs" / f"worker-supervisor-{key}.lock"):
-            supervise([sys.executable, "-m", "app.cli.worker", "--supervised"], stop)
+            supervise_services(service_commands(settings), stop)
     except RuntimeError as error:
         log.error("%s", error)
         return 1

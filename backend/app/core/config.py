@@ -4,7 +4,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import SecretStr
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -50,7 +50,12 @@ class Settings(BaseSettings):
     import_duplicate_policy: Literal["reject_all", "keep_first"] = "reject_all"
     job_max_attempts: int = 3
     job_timeout_seconds: int = 3600
-    recovery_interval_seconds: int = 30
+    recovery_interval_seconds: int = Field(30, ge=1)
+    import_workers: int = Field(1, ge=1)
+    export_workers: int = Field(1, ge=1)
+    dispatch_batch_size: int = Field(100, ge=1, le=1000)
+    export_batch_size: int = Field(500, ge=1, le=1000)
+    queued_recheck_seconds: int = Field(300, ge=1)
     access_table: str = "person_data"
     access_template: Path | None = None
 
