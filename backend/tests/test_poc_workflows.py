@@ -4,6 +4,7 @@ import json
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from io import StringIO, BytesIO
+from itertools import count
 from uuid import UUID, uuid4
 
 import pytest
@@ -21,6 +22,7 @@ from app.recruits.models import ImportJob, Recruit, ImportRecord, ImportRecordEr
 from app.recruits.validation import FIELDS
 
 PASSWORD = "Synthetic-test-42!"
+SYNTHETIC_SERIALS = count(1, 2)
 
 
 @pytest.fixture
@@ -44,8 +46,9 @@ def actors():
 
 
 def row(nid=None, **changes):
-    # 4 serial digits, odd gender digit; random enough for isolated test uploads.
-    serial = (uuid4().int % 5000) * 2 + 1
+    # Unique within this test session; random IDs could collide with approved recruits.
+    serial = next(SYNTHETIC_SERIALS)
+    assert serial <= 9999, "Synthetic national-ID serial range exhausted"
     return {"id": "1", "name": "أحمد محمد حسن علي", "national_id": nid or f"300010101{serial:04d}0",
             "birth_date": "2000-01-01", "gov_id": "01", "gov_name": "القاهرة",
             "ps_id": "0101", "ps_name": "قسم تجريبي", "type_id": "1", "type_name": "عالى", **changes}
@@ -287,6 +290,38 @@ def test_validation_completion_uses_the_requester_of_each_run(actors, make_user)
             assert [json.loads(entry.new_values)["validation_run"] for entry in entries] == [0, 1, 2]
 
 
+def test_partial_identifier_search_returns_all_matches_with_paging_and_literal_wildcards(actors):
+    admin, operator = actors
+    job = upload(admin, [row(nid="30001010111310", id="1"), row(nid="30001010121310", id="2")])
+    process_import(job)
+    assert admin.post(f"/api/v1/imports/{job}/approve").status_code == 200
+    with get_sessionmaker()() as db:
+        ids = list(db.scalars(select(Recruit.id).where(Recruit.import_job_id == UUID(job)).order_by(Recruit.national_id)))
+    profiles = []
+    for index, rid in enumerate(ids):
+        response = operator.post(f"/api/v1/recruits/{rid}/complete", json=completion(police_number=f"{index}PART%_5678"))
+        assert response.status_code == 200, response.text
+        profiles.append(response.json())
+    for params in [{"national_id": "1310"}, {"search": "1310"}, {"search": "PART%_"},
+                   {"police_number": "5678", "enlistment_year": 2026}]:
+        result = operator.get('/api/v1/recruits', params={**params, 'page_size': 1}).json()
+        assert result['total'] == 2
+        other = operator.get('/api/v1/recruits', params={**params, 'page_size': 1, 'page': 2}).json()
+        assert {result['items'][0]['id'], other['items'][0]['id']} == {str(rid) for rid in ids}
+    assert operator.get('/api/v1/recruits', params={'police_number': '5678', 'enlistment_year': 2025}).json()['total'] == 0
+    assert operator.get('/api/v1/recruits', params={'police_number': '5678'}).status_code == 422
+    for profile in profiles:
+        for key in ['barcode', 'search']:
+            response = operator.get('/api/v1/recruits', params={key: profile['barcode'][-4:]})
+            assert response.status_code == 200
+            assert profile['id'] in {item['id'] for item in response.json()['items']}
+    assert operator.get('/api/v1/recruits', params={'national_id': '1%'}).status_code == 422
+    assert operator.get('/api/v1/recruits', params={'barcode': '1' * 13}).status_code == 422
+    # Exact lookup is still exact; partial searching cannot weaken identity validation.
+    assert operator.get('/api/v1/recruits/by-national-id/1310').status_code == 422
+    assert operator.get('/api/v1/recruits', params={'search': '%[_]'}).json()['total'] == 0
+
+
 def test_audit_search_finds_arabic_actions_and_related_recruit_events(actors):
     admin, operator = actors
     rid = approved_recruit(admin)
@@ -442,6 +477,61 @@ def test_worker_crash_after_checkpoint_resumes_without_duplicates(actors, monkey
         assert len(db.scalars(select(ImportRecord).where(ImportRecord.import_job_id == UUID(job))).all()) == 270
 
 
+def test_parsing_publishes_persisted_progress_before_eof_and_checks_cross_batch_duplicates(actors, monkeypatch):
+    from app.recruits import jobs
+    admin, _ = actors
+    # Distinct synthetic IDs, with a duplicate crossing the 250-row evaluation boundary.
+    rows = [row(nid=f"301020202{2 * i + 1:04d}0", birth_date="2001-02-02", gov_id="02", gov_name="الإسكندرية") for i in range(511)]
+    rows.append(rows[0])
+    job = upload(admin, rows)
+    consumed = 0
+    real_iter = jobs.iter_records
+    def tracked(path):
+        nonlocal consumed
+        for record in real_iter(path):
+            consumed += 1
+            yield record
+    events = []
+    def capture(item):
+        events.append(jobs.snapshot(item))
+        if item.status == "PARSING" and item.parsed_rows == 250:
+            assert consumed == 250  # discovery is not waiting for full materialization
+            persisted = admin.get(f"/api/v1/imports/{job}").json()
+            assert persisted["parsed_rows"] == 250 and persisted["total_rows"] == 250
+            assert persisted["processed_rows"] == 0
+    monkeypatch.setattr(jobs, "iter_records", tracked)
+    monkeypatch.setattr(jobs, "publish", capture)
+    process_import(job)
+    assert [e["parsed_rows"] for e in events if e["status"] == "PARSING"] == [0, 250, 500, 512]
+    assert [e["processed_rows"] for e in events if e["status"] == "VALIDATING"] == [0, 250, 500, 512]
+    assert all(e["processed_rows"] == e["valid_rows"] + e["invalid_rows"] for e in events)
+    assert events[-1]["invalid_rows"] == 2
+    assert events[-1]["valid_rows"] == 510
+
+
+def test_parsing_restart_resets_read_counter_without_creating_duplicate_staging(actors, monkeypatch):
+    from app.recruits import jobs
+    admin, _ = actors
+    job = upload(admin, [row() for _ in range(260)])
+    original = jobs.iter_records
+    def broken(path):
+        for number, record in enumerate(original(path)):
+            if number == 250:
+                raise RuntimeError("synthetic reader interruption")
+            yield record
+    monkeypatch.setattr(jobs, "iter_records", broken)
+    with pytest.raises(RuntimeError):
+        process_import(job)
+    state = admin.get(f"/api/v1/imports/{job}").json()
+    assert state["parsed_rows"] == 250 and state["processed_rows"] == 0
+    monkeypatch.setattr(jobs, "iter_records", original)
+    process_import(job)
+    state = admin.get(f"/api/v1/imports/{job}").json()
+    assert state["parsed_rows"] == state["processed_rows"] == state["total_rows"] == 260
+    with get_sessionmaker()() as db:
+        assert len(list(db.scalars(select(ImportRecord.id).where(ImportRecord.import_job_id == UUID(job))))) == 260
+
+
 def test_dispatch_recovers_enqueue_outage_and_bounds_prestart_failures(actors, monkeypatch):
     from app.recruits import jobs
     from redis.exceptions import ConnectionError
@@ -481,6 +571,21 @@ def test_recruit_documents_link_and_download(actors):
     assert operator.get(f"/api/v1/recruits/{other}/documents/{document}/download").status_code == 404
 
 
+def test_label_preview_matches_print_document_without_creating_a_print_audit(actors):
+    admin, operator = actors
+    rid = approved_recruit(admin)
+    assert operator.post(f"/api/v1/recruits/{rid}/complete", json=completion()).status_code == 200
+    preview = operator.get(f"/api/v1/recruits/{rid}/barcode?preview=true")
+    assert preview.status_code == 200
+    with get_sessionmaker()() as db:
+        assert not db.scalar(select(AuditLog.id).where(AuditLog.entity_id == rid, AuditLog.action == "label"))
+    printed = operator.get(f"/api/v1/recruits/{rid}/barcode")
+    assert printed.status_code == 200 and printed.content == preview.content
+    with get_sessionmaker()() as db:
+        entry = db.scalar(select(AuditLog).where(AuditLog.entity_id == rid, AuditLog.action == "label"))
+        assert json.loads(entry.new_values)["event"] == "print_requested"
+
+
 @pytest.mark.skipif(__import__('os').name != 'nt', reason="Microsoft ACE export requires a Windows worker")
 def test_accdb_export_preserves_arabic(actors, monkeypatch):
     from app.recruits.files import path_for, access_connection, read_records
@@ -505,7 +610,7 @@ def test_accdb_export_preserves_arabic(actors, monkeypatch):
 
 
 @pytest.mark.skipif(__import__('os').name != 'nt', reason="Native Windows worker regression")
-def test_windows_worker_processes_import_and_export_in_child_processes(actors, tmp_path):
+def test_supervised_windows_worker_recovers_and_processes_import_and_export(actors, tmp_path):
     import os
     import subprocess
     import sys
@@ -519,7 +624,7 @@ def test_windows_worker_processes_import_and_export_in_child_processes(actors, t
                RECOVERY_INTERVAL_SECONDS='1')
     log_path = tmp_path / 'worker.log'
     with log_path.open('w', encoding='utf-8') as log:
-        worker = subprocess.Popen([sys.executable, '-m', 'app.cli.worker'], cwd=REPO_ROOT / 'backend',
+        worker = subprocess.Popen([sys.executable, '-m', 'app.cli.worker_supervisor'], cwd=REPO_ROOT / 'backend',
             env=env, stdout=log, stderr=subprocess.STDOUT, creationflags=subprocess.CREATE_NO_WINDOW)
         try:
             def wait_for(path, expected):
@@ -533,8 +638,17 @@ def test_windows_worker_processes_import_and_export_in_child_processes(actors, t
                 return state
             state = wait_for(f'/api/v1/imports/{job}', 'READY_FOR_REVIEW')
             assert state['invalid_rows'] == 1 and state['retry_count'] == 1
+            # Crash the actual RQ worker, leaving its supervisor alive. The next
+            # export must be completed by a new worker without manual intervention.
+            import signal
+            from rq import Worker
+            from app.core.redis_client import get_redis
+            running = [w for w in Worker.all(connection=get_redis()) if env['QUEUE_NAME'] in w.queue_names()]
+            assert len(running) == 1
+            os.kill(running[0].pid, signal.SIGTERM)
             export = admin.post(f'/api/v1/imports/{job}/exports', json={'format': 'xlsx'}).json()['id']
             wait_for(f'/api/v1/exports/{export}', 'COMPLETED')
+            assert 'generation=2' in log_path.read_text(encoding='utf-8')
             assert admin.get(f'/api/v1/exports/{export}/download').content.startswith(b'PK')
             staged = admin.get(f'/api/v1/imports/{job}/report').json()['invalid']['items'][0]
             result = admin.patch(f'/api/v1/imports/{job}/rows/{staged["id"]}', json={

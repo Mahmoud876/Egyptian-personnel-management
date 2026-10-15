@@ -78,7 +78,8 @@ const raw = (record: ImportRecord, field: string) => {
 
 function ProgressCard({ job }: { job: ImportJob }) {
   const step = PROCESSING_STEPS.indexOf(job.status as (typeof PROCESSING_STEPS)[number]);
-  const determinate = job.total_rows > 0;
+  const parsing = job.status === 'PARSING';
+  const determinate = !parsing && job.total_rows > 0;
   return (
     <SectionCard
       icon={<HourglassIcon />}
@@ -100,7 +101,7 @@ function ProgressCard({ job }: { job: ImportJob }) {
       />
       <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1, mt: 1.5 }}>
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          {determinate
+          {parsing ? ar.conscripts.report.discovered(formatNumber(job.parsed_rows ?? 0)) : determinate
             ? ar.conscripts.report.processed(formatNumber(job.processed_rows), formatNumber(job.total_rows))
             : ar.conscripts.report.counting}
         </Typography>
@@ -114,6 +115,7 @@ function ProgressCard({ job }: { job: ImportJob }) {
           </Box>
         </Typography>
       </Box>
+      {parsing && <Typography variant="caption" sx={{ color: 'text.secondary' }}>{ar.conscripts.report.parsingHint}</Typography>}
     </SectionCard>
   );
 }

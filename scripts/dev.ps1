@@ -37,7 +37,7 @@ npm.cmd run dev
 Start-InNewWindow -Title "personnel worker" -Command @"
 Remove-Item Env:PYTHONHOME -ErrorAction SilentlyContinue
 Set-Location -LiteralPath '$BackendDir'
-& '$VenvPython' -m app.cli.worker
+& '$VenvPython' -m app.cli.worker_supervisor
 "@
 
 Write-Host ''

@@ -28,6 +28,7 @@ New PoC runtime dependencies:
 | openpyxl | 3.1.5 | MIT | XLSX reader/writer |
 | xlrd | 2.0.2 | BSD-3-Clause | Legacy XLS reader |
 | python-barcode | 0.16.1 | MIT | Offline Code 128 SVG labels |
+| zxing-cpp (test only) | 2.3.0 | Apache-2.0 | Independent decoding of rasterized label barcodes at printer resolutions; not used at runtime ([upstream](https://github.com/zxing-cpp/zxing-cpp)) |
 
 PoC transitive dependencies include et-xmlfile (MIT), click (BSD-3-Clause) and croniter (MIT).
 
@@ -103,3 +104,5 @@ Build-time transitive licences outside the allow-list (not shipped in the bundle
 | Microsoft Access Database Engine | Microsoft licence | Platform prerequisite implied by the requested native ACCDB support; installed separately, not bundled as Python code. |
 | @fontsource/cairo | OFL-1.1 (SIL Open Font License) | Named explicitly in the CLAUDE.md stack; treated as approved. OFL allows bundling and redistribution with the app; the font may not be sold on its own. |
 | typing_extensions (transitive, Python) | PSF-2.0 | Unavoidable: required by pydantic, fastapi, sqlalchemy. Permissive. |
+
+The Arabic regular Cairo WOFF2 is also bundled under `backend/app/recruits/assets/` with its original `Cairo-LICENSE.txt` and embedded in standalone label documents. This uses the same already-approved font and license, with no network font loading.

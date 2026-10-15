@@ -1,4 +1,3 @@
-import html
 import json
 import time
 from io import BytesIO
@@ -185,8 +184,8 @@ def download_export(export_id: UUID, _: CurrentUser = Depends(file_permission), 
 
 @router.get("/recruits", response_model=Page[RecruitOut])
 def search_recruits(search: str | None = Query(None, max_length=200),
-                    national_id: str | None = Query(None, pattern=r"^[0-9]{14}$"),
-                    barcode: str | None = Query(None, pattern=r"^[0-9]{12}$"),
+                    national_id: str | None = Query(None, pattern=r"^[0-9]{1,14}$"),
+                    barcode: str | None = Query(None, pattern=r"^[0-9]{1,12}$"),
                     name: str | None = Query(None, max_length=200),
                     police_number: str | None = Query(None, min_length=1, max_length=20),
                     enlistment_year: int | None = Query(None, ge=2000, le=2100),
@@ -224,26 +223,19 @@ def edit(recruit_id: UUID, body: EditProfile, request: Request,
 
 
 @router.get("/recruits/{recruit_id}/barcode", response_class=HTMLResponse)
-def label(recruit_id: UUID, request: Request, actor: CurrentUser = Depends(require_permission("barcode:get")), db: Session = Depends(get_db)):
+def label(recruit_id: UUID, request: Request, preview: bool = False,
+          actor: CurrentUser = Depends(require_permission("barcode:get")), db: Session = Depends(get_db)):
     recruit = service.get(db, Recruit, recruit_id)
     if not recruit.is_locked or not recruit.barcode or not recruit.police_number:
         raise AppError(409, "بيانات التجنيد غير مكتملة", "incomplete_profile")
-    from barcode import Code128
-    from barcode.writer import SVGWriter
-    graphic = Code128(recruit.barcode, writer=SVGWriter()).render({"module_width": .25, "module_height": 8,
-                      "quiet_zone": 2.5, "font_size": 7, "text_distance": 2, "write_text": True})
-    svg = graphic.decode("utf-8")
-    svg = svg[svg.index("<svg"):]
-    audit.write(db, action="label", user_id=actor.id, ip=client_ip(request), entity="recruit", entity_id=str(recruit.id),
-                new_values={"barcode": recruit.barcode})
-    db.commit()
-    return HTMLResponse('<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8">'
-        '<title>ملصق المجند</title><style>@page{size:50mm 25mm;margin:0}body{margin:0;font-family:Tahoma,Arial,sans-serif}'
-        '.label{width:50mm;height:25mm;box-sizing:border-box;text-align:center;padding:1mm;overflow:hidden}'
-        'svg{display:block;margin:auto;max-width:46mm;max-height:15mm}.name{font-size:9pt}.ids{font-size:8pt}</style>'
-        '<div class="label">'+svg+'<div class="name">'+html.escape(recruit.name)+'</div><div class="ids">'
-        +html.escape(recruit.police_number)+' / '+str(recruit.enlistment_year)+'</div></div></html>',
-        headers={"Cache-Control": "no-store", "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; img-src data:"})
+    from .labels import render_label, LABEL_CSP
+    if not preview:
+        # This records a print request, not a claim that the physical printer succeeded.
+        audit.write(db, action="label", user_id=actor.id, ip=client_ip(request), entity="recruit", entity_id=str(recruit.id),
+                    new_values={"barcode": recruit.barcode, "label_size_mm": "50x25", "event": "print_requested"})
+        db.commit()
+    return HTMLResponse(render_label(recruit.barcode, recruit.name, recruit.police_number, recruit.enlistment_year),
+        headers={"Cache-Control": "no-store", "Content-Security-Policy": LABEL_CSP})
 
 
 @router.post("/recruits/{recruit_id}/documents", response_model=DocumentOut, status_code=201)

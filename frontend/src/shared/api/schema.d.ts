@@ -1108,6 +1108,11 @@ export interface components {
             status: string;
             /** Total Rows */
             total_rows: number;
+            /**
+             * Parsed Rows
+             * @default 0
+             */
+            parsed_rows: number;
             /** Processed Rows */
             processed_rows: number;
             /** Valid Rows */
@@ -3165,7 +3170,9 @@ export interface operations {
     };
     label_api_v1_recruits__recruit_id__barcode_get: {
         parameters: {
-            query?: never;
+            query?: {
+                preview?: boolean;
+            };
             header?: never;
             path: {
                 recruit_id: string;

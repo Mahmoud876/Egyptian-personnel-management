@@ -3,7 +3,9 @@ import hashlib
 import json
 import logging
 from collections import Counter
-from contextlib import contextmanager
+from contextlib import contextmanager, closing
+from itertools import batched, islice
+from time import monotonic
 from datetime import date, timedelta
 from uuid import UUID, uuid4
 
@@ -22,7 +24,7 @@ from app.core.db import get_engine, get_sessionmaker
 from app.core.redis_client import get_redis, key
 from app.core.security import utcnow
 from app.core.models import AuditLog
-from .files import path_for, read_records, write_export, new_key
+from .files import path_for, iter_records, write_export, new_key
 from .models import ImportJob, ImportRecord, ImportRecordError, Recruit, ExportJob
 from .validation import validate_row, readable_error, FIELD_LABELS
 
@@ -36,6 +38,7 @@ def queue():
 
 def snapshot(job: ImportJob):
     return {"id": str(job.id), "status": job.status, "total_rows": job.total_rows,
+            "parsed_rows": job.parsed_rows, "validation_run": job.validation_run,
             "processed_rows": job.processed_rows, "valid_rows": job.valid_rows,
             "invalid_rows": job.invalid_rows, "version": job.progress_version,
             "retry_count": job.retry_count, "last_error": job.last_error}
@@ -97,6 +100,25 @@ def _failure(model, job_id, exc):
             publish(job)
 
 
+def source_records(db, job):
+    """Bounded streaming for both immutable uploads and frozen correction snapshots."""
+    if job.validation_run:
+        last = 0
+        while True:
+            rows = db.execute(select(ImportRecord.id, ImportRecord.row_number, ImportRecord.raw_data_json,
+                ImportRecord.corrected_data_json).where(ImportRecord.import_job_id == job.id,
+                    ImportRecord.row_number > last).order_by(ImportRecord.row_number).limit(250)).all()
+            if not rows:
+                return
+            for record in rows:
+                last = record.row_number
+                yield record.id, json.loads(record.corrected_data_json or record.raw_data_json)
+    else:
+        with closing(iter_records(path_for(job.storage_key))) as records:
+            for raw in records:
+                yield None, raw
+
+
 def process_import(job_id: str):
     job_id = UUID(job_id)
     with worker_lock(f"poc-import-{job_id}", wait_ms=5000) as acquired:
@@ -109,81 +131,100 @@ def process_import(job_id: str):
                     return
                 job.retry_count += 1
                 job.status = "PARSING"
+                job.parsed_rows = 0
                 job.started_at = job.started_at or utcnow()
                 job.heartbeat_at = utcnow()
                 job.last_error = None
                 job.progress_version += 1
                 db.commit()
                 publish(job)
-                staged_ids = []
-                if job.validation_run:
-                    originals = db.execute(select(ImportRecord.id, ImportRecord.raw_data_json,
-                        ImportRecord.corrected_data_json).where(ImportRecord.import_job_id == job.id)
-                        .order_by(ImportRecord.row_number)).all()
-                    staged_ids = [record.id for record in originals]
-                    rows = [json.loads(record.corrected_data_json or record.raw_data_json) for record in originals]
-                    if len(rows) != job.total_rows:
-                        raise ValueError("INCOMPLETE_STAGING")
-                else:
+                if not job.validation_run:
                     path = path_for(job.storage_key)
                     with path.open("rb") as uploaded:
                         digest = hashlib.file_digest(uploaded, "sha256").hexdigest()
                     if digest != job.file_sha256:
                         raise ValueError("UPLOADED_FILE_CHANGED")
-                    rows = read_records(path)
-                counts = Counter(str(row.get("national_id") or "").strip() for row in rows)
+                # Discover/count IDs first so duplicates in later batches invalidate earlier rows too.
+                # Only identifiers are retained; raw records are streamed again for evaluation.
+                expected = job.total_rows
+                counts = Counter()
                 first = {}
-                for index, row in enumerate(rows, 1):
-                    first.setdefault(str(row.get("national_id") or "").strip(), index)
+                found = 0
+                last_publish = monotonic()
+                with closing(source_records(db, job)) as records:
+                    for found, (_, raw) in enumerate(records, 1):
+                        if found > get_settings().import_max_rows:
+                            raise ValueError("ROW_LIMIT_EXCEEDED")
+                        nid = str(raw.get("national_id") or "").strip()
+                        counts[nid] += 1
+                        first.setdefault(nid, found)
+                        if found % 250 == 0 or monotonic() - last_publish >= 1:
+                            job.parsed_rows = found
+                            job.total_rows = max(job.total_rows, found)
+                            job.heartbeat_at = utcnow()
+                            job.progress_version += 1
+                            db.commit()
+                            publish(job)
+                            last_publish = monotonic()
+                if (job.validation_run and found != expected) or found < job.checkpoint_row:
+                    raise ValueError("INCOMPLETE_STAGING")
+                job.parsed_rows = found
+                job.total_rows = found
+                job.progress_version += 1
+                job.heartbeat_at = utcnow()
+                db.commit()
+                publish(job)
                 qualifications = set(db.scalars(select(Qualification.id).where(Qualification.is_active == True)))
-                job.total_rows = len(rows)
                 job.status = "VALIDATING"
                 job.progress_version += 1
                 job.heartbeat_at = utcnow()
                 db.commit()
                 publish(job)
-                for offset in range(job.checkpoint_row, len(rows), 250):
-                    chunk = rows[offset:offset + 250]
-                    nids = [str(r.get("national_id") or "").strip() for r in chunk]
-                    existing = set(db.scalars(select(Recruit.national_id).where(Recruit.national_id.in_(nids))))
-                    batch_valid = batch_invalid = 0
-                    staged = []
-                    row_errors = []
-                    for number, raw in enumerate(chunk, offset + 1):
-                        nid = str(raw.get("national_id") or "").strip()
-                        duplicate = counts[nid] > 1 and (job.duplicate_policy == "reject_all" or first[nid] != number)
-                        parsed, errors = validate_row(raw, existing, duplicate, qualifications)
-                        record_id = staged_ids[number - 1] if job.validation_run else uuid4()
-                        record = dict(id=record_id, import_job_id=job.id, row_number=number,
-                            source_record_id=str(raw.get("id") or "")[:100], raw_data_json=json.dumps(raw, ensure_ascii=False),
-                            national_id_raw=str(raw.get("national_id") or ""),
-                            normalized_national_id=nid if len(nid) == 14 else None,
-                            parsed_data_json=json.dumps(parsed, ensure_ascii=False), parsed_type_id=parsed["type_id"],
-                            validation_status="INVALID" if errors else "VALID")
+                with closing(source_records(db, job)) as records:
+                    for chunk in batched(islice(records, job.checkpoint_row, None), 250):
+                        offset = job.checkpoint_row
+                        nids = [str(r.get("national_id") or "").strip() for _, r in chunk]
+                        existing = set(db.scalars(select(Recruit.national_id).where(Recruit.national_id.in_(nids))))
+                        batch_valid = batch_invalid = 0
+                        staged = []
+                        row_errors = []
+                        for number, (source_id, raw) in enumerate(chunk, offset + 1):
+                            nid = str(raw.get("national_id") or "").strip()
+                            duplicate = counts[nid] > 1 and (job.duplicate_policy == "reject_all" or first[nid] != number)
+                            parsed, errors = validate_row(raw, existing, duplicate, qualifications)
+                            record_id = source_id if job.validation_run else uuid4()
+                            record = dict(id=record_id, import_job_id=job.id, row_number=number,
+                                source_record_id=str(raw.get("id") or "")[:100], raw_data_json=json.dumps(raw, ensure_ascii=False),
+                                national_id_raw=str(raw.get("national_id") or ""),
+                                normalized_national_id=nid if len(nid) == 14 else None,
+                                parsed_data_json=json.dumps(parsed, ensure_ascii=False), parsed_type_id=parsed["type_id"],
+                                validation_status="INVALID" if errors else "VALID")
+                            if job.validation_run:
+                                # The source snapshot never changes, even after repeated corrections/retries.
+                                del record["raw_data_json"]
+                            staged.append(record)
+                            row_errors.extend(dict(id=uuid4(), import_row_id=record_id, **error) for error in errors)
+                            batch_invalid += bool(errors)
+                            batch_valid += not bool(errors)
                         if job.validation_run:
-                            # The source snapshot never changes, even after repeated corrections/retries.
-                            del record["raw_data_json"]
-                        staged.append(record)
-                        row_errors.extend(dict(id=uuid4(), import_row_id=record_id, **error) for error in errors)
-                        batch_invalid += bool(errors)
-                        batch_valid += not bool(errors)
-                    if job.validation_run:
-                        db.execute(delete(ImportRecordError).where(ImportRecordError.import_row_id.in_(
-                            [record["id"] for record in staged])))
-                        db.execute(update(ImportRecord), staged)
-                    else:
-                        db.execute(insert(ImportRecord), staged)
-                    if row_errors:
-                        db.execute(insert(ImportRecordError), row_errors)
-                    job.invalid_rows += batch_invalid
-                    job.valid_rows += batch_valid
-                    job.processed_rows = offset + len(chunk)
-                    job.checkpoint_row = job.processed_rows
-                    job.heartbeat_at = utcnow()
-                    job.progress_version += 1
-                    # Staged rows, errors, counters and checkpoint commit together.
-                    db.commit()
-                    publish(job)
+                            db.execute(delete(ImportRecordError).where(ImportRecordError.import_row_id.in_(
+                                [record["id"] for record in staged])))
+                            db.execute(update(ImportRecord), staged)
+                        else:
+                            db.execute(insert(ImportRecord), staged)
+                        if row_errors:
+                            db.execute(insert(ImportRecordError), row_errors)
+                        job.invalid_rows += batch_invalid
+                        job.valid_rows += batch_valid
+                        job.processed_rows = offset + len(chunk)
+                        job.checkpoint_row = job.processed_rows
+                        job.heartbeat_at = utcnow()
+                        job.progress_version += 1
+                        # Staged rows, errors, counters and checkpoint commit together.
+                        db.commit()
+                        publish(job)
+                if job.processed_rows != job.total_rows:
+                    raise ValueError("SOURCE_ROW_COUNT_CHANGED")
                 job.status = "READY_FOR_REVIEW"
                 job.completed_at = utcnow()
                 job.progress_version += 1

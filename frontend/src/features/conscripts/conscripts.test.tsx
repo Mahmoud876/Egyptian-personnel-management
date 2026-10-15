@@ -46,6 +46,7 @@ function importJob(overrides: Partial<Schemas['ImportOut']> = {}): Schemas['Impo
     enlistment_year: 2026,
     status: 'READY_FOR_REVIEW',
     total_rows: 10,
+    parsed_rows: 10,
     processed_rows: 10,
     valid_rows: 8,
     invalid_rows: 2,
@@ -64,6 +65,12 @@ function importJob(overrides: Partial<Schemas['ImportOut']> = {}): Schemas['Impo
 const emptyPage = { items: [], total: 0, page: 1, page_size: 20 };
 
 describe('live import snapshots', () => {
+  it('retains parsed row progress on reconnect and ignores an older counter', () => {
+    const job = importJob({ status: 'PARSING', parsed_rows: 250, total_rows: 250, processed_rows: 0, valid_rows: 0, invalid_rows: 0 });
+    const updated = mergeImportProgress(job, { ...job, parsed_rows: 500, total_rows: 500, version: 4 });
+    expect(updated.parsed_rows).toBe(500);
+    expect(mergeImportProgress(updated, { ...job, version: 3 }).parsed_rows).toBe(500);
+  });
   it('accepts newer progress and ignores delayed, cross-job and malformed events', () => {
     const job = importJob({ status: 'VALIDATING' });
     const snapshot = { ...job, version: 4, status: 'READY_FOR_REVIEW' };
@@ -117,7 +124,7 @@ describe('enlistment data entry', () => {
     });
     expect(end.value).toBe('2027-03-01');
 
-    fireEvent.change(screen.getByLabelText(new RegExp(ar.conscripts.fields.policeNumber)), {
+    fireEvent.change(within(screen.getByRole('main')).getByLabelText(new RegExp(ar.conscripts.fields.policeNumber)), {
       target: { value: ' 12345 ' },
     });
     fireEvent.click(screen.getByRole('button', { name: ar.conscripts.entry.save }));
@@ -167,7 +174,109 @@ describe('enlistment data entry', () => {
   });
 });
 
+describe('label recruit lookup', () => {
+  it.each([
+    ['national_id', '30101150104521'],
+    ['barcode', '202610000003'],
+  ])('keeps %s lookup working', async (_kind, value) => {
+    stubFetch(({ path }) => {
+      if (path === '/api/v1/recruits') return { status: 200, body: { ...emptyPage, items: [recruit({ barcode: '202610000003' })], total: 1 } };
+      if (path.startsWith('/api/v1/recruits/')) return { status: 200, body: recruit() };
+    });
+    const app = renderApp('/conscripts/labels', makeMe(OPERATOR));
+    fireEvent.change(await screen.findByLabelText(ar.conscripts.lookup.placeholderEither), { target: { value } });
+    fireEvent.click(screen.getByRole('button', { name: ar.conscripts.lookup.submit }));
+    await waitFor(() => expect(app.router.state.location.pathname).toBe(`/conscripts/labels/${RECRUIT_ID}`));
+    expect(requestedUrls().find((url) => url.pathname === '/api/v1/recruits')?.searchParams.get('search')).toBe(value);
+  });
+
+  it.each(['998781241123', '0012AB'])('looks up police number %s with its year, without guessing barcode', async (police) => {
+    stubFetch(({ path }) => {
+      if (path === '/api/v1/recruits') return { status: 200, body: { ...emptyPage, items: [recruit({ police_number: police })], total: 1 } };
+      if (path === `/api/v1/recruits/${RECRUIT_ID}`) return { status: 200, body: recruit() };
+    });
+    const app = renderApp('/conscripts/labels', makeMe(OPERATOR));
+    fireEvent.mouseDown(await screen.findByRole('combobox', { name: ar.conscripts.search.searchBy }));
+    fireEvent.click(screen.getByRole('option', { name: ar.conscripts.lookup.policeMode }));
+    fireEvent.change(screen.getByLabelText(ar.conscripts.fields.policeNumber), { target: { value: police } });
+    fireEvent.click(screen.getByRole('button', { name: ar.conscripts.lookup.submit }));
+    expect(await screen.findByText(ar.conscripts.lookup.policeYearRequired)).toBeTruthy();
+    expect(requestedUrls().some((url) => url.pathname === '/api/v1/recruits')).toBe(false);
+    fireEvent.change(screen.getByLabelText(ar.conscripts.enlistmentYear), { target: { value: '2026' } });
+    fireEvent.click(screen.getByRole('button', { name: ar.conscripts.lookup.submit }));
+    await waitFor(() => expect(app.router.state.location.pathname).toBe(`/conscripts/labels/${RECRUIT_ID}`));
+    const query = requestedUrls().find((url) => url.pathname === '/api/v1/recruits')!.searchParams;
+    expect(query.get('police_number')).toBe(police);
+    expect(query.get('enlistment_year')).toBe('2026');
+    expect(query.has('barcode')).toBe(false);
+  });
+
+  it('keeps the form open and explains an unmatched police number/year', async () => {
+    stubFetch(({ path }) => path === '/api/v1/recruits' ? { status: 200, body: emptyPage } : undefined);
+    const app = renderApp('/conscripts/labels', makeMe(OPERATOR));
+    fireEvent.mouseDown(await screen.findByRole('combobox', { name: ar.conscripts.search.searchBy }));
+    fireEvent.click(screen.getByRole('option', { name: ar.conscripts.lookup.policeMode }));
+    fireEvent.change(screen.getByLabelText(ar.conscripts.fields.policeNumber), { target: { value: '998781241123' } });
+    fireEvent.change(screen.getByLabelText(ar.conscripts.enlistmentYear), { target: { value: '2025' } });
+    fireEvent.click(screen.getByRole('button', { name: ar.conscripts.lookup.submit }));
+    expect(await screen.findByText(ar.conscripts.lookup.policeNotFound)).toBeTruthy();
+    expect(app.router.state.location.pathname).toBe('/conscripts/labels');
+  });
+});
+
+describe('partial recruit lookup', () => {
+  it.each(['/conscripts/entry', '/conscripts/labels'])('shows all matches and opens only the selected person on %s', async (path) => {
+    const second = recruit({ id: JOB_ID, name: 'مجند ثان', national_id: '30201150104521' });
+    stubFetch(({ path: requestPath }) => {
+      if (requestPath === '/api/v1/recruits') return { status: 200, body: { ...emptyPage, items: [recruit(), second], total: 2 } };
+      if (requestPath === `/api/v1/recruits/${JOB_ID}`) return { status: 200, body: second };
+      if (requestPath.startsWith('/api/v1/lookups/')) return { status: 200, body: [] };
+      if (requestPath.endsWith('/documents')) return { status: 200, body: [] };
+    });
+    const app = renderApp(path, makeMe(OPERATOR));
+    const label = path.endsWith('labels') ? ar.conscripts.lookup.placeholderEither : ar.conscripts.lookup.placeholder;
+    fireEvent.change(await screen.findByLabelText(label), { target: { value: '4521' } });
+    fireEvent.click(screen.getByRole('button', { name: ar.conscripts.lookup.submit }));
+    expect(await screen.findByText(ar.conscripts.lookup.chooseMatch(2))).toBeTruthy();
+    expect(app.router.state.location.pathname).toBe(path);
+    expect(screen.getByText(second.national_id)).toBeTruthy();
+    expect(screen.getByText(recruit().national_id)).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: ar.conscripts.lookup.selectMatch(second.name, second.national_id) }));
+    await waitFor(() => expect(app.router.state.location.pathname).toBe(`${path}/${JOB_ID}`));
+  });
+
+  it('paginates matches without silently selecting a single result on the last page', async () => {
+    const items = Array.from({ length: 11 }, (_, index) => recruit({ id: `${RECRUIT_ID}-${index}`, name: `مجند ${index}` }));
+    let calls = 0;
+    stubFetch(({ path }) => {
+      if (path === '/api/v1/recruits') {
+        calls += 1;
+        return { status: 200, body: { items: calls === 1 ? items.slice(0, 10) : items.slice(10), total: 11, page: calls, page_size: 10 } };
+      }
+    });
+    const app = renderApp('/conscripts/labels', makeMe(OPERATOR));
+    fireEvent.change(await screen.findByLabelText(ar.conscripts.lookup.placeholderEither), { target: { value: '4521' } });
+    fireEvent.click(screen.getByRole('button', { name: ar.conscripts.lookup.submit }));
+    await screen.findByText(ar.conscripts.lookup.chooseMatch(11));
+    fireEvent.click(screen.getByText('2', { selector: 'button' }));
+    expect(await screen.findByText('مجند 10')).toBeTruthy();
+    expect(app.router.state.location.pathname).toBe('/conscripts/labels');
+    expect(requestedUrls().filter((url) => url.pathname === '/api/v1/recruits').at(-1)?.searchParams.get('page')).toBe('2');
+    fireEvent.change(screen.getByLabelText(ar.conscripts.lookup.placeholderEither), { target: { value: '9999' } });
+    expect(screen.queryByText('مجند 10')).toBeNull();
+  });
+});
+
 describe('import review', () => {
+  it('shows discovered rows while parsing without presenting an estimated percentage', async () => {
+    stubFetch(({ path }) => path === `/api/v1/imports/${JOB_ID}` ? { status: 200, body: importJob({
+      status: 'PARSING', parsed_rows: 500, total_rows: 500, processed_rows: 0, valid_rows: 0, invalid_rows: 0,
+    }) } : undefined);
+    renderApp(`/conscripts/imports/${JOB_ID}`, makeMe(ADMIN));
+    expect(await screen.findByText(ar.conscripts.report.discovered('500'))).toBeTruthy();
+    expect(screen.getByRole('progressbar').hasAttribute('aria-valuenow')).toBe(false);
+    expect(screen.getByText(ar.conscripts.report.parsingHint)).toBeTruthy();
+  });
   it('shows the failing field and original value, and submits only the administrator correction', async () => {
     let job = importJob();
     const record = { id: RECRUIT_ID, row_number: 4, validation_status: 'INVALID',

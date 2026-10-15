@@ -95,7 +95,7 @@ winget install Python.Python.3.12 OpenJS.NodeJS.LTS Microsoft.msodbcsql.18 Docke
 scripts\dev.ps1
 ```
 
-On first run this creates `.env` from `.env.example` with generated database passwords and free ports, creates `backend\.venv`, and installs the backend and frontend dependencies. It then starts SQL Server and Redis in Docker, applies `backend\sql\*.sql` (creating or updating the `personnel` database), and starts the API (uvicorn with reload), the RQ worker and the frontend (Vite) as background processes. Logs and process IDs go to `storage\logs`.
+On first run this creates `.env` from `.env.example` with generated database passwords and free ports, creates `backend\.venv`, and installs the backend and frontend dependencies. It then starts SQL Server and Redis in Docker, applies `backend\sql\*.sql` (creating or updating the `personnel` database), and starts the API (uvicorn with reload), the supervised RQ worker and the frontend (Vite) as background processes. Logs and process IDs go to `storage\logs`.
 
 - App: `http://localhost:<WEB_PORT>` (default 5173)
 - Health: `http://localhost:<API_PORT>/api/v1/health`
@@ -120,7 +120,7 @@ Use the `taskkill /PID <pid> /T /F` commands printed by `dev.ps1` to stop the ap
 | `scripts\dev.ps1` | Starts SQL Server, Redis, API, RQ worker and frontend |
 | `scripts\test.ps1` | Initialises the database, then runs pytest, `tsc --noEmit` and Vitest. Exits 1 on any failure |
 | `scripts\create-admin.ps1` | Creates the first administrator and prints a one-time password; `-Reset` resets an existing one |
-| `scripts\worker.ps1` | Runs the RQ worker and SQL recovery dispatcher in the current terminal |
+| `scripts\worker.ps1` | Runs the supervised RQ worker and SQL recovery dispatcher in the current terminal; Ctrl+C stops both |
 | `scripts\gen-types.ps1` | Regenerates `frontend/src/shared/api/schema.d.ts` from the OpenAPI schema (no running server needed) |
 
 If PowerShell refuses to run scripts: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`, or run them with `powershell -ExecutionPolicy Bypass -File scripts\dev.ps1`.
@@ -145,7 +145,7 @@ backend/
     auth/            login, logout, current user, change password
     admin/           users and roles, audit log, lookups
     recruits/        conscript imports, validation, jobs, profiles, labels, documents
-    cli/             db_init, create_admin, worker
+    cli/             db_init, create_admin, worker, worker_supervisor
   sql/               numbered, idempotent T-SQL scripts (source of truth for the schema)
   tests/
 frontend/
@@ -167,7 +167,7 @@ stitch_egyptian_personnel_management_system/   UI design reference (Google Stitc
 
 ## Production
 
-`npm run build` in `frontend/` produces `frontend/dist`. When that folder exists, the backend serves it at `/` with client-side routing fallback, and the API stays under `/api/v1`. Run the API and `python -m app.cli.worker` as separately supervised services with the same `.env` and shared storage. Use HTTPS, `ENV=prod` (disables the API docs) and `SESSION_COOKIE_SECURE=true`. For an offline deployment, bring Python wheels, the built frontend, container images and the Microsoft drivers onto the intranet in advance. See [docs/backend-poc.md](docs/backend-poc.md) for details.
+`npm run build` in `frontend/` produces `frontend/dist`. When that folder exists, the backend serves it at `/` with client-side routing fallback, and the API stays under `/api/v1`. Run the API and `python -m app.cli.worker_supervisor` as separately managed services with the same `.env` and shared storage; the supervisor restarts crashed workers with backoff, and the service manager should restart the supervisor itself. Use HTTPS, `ENV=prod` (disables the API docs) and `SESSION_COOKIE_SECURE=true`. For an offline deployment, bring Python wheels, the built frontend, container images and the Microsoft drivers onto the intranet in advance. See [docs/backend-poc.md](docs/backend-poc.md) for details.
 
 ## Documentation
 

@@ -35,6 +35,7 @@ class ImportJob(Timestamped, Base):
     enlistment_year: Mapped[int] = mapped_column(Integer)
     status: Mapped[str] = mapped_column(Unicode(30), default="QUEUED")
     total_rows: Mapped[int] = mapped_column(Integer, default=0)
+    parsed_rows: Mapped[int] = mapped_column(Integer, default=0, server_default=text("0"))
     processed_rows: Mapped[int] = mapped_column(Integer, default=0)
     valid_rows: Mapped[int] = mapped_column(Integer, default=0)
     invalid_rows: Mapped[int] = mapped_column(Integer, default=0)

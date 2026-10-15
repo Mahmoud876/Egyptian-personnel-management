@@ -1,9 +1,10 @@
 """Run RQ with a recurring SQL dispatcher and crash recovery.
 
-RQ workers isolate jobs in child processes. Supervise this command in production.
+RQ workers isolate jobs in child processes. Launch app.cli.worker_supervisor for automatic restart.
 """
 import logging
 import os
+import sys
 import threading
 
 from rq import SpawnWorker
@@ -40,4 +41,6 @@ def main():
 
 
 if __name__ == "__main__":
+    if "--supervised" in sys.argv and sys.stdin.readline() != "start\n":
+        sys.exit("Supervisor did not release the worker startup gate")
     main()

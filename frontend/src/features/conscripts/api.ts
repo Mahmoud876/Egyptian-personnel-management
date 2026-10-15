@@ -59,6 +59,8 @@ const progressSnapshot = z.object({
   id: z.string(),
   status: z.enum(['QUEUED', 'PARSING', 'VALIDATING', 'READY_FOR_REVIEW', 'APPROVED', 'CANCELLED', 'FAILED']),
   total_rows: z.number().int().nonnegative(),
+  parsed_rows: z.number().int().nonnegative().optional(),
+  validation_run: z.number().int().nonnegative().optional(),
   processed_rows: z.number().int().nonnegative(),
   valid_rows: z.number().int().nonnegative(),
   invalid_rows: z.number().int().nonnegative(),
@@ -72,7 +74,9 @@ export function mergeImportProgress(job: ImportJob, payload: unknown): ImportJob
   const parsed = progressSnapshot.safeParse(payload);
   if (!parsed.success || parsed.data.id !== job.id || parsed.data.version <= job.progress_version) return job;
   const { version, ...data } = parsed.data;
-  return { ...job, ...data, progress_version: version };
+  return { ...job, ...data, progress_version: version,
+    parsed_rows: data.parsed_rows ?? job.parsed_rows,
+    validation_run: data.validation_run ?? job.validation_run };
 }
 
 /** Live progress of a running import over SSE (GET /imports/{id}/events), merged into the job query. */
@@ -303,7 +307,7 @@ export const documentDownloadUrl = (recruitId: string, documentId: string) =>
   `${API_BASE}/recruits/${recruitId}/documents/${documentId}/download`;
 
 /** The printable 50 × 25 mm label. Opening it records a "label" entry in the audit log. */
-export const labelUrl = (recruitId: string) => `${API_BASE}/recruits/${recruitId}/barcode`;
+export const labelUrl = (recruitId: string, preview = false) => `${API_BASE}/recruits/${recruitId}/barcode${preview ? '?preview=true' : ''}`;
 
 // --- lookups for display names -----------------------------------------------------------
 

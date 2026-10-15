@@ -85,6 +85,7 @@ def revalidate(db, job_id, body, actor, ip, record_id=None):
         job.validation_run += 1
         job.status = "QUEUED"
         job.processed_rows = job.valid_rows = job.invalid_rows = job.checkpoint_row = 0
+        job.parsed_rows = 0
         job.retry_count = 0
         job.rq_job_id = None
         job.last_error = None
@@ -214,14 +215,16 @@ def search(db, paging, search=None, national_id=None, barcode=None, name=None, p
     query = select(Recruit).order_by(Recruit.created_at.desc(), Recruit.id)
     if search:
         pattern = like_contains(normalize_name(search.strip()))
-        query = query.where(or_(Recruit.national_id == search.strip(), Recruit.barcode == search.strip(),
+        identifier = like_contains(search.strip())
+        query = query.where(or_(Recruit.national_id.like(identifier), Recruit.barcode.like(identifier),
+                               Recruit.police_number.like(identifier),
                                Recruit.normalized_name.like(pattern)))
     if national_id:
-        query = query.where(Recruit.national_id == national_id)
+        query = query.where(Recruit.national_id.like(like_contains(national_id)))
     if barcode:
-        query = query.where(Recruit.barcode == barcode)
+        query = query.where(Recruit.barcode.like(like_contains(barcode)))
     if name:
         query = query.where(Recruit.normalized_name.like(like_contains(normalize_name(name.strip()))))
     if police_number:
-        query = query.where(Recruit.police_number == police_number, Recruit.enlistment_year == enlistment_year)
+        query = query.where(Recruit.police_number.like(like_contains(police_number.strip())), Recruit.enlistment_year == enlistment_year)
     return paginate(db, query, paging, lambda row: detail(row[0]))

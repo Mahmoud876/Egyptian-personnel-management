@@ -1,5 +1,9 @@
 # Review against the governing PoC Markdown
 
+**Worker restart follow-up — 2026-10-15:** the normal development and standalone worker launchers now run `app.cli.worker_supervisor`. Worker exits trigger automatic restart with bounded backoff and abandoned child-process cleanup. This implements the supervisor restart shown in the MD crash-recovery sequence. Production boot/service management remains a deployment step; see [backend-poc.md](backend-poc.md#install-run-and-deploy).
+
+**Latest follow-up — 2026-10-15:** item 5 / FR-25 now exposes incremental reading counts and streamed batch validation, with checkpoint recovery. FR-23/24 software was improved: identical preview/print documents, full-name fit checks, offline font and independent barcode decoding at 203/300 DPI. Physical printer/scanner acceptance is still pending; the owner has no printer set up and chose to retain 50 × 25 mm. These updates supersede the historical observations below.
+
 **Follow-up — 2026-10-15:** rejection reasons (item 2), audit time filtering (item 3), revalidation-completion attribution (item 4), and the FR-13 audit-search limitations below have been addressed. The original observations are retained as the audit record; see [integration-status.md](integration-status.md#audit-and-rejection-reason-fixes--2026-10-15) for the current behavior. Gender eligibility, initial parsing metrics and the other listed limits remain outside this fix.
 
 Reviewed on 2026-10-14, after the correction/revalidation implementation. Source: `PoC 3f98b04e77e080368063da1908126936.md`, including its functional requirements, sequence diagrams, ERD and database constraints. The MD repeats FR-3 and FR-21; both occurrences are covered below.

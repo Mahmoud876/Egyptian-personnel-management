@@ -23,6 +23,7 @@ class ImportOut(BaseModel):
     enlistment_year: int
     status: str
     total_rows: int
+    parsed_rows: int = 0
     processed_rows: int
     valid_rows: int
     invalid_rows: int

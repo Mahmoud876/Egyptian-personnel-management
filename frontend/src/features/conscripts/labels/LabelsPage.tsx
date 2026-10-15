@@ -6,9 +6,10 @@ import Typography from '@mui/material/Typography';
 import { useMutation } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
-import { ApiError, api, errorMessage, unwrap } from '../../../shared/api/client';
+import { ApiError, errorMessage } from '../../../shared/api/client';
 import { ar } from '../../../shared/i18n/ar';
-import { Barcode } from '../../../shared/ui/Barcode';
+import { LabelPreview } from './LabelPreview';
+import { printLabel } from './printing';
 import { Mono } from '../../../shared/ui/DataText';
 import { NotFoundPage } from '../../../shared/ui/ErrorPages';
 import { ArrowBackIcon, EditNoteIcon, InfoIcon, PrintIcon, QrCode2Icon, TuneIcon } from '../../../shared/ui/icons';
@@ -16,119 +17,12 @@ import { useNotify } from '../../../shared/ui/notifications';
 import { PageHeader } from '../../../shared/ui/PageHeader';
 import { SectionCard } from '../../../shared/ui/SectionCard';
 import { ErrorAlert, LoadingState } from '../../../shared/ui/states';
-import { MONO_FONT, tokens } from '../../../shared/ui/tokens';
-import { type Recruit, labelUrl, useRecruitQuery } from '../api';
+import { tokens } from '../../../shared/ui/tokens';
+import { type Recruit, useRecruitQuery } from '../api';
 import { RecruitStatusBadge, RecruitTile } from '../entry/EntryPage';
 import { NationalIdLookup } from '../entry/NationalIdLookup';
 import { conscriptsPaths } from '../paths';
 
-/** On-screen preview scale: the 50 × 25 mm label drawn at 2.4× so it is readable. */
-const PREVIEW_SCALE = 2.4;
-
-async function findByBarcode(barcode: string): Promise<Recruit | null> {
-  const page = await unwrap(api.GET('/api/v1/recruits', { params: { query: { barcode, page: 1, page_size: 1 } } }));
-  return page.items[0] ?? null;
-}
-
-/**
- * Prints the backend's label page (the authoritative 50 × 25 mm layout, recorded in the audit log)
- * through a hidden frame, so the browser's print dialog shows only the label.
- */
-async function printLabel(recruitId: string): Promise<void> {
-  const response = await fetch(labelUrl(recruitId), { credentials: 'same-origin' });
-  if (!response.ok) {
-    const body = (await response.json().catch(() => ({}))) as { detail?: unknown; code?: unknown };
-    throw new ApiError(
-      response.status,
-      typeof body.detail === 'string' ? body.detail : ar.common.errorGeneric,
-      typeof body.code === 'string' ? body.code : 'error',
-    );
-  }
-  const html = await response.text();
-  await new Promise<void>((resolve) => {
-    const frame = document.createElement('iframe');
-    frame.setAttribute('aria-hidden', 'true');
-    frame.style.cssText = 'position:fixed;width:0;height:0;border:0;inset-inline-end:0;bottom:0';
-    frame.onload = () => {
-      frame.contentWindow?.focus();
-      frame.contentWindow?.print();
-      resolve();
-      // Some browsers return from print() before the dialog closes; remove the frame later.
-      setTimeout(() => frame.remove(), 60_000);
-    };
-    frame.srcdoc = html;
-    document.body.appendChild(frame);
-  });
-}
-
-function LabelPreview({ recruit }: { recruit: Recruit }) {
-  const mm = (value: number) => `${value * PREVIEW_SCALE}mm`;
-  return (
-    <Box
-      sx={{
-        borderRadius: 1.5,
-        bgcolor: 'surface.container',
-        border: 1,
-        borderColor: 'divider',
-        p: { xs: 2, md: 4 },
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 2,
-        overflowX: 'auto',
-      }}
-    >
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', width: mm(50), color: 'text.secondary' }} dir="ltr">
-        {[0, 10, 20, 30, 40, 50].map((tick) => (
-          <Typography key={tick} variant="caption" sx={{ fontFamily: MONO_FONT, fontSize: 11 }}>
-            {tick}
-          </Typography>
-        ))}
-      </Box>
-      <Box
-        role="img"
-        aria-label={ar.conscripts.labels.previewLabel(recruit.name)}
-        sx={{
-          width: mm(50),
-          height: mm(25),
-          bgcolor: '#ffffff',
-          borderRadius: 1,
-          boxShadow: '0 1px 3px rgba(20, 28, 40, 0.12), 0 8px 24px rgba(20, 28, 40, 0.08)',
-          p: mm(1),
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          textAlign: 'center',
-          color: '#000000',
-          fontFamily: 'Tahoma, Arial, sans-serif',
-          flexShrink: 0,
-        }}
-      >
-        <Box sx={{ '& svg': { display: 'block', maxWidth: mm(46), maxHeight: mm(15), width: 'auto', height: 'auto' } }}>
-          {recruit.barcode && <Barcode value={recruit.barcode} moduleMm={0.25 * PREVIEW_SCALE} barHeightMm={8 * PREVIEW_SCALE} />}
-        </Box>
-        <Typography sx={{ fontSize: `${9 * PREVIEW_SCALE}pt`, lineHeight: 1.2, fontFamily: 'inherit', fontWeight: 600 }}>
-          {recruit.name}
-        </Typography>
-        <Typography sx={{ fontSize: `${8 * PREVIEW_SCALE}pt`, lineHeight: 1.2, fontFamily: 'inherit' }}>
-          {recruit.police_number} / {recruit.enlistment_year}
-        </Typography>
-      </Box>
-      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-        <span>
-          {ar.conscripts.labels.size}: <Mono>50 × 25 mm</Mono>
-        </span>
-        <span>
-          {ar.conscripts.labels.symbology}: <Mono>Code 128</Mono>
-        </span>
-        <span>
-          {ar.conscripts.fields.barcode}: <Mono>{recruit.barcode}</Mono>
-        </span>
-      </Typography>
-    </Box>
-  );
-}
 
 function PrintPanel({ recruit }: { recruit: Recruit }) {
   const notify = useNotify();
@@ -268,6 +162,7 @@ function LabelForRecruit({ id }: { id: string }) {
             </SectionCard>
             <Alert severity="info" icon={<InfoIcon sx={{ color: tokens.primary }} />}>
               {ar.conscripts.labels.guidance}
+              <Typography variant="body2" sx={{ mt: 1 }}>{ar.conscripts.labels.verifyScan}</Typography>
             </Alert>
           </Stack>
           <PrintPanel recruit={data} />
@@ -287,7 +182,7 @@ export function LabelLookupPage() {
           title={ar.conscripts.labels.lookupTitle}
           subtitle={ar.conscripts.labels.lookupSubtitle}
           onFound={(recruit) => void navigate(conscriptsPaths.labelFor(recruit.id))}
-          findByBarcode={findByBarcode}
+          allowIdentifiers
         />
         <Alert severity="info" icon={<InfoIcon sx={{ color: tokens.primary }} />}>
           {ar.conscripts.labels.lookupNote}

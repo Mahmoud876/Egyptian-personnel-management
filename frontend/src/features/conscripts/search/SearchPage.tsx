@@ -36,7 +36,6 @@ import { TablePager } from '../../../shared/ui/TablePager';
 import { type Recruit, type RecruitsQuery, useQualifications, useRecruitsQuery } from '../api';
 import { conscriptsPaths } from '../paths';
 import { BatchYear } from '../BatchYear';
-import { BARCODE_PATTERN, NATIONAL_ID_PATTERN } from '../rules';
 
 const MODES = ['search', 'national_id', 'barcode', 'name', 'police_number'] as const;
 type Mode = (typeof MODES)[number];
@@ -54,8 +53,8 @@ function useCriteria() {
 }
 
 function validate(mode: Mode, q: string, year: string): string | null {
-  if (mode === 'national_id' && q && !NATIONAL_ID_PATTERN.test(q)) return ar.conscripts.search.invalidNationalId;
-  if (mode === 'barcode' && q && !BARCODE_PATTERN.test(q)) return ar.conscripts.search.invalidBarcode;
+  if (mode === 'national_id' && q && !/^[0-9]{1,14}$/.test(q)) return ar.conscripts.search.invalidNationalId;
+  if (mode === 'barcode' && q && !/^[0-9]{1,12}$/.test(q)) return ar.conscripts.search.invalidBarcode;
   if (mode === 'police_number' && q && !/^[0-9]{4}$/.test(year)) return ar.conscripts.search.yearRequired;
   return null;
 }
