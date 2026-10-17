@@ -83,6 +83,8 @@ Only MIT, BSD, Apache-2.0 or ISC dependencies are used; see [docs/licenses.md](d
 - Microsoft ODBC Driver 18 for SQL Server
 - For Access imports and exports: a matching 64-bit Microsoft Access Database Engine (ODBC and ACE DAO). Excel and CSV imports don't need it.
 
+On Ubuntu, Access imports (`.mdb` / `.accdb`) use MDB Tools: install it on the worker with `sudo apt-get install -y mdbtools`, then restart the worker. Access exports still require a Windows worker with the Microsoft Access engine; use XLSX exports on Ubuntu. Encrypted Access databases are not supported by MDB Tools.
+
 With winget:
 
 ```powershell

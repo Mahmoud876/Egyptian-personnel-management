@@ -2,8 +2,10 @@
 import csv
 import hashlib
 import os
+import shutil
 import subprocess
 import json
+from tempfile import TemporaryFile
 from collections.abc import Iterable
 from contextlib import suppress
 from datetime import date, datetime
@@ -90,6 +92,30 @@ def access_connection(path: Path, readonly=True):
                           ";ReadOnly=" + ("1" if readonly else "0") + ";", autocommit=False)
 
 
+def _access_records_mdbtools(path: Path, table: str):
+    executable = shutil.which("mdb-export")
+    if executable is None:
+        raise RuntimeError("ACCESS_READER_REQUIRED: install MDB Tools on the worker: sudo apt-get install -y mdbtools")
+    # Spool to disk to bound memory and check the exit status before accepting rows.
+    # Physical row order is repeatable because uploads are immutable.
+    with TemporaryFile(mode="w+", encoding="utf-8", newline="") as output, TemporaryFile() as errors:
+        try:
+            result = subprocess.run(
+                [executable, "-D", "%Y-%m-%d", "-T", "%Y-%m-%dT%H:%M:%S", str(path.resolve()), table],
+                stdout=output, stderr=errors, env=dict(os.environ, MDBICONV="UTF-8"),
+                timeout=get_settings().job_timeout_seconds,
+            )
+        except subprocess.TimeoutExpired as exc:
+            raise ValueError("ACCESS_READ_TIMEOUT: MDB Tools could not read the file in time") from exc
+        if result.returncode:
+            raise ValueError("ACCESS_READ_FAILED: MDB Tools could not read the configured table")
+        output.seek(0)
+        csv.field_size_limit(1024 * 1024)
+        # MDB Tools quotes text, including empty text; unquoted empty cells are NULL.
+        reader = csv.reader(output, quoting=csv.QUOTE_NOTNULL)
+        yield from _records(next(reader, []), reader)
+
+
 def iter_records(path: Path):
     suffix = path.suffix.lower()
     if suffix == ".csv":
@@ -123,6 +149,9 @@ def iter_records(path: Path):
         table = get_settings().access_table
         if not table.replace("_", "").isalnum():
             raise ValueError("Invalid configured Access table")
+        if os.name != "nt":
+            yield from _access_records_mdbtools(path, table)
+            return
         with access_connection(path) as conn:
             # Stable ordering matters for restart checkpoints. Materialization below is reused for a run.
             cursor = conn.execute(f"SELECT * FROM [{table}] ORDER BY [id]")
